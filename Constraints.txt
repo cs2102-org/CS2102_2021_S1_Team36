@@ -1,0 +1,59 @@
+## Constraints
+- Pet Owner or CareTaker is a User . (ISA Relationship)
+The ISA relationship has covering and overlap constraints.
+Covering constraint as there can only be 2 types of users.
+Overlap constraint as the user can use the same account as a Pet Owner and CareTaker.
+
+- Pet has a key+participation constraint with Owns .
+A pet must be owned by some pet owner, else, it won’t be added to the database.
+We are also assuming there is no co-own pet feature in our implementation so we added the key constraint.
+
+- Pet has a key+participation constraint with Categorise .
+The pet must be categorised as one of the types of pet when added to the database,
+and each pet is in exactly one category.
+This is such that we can match the base price of the caretaker with the pet when the pet owner is bidding.
+
+- The Bid entity has a key+total participation constraint with the BidsFor relation.
+A pet owner can submit the same bid (same CareTaker , and same Pet ) multiple times. A
+PetOwner must make payment for a specific bid. Hence, we would like each bid to be
+uniquely identified by a bid id. To attach a unique big id to every entry in the BidsFor
+relation, we make bid id the primary key for Bid and use the key+total participation
+relationship with BidsFor.
+
+- Transactions has a key+participation constraint with PaymentFor .
+The transaction must be a one time payment for the successful bid. We are assuming
+that the payment cannot be done partially and the full amount has to be paid upfront.
+
+- Transactions has a key+participation constraint with CaringFor.
+An entry in CaringFor must be identified by the pet, caretaker and the transaction.
+This is such that there can be multiple times the caretaker can take care of the same pet
+on different transactions.
+If a pet was taken care of by a caretaker, there must be a corresponding transaction
+used to identify the entry in CaringFor .
+
+- Review and ReviewFor is a weak entity set.
+Additionally, Review has an identity dependency.
+A review can only exist with a corresponding transaction. As we are not adding a review
+ID, we want the reviews to be identified by the transaction.
+
+- A Review for a Transaction can only be created by the PetOwner involved in that
+transaction. (Cannot be captured by ER diagram)
+
+- The rating attribute of a CareTaker is determined by the average rating he/she received
+from all the Reviews written about him. (Cannot be captured by ER diagram)
+
+## Justification for using serial types
+Serial types will be used to create various identification numbers for entities as it will be
+self-incrementing and has to be used to uniquely identify the entities. These entities include:
+PCS Administrator, User, Pet, Bid and Transaction.
+
+- PCS Administrator
+  - Admin ID
+- User
+  - User ID
+- Pet
+  - Pet ID
+- Bid
+  - Bid ID
+- Transaction
+  - Transaction ID
