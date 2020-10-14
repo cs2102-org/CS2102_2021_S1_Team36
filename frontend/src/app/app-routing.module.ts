@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './components/general/home/home.component';
-import { CareTakerAvailabilityPageComponent } from './components/pet-owner/care-taker-availability-page/care-taker-availability-page.component';
+import { CaretakerAvailabilityPageComponent } from './components/pet-owner/caretaker-availability-page/caretaker-availability-page.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'caretaker-availabilities', component: CareTakerAvailabilityPageComponent },
+  { path: 'caretaker-availabilities', component: CaretakerAvailabilityPageComponent },
 ];
 
 @NgModule({
@@ -15,4 +15,4 @@ const routes: Routes = [
 })
 export class AppRoutingModule { }
 
-export const routingComponents = [HomeComponent, CareTakerAvailabilityPageComponent];
+export const routingComponents = [HomeComponent, CaretakerAvailabilityPageComponent];
