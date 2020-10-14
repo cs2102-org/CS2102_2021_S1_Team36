@@ -8,5 +8,5 @@
         <input type="password" formControlName="password">
     </p>
     <button type="button"[routerLink] = "['/signup']" mat-dialog-close> Signup </button>
-    <button type = "submit"[disabled] = "!loginForm.valid" > Submit </button>
+    <button type = "submit"[disabled] = "!loginForm.valid" mat-dialog-close> Submit </button>
 </form>
