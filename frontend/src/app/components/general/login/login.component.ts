@@ -22,7 +22,3 @@ export class LoginComponent implements OnInit {
     console.log('SENT');
   }
 }
-// <div class="buttons" >
-//   <button type="button"[routerLink] = "['/signup']" > Signup < /button>
-//     < button type = "submit"[disabled] = "!loginForm.valid" > Submit < /button>
-//       < /div>
