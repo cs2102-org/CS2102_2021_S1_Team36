@@ -2,7 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MenuHeaderComponent } from './components/general/menu-header/menu-header.component';
 import { LoginComponent } from './components/general/login/login.component';
 import { SignupComponent } from './components/general/signup/signup.component';
@@ -17,14 +19,16 @@ import { CaretakerAvailabilityPageComponent } from './components/pet-owner/caret
     LoginComponent,
     SignupComponent,
     CaretakerSummaryPageComponent,
-    CaretakerAvailabilityPageComponent
+    CaretakerAvailabilityPageComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    MatDialogModule,
+    NoopAnimationsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
