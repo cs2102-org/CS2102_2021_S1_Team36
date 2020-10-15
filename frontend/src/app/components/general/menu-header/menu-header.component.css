@@ -1,0 +1,19 @@
+.menu-header {
+    background-color: black;
+    padding: 30px;
+}
+
+#button-login {
+    float:right;
+    margin-right: 20px;
+}
+
+#button-pet-owner {
+    float:right;
+    margin-right: 20px;
+}
+
+#button-caretaker {
+    float: right;
+    margin-right: 20px;
+}

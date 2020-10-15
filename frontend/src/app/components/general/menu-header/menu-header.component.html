@@ -1,1 +1,22 @@
-<button (click)="openLogin()">Sign In</button>
+ <div class="menu-header">
+    <button (click)="openLogin()" id="button-login">Sign In</button>
+    <app-auto-dropdown id="button-pet-owner">
+        <div trigger><button>Pet Owner</button></div>
+        <div content>
+            <span mat-menu-item>Find Caretakers</span>
+            <span mat-menu-item>Summary</span>
+            <span mat-menu-item>Bids</span>
+        </div>
+    </app-auto-dropdown>
+    <app-auto-dropdown id="button-caretaker">
+        <div trigger><button>Care Taker</button></div>
+        <div content>
+            <span mat-menu-item>Declare Leave</span>
+            <span mat-menu-item>Summary</span>
+            <span mat-menu-item>Bids</span>
+        </div>
+    </app-auto-dropdown>
+</div>
+
+
+
