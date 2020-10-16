@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ValidatorFn, FormGroup, ValidationErrors, FormControl, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'app-signup',
@@ -26,11 +28,15 @@ export class SignupComponent implements OnInit {
     },
     { validators: this.passwordMatchValidator }
   );
-  constructor() {}
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {}
 
   onSubmit() {
     const signUpDetails = this.signUpForm.value;
+  }
+  
+  openLogin() {
+    this.dialog.open(LoginComponent);
   }
 }
