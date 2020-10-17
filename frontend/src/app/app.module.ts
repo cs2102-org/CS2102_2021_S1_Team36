@@ -13,6 +13,7 @@ import { SignupComponent } from './components/general/signup/signup.component';
 import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-summary-page/caretaker-summary-page.component';
 import { CaretakerAvailabilityPageComponent } from './components/general/caretaker-availability-page/caretaker-availability-page.component';
 import { AutoDropdownComponent } from './auto-dropdown.component';
+import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { AutoDropdownComponent } from './auto-dropdown.component';
     SignupComponent,
     CaretakerSummaryPageComponent,
     CaretakerAvailabilityPageComponent,
-    AutoDropdownComponent
+    AutoDropdownComponent,
+    PetOwnerBidsComponent
   ],
   imports: [
     BrowserModule,

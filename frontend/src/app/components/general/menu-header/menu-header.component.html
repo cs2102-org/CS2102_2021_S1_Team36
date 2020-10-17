@@ -3,16 +3,16 @@
     <app-auto-dropdown id="button-pet-owner">
         <div trigger>Pet Owner</div>
         <div content>
+            <span mat-menu-item [routerLink] = "['/pet-owner-bids']">Bids</span>
             <span mat-menu-item>Summary</span>
-            <span mat-menu-item>Bids</span>
         </div>
     </app-auto-dropdown>
     <app-auto-dropdown id="button-caretaker">
         <div trigger>Care Taker</div>
         <div content>
+            <span mat-menu-item>Bids</span>
             <span mat-menu-item>Declare Leave</span>
             <span mat-menu-item>Summary</span>
-            <span mat-menu-item>Bids</span>
         </div>
     </app-auto-dropdown>
     <div id="button-find-caretakers" [routerLink] = "['/caretaker-availabilities']">Find CareTakers</div>
