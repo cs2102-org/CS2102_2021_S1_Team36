@@ -5,12 +5,14 @@ import { CaretakerAvailabilityPageComponent } from './components/general/caretak
 import { SignupComponent } from './components/general/signup/signup.component';
 import { LoginComponent } from './components/general/login/login.component';
 import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
+import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'caretaker-availabilities', component: CaretakerAvailabilityPageComponent },
   { path: 'signup', component: SignupComponent },
-  { path: 'pet-owner-bids', component: PetOwnerBidsComponent }
+  { path: 'pet-owner-bids', component: PetOwnerBidsComponent },
+  { path: 'caretaker-bids', component: CaretakerBidsComponent }
 ];
 
 @NgModule({

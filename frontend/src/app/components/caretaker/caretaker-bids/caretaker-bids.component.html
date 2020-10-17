@@ -1,0 +1,28 @@
+<div id="#content">
+    <div class="column-left">
+        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+
+            <div class="text-bar">
+              <p><label>Search:</label></p>
+              <p> <input type="text" formControlName="search"></p>
+            </div>
+
+            <div class="text-bar">
+              <p><label>Date:</label></p>
+              <p><input type="text" formControlName="date"></p>
+            </div>
+
+            <div class="text-bar">
+              <p><label>Type of Pet:</label></p>
+              <p><input type="text" formControlName="petType"></p>
+            </div>
+          </form>
+    </div>
+    <div class="column-right">
+        <h2>List of Bids (CareTaker)</h2>
+        <button>Show All</button>
+        <button>Pending</button>
+        <button>Rejected</button>
+        <button>Done</button>
+    </div>
+</div>

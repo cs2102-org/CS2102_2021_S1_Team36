@@ -1,0 +1,27 @@
+.column-left {
+  width: 25%;
+  float: left;
+  word-wrap: break-word;
+  height: 100vh;
+  border-right: 1px solid rgb(0, 0, 0);
+}
+
+.column-right {
+  width: 65%;
+  float: right;
+  word-wrap: break-word;
+}
+
+#content {
+  width: 50%;
+  max-width: 20;
+}
+
+.form {
+  padding-top: 100px;
+  padding-left: 25%;
+}
+
+.text-bar {
+  padding-bottom: 15px;
+}

@@ -14,6 +14,7 @@ import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-
 import { CaretakerAvailabilityPageComponent } from './components/general/caretaker-availability-page/caretaker-availability-page.component';
 import { AutoDropdownComponent } from './auto-dropdown.component';
 import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
+import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet
     CaretakerSummaryPageComponent,
     CaretakerAvailabilityPageComponent,
     AutoDropdownComponent,
-    PetOwnerBidsComponent
+    PetOwnerBidsComponent,
+    CaretakerBidsComponent
   ],
   imports: [
     BrowserModule,
