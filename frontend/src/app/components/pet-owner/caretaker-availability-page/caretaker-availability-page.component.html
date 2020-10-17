@@ -1,13 +1,22 @@
 <div id="#content">
     <div class="column-left">
         <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
-            <p><label>Search:</label></p>
-            <p> <input type="text" formControlName="search"></p>
-            <p><label>Date:</label></p>
-            <p><input type="text" formControlName="date"></p>
-            <p><label>Type of Pet:</label></p>
-            <p><input type="text" formControlName="petType"></p> 
-        </form>
+
+            <div class="text-bar">
+              <p><label>Search:</label></p>
+              <p> <input type="text" formControlName="search"></p>
+            </div>
+
+            <div class="text-bar">
+              <p><label>Date:</label></p>
+              <p><input type="text" formControlName="date"></p>
+            </div>
+
+            <div class="text-bar">
+              <p><label>Type of Pet:</label></p>
+              <p><input type="text" formControlName="petType"></p>
+            </div>
+          </form>
     </div>
     <div class="column-right">
         <h2>List of Caretakers</h2>
