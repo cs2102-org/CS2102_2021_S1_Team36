@@ -1,23 +1,24 @@
-<p *ngIf="signUpForm.get('password_confirm').touched">Passwords do not match</p>
+ <div class="content">
+    <p *ngIf="signUpForm.get('password_confirm').touched">Passwords do not match</p>
 
-<form class="form" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
-<p>
-    <label>Name:</label>
-    <input type="text" formControlName="name">
-</p>
-<p>
-    <label>Email:</label>
-    <input type="email" formControlName="email" value=""  autocomplete="new-email">
-</p>
-<p>
-    <label>Password:</label>
-    <input type="password" formControlName="password" value=""  autocomplete="new-password">
-</p>
-<p>
-    <label>Retype Password:</label>
-    <input type="password" formControlName="password_confirm">
-</p>
-<div class="buttons">
-    <button type="button" (click)="openLogin()">Existing User</button>
-    <button type="submit" [disabled]="!signUpForm.valid">Submit</button>
+    <form class="form" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+        <p>
+            <label>Name:</label>
+            <input type="text" formControlName="name">
+        </p>
+        <p>
+            <label>Email:</label>
+            <input type="email" formControlName="email" value=""  autocomplete="new-email">
+        </p>
+        <p>
+            <label>Password:</label>
+            <input type="password" formControlName="password" value=""  autocomplete="new-password">
+        </p>
+        <p>
+            <label>Retype Password:</label>
+            <input type="password" formControlName="password_confirm">
+        </p>
+        <button type="button" (click)="openLogin()">Existing User</button>
+        <button type="submit" [disabled]="!signUpForm.valid">Submit</button>
+    </form>
 </div>

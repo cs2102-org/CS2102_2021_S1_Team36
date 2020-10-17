@@ -11,7 +11,7 @@ import { MenuHeaderComponent } from './components/general/menu-header/menu-heade
 import { LoginComponent } from './components/general/login/login.component';
 import { SignupComponent } from './components/general/signup/signup.component';
 import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-summary-page/caretaker-summary-page.component';
-import { CaretakerAvailabilityPageComponent } from './components/pet-owner/caretaker-availability-page/caretaker-availability-page.component';
+import { CaretakerAvailabilityPageComponent } from './components/general/caretaker-availability-page/caretaker-availability-page.component';
 import { AutoDropdownComponent } from './auto-dropdown.component';
 
 @NgModule({
