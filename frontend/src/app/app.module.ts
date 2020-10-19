@@ -16,6 +16,14 @@ import { AutoDropdownComponent } from './auto-dropdown.component';
 import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
 import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
 import { StatsComponent } from './components/admin/stats/stats.component';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid'; 
+import interactionPlugin from '@fullcalendar/interaction'; 
+
+FullCalendarModule.registerPlugins([
+  dayGridPlugin,
+  interactionPlugin
+]);
 
 @NgModule({
   declarations: [
@@ -38,7 +46,8 @@ import { StatsComponent } from './components/admin/stats/stats.component';
     MatDialogModule,
     NoopAnimationsModule,
     MatMenuModule,
-    MatIconModule
+    MatIconModule,
+    FullCalendarModule
   ],
   providers: [],
   bootstrap: [AppComponent],
