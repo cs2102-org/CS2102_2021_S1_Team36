@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CalendarOptions } from '@fullcalendar/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dauyGridPlugin from '@fullcalendar/daygrid';
 
 @Component({
@@ -8,6 +8,8 @@ import dauyGridPlugin from '@fullcalendar/daygrid';
   styleUrls: ['./caretaker-summary-page.component.css']
 })
 export class CaretakerSummaryPageComponent implements OnInit {
+
+  @ViewChild('calendar') calendarComponent: FullCalendarComponent;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -25,6 +27,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.calendarComponent.getApi().render();
   }
 
 }
