@@ -1,5 +1,10 @@
  <div class="menu-header">
-    <button (click)="openLogin()" id="button-login">Sign In</button>
+    <div *ngIf="!isLogged; else elseBlock" id="button-login">
+        <button (click)="openLogin()">Sign In</button>
+    </div>
+    <ng-template #elseBlock>
+        <button (click)="logout()" id="button-login">Logout</button>
+    </ng-template>
     <app-auto-dropdown id="button-pet-owner">
         <div trigger>Pet Owner</div>
         <div content>

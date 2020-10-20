@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('./db');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 const authRouter = require('./routes/auth');
 
 app.use(express.json())
+    .use(cors())
     .use(express.urlencoded({extended: false}))
     .use('/api/auth', authRouter)
     .listen(PORT, () => console.log(`Running server on ${PORT}`));

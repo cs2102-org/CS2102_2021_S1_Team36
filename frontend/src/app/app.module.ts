@@ -19,6 +19,7 @@ import { StatsComponent } from './components/admin/stats/stats.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid'; 
 import interactionPlugin from '@fullcalendar/interaction'; 
+import { HttpClientModule } from '@angular/common/http';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -47,7 +48,8 @@ FullCalendarModule.registerPlugins([
     NoopAnimationsModule,
     MatMenuModule,
     MatIconModule,
-    FullCalendarModule
+    FullCalendarModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
