@@ -1,5 +1,7 @@
 const express = require('express');
-const pool = require('../db')
+const pool = require('../db');
+const jwt = require('../auth/index');
+const { json } = require('express');
 
 const router = express.Router();
 
@@ -12,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 
 // User login
-router.get("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const { rows } = await pool.query(
     "SELECT * FROM Users WHERE email=$1 AND password=$2;"
@@ -20,7 +22,10 @@ router.get("/login", async (req, res) => {
   if (rows.length < 1) {
     return res.status(404).json({ error: "User not found" });
   }
-  return res.status(200).json(rows);
+
+  jwt.sign(rows[0], 'secretkey', (err, token) => {
+    return res.status(200).json({token});
+  });
 });
 
 // User signup
