@@ -20,6 +20,8 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid'; 
 import interactionPlugin from '@fullcalendar/interaction'; 
 import { HttpClientModule } from '@angular/common/http';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -50,6 +52,8 @@ FullCalendarModule.registerPlugins([
     MatIconModule,
     FullCalendarModule,
     HttpClientModule,
+    // MatDatepickerModule,
+    // MatFormFieldModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

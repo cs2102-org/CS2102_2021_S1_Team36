@@ -22,5 +22,15 @@
         <h2>List of Caretakers</h2>
         <button>Show All</button>
         <button>Recommended</button>
+        <button>Previously Transacted</button>
+
+        <ul class="heroes">
+          <li *ngFor="let hero of heroes">
+            <h4>{{hero.name}}</h4>
+            <p>{{hero.Rating}}</p>
+            <p>{{hero.from}} to {{hero.to}}</p>
+            <p>{{hero.price}}</p>
+          </li>
+        </ul>
     </div>
 </div>
