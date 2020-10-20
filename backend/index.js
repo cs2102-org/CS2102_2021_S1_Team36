@@ -14,9 +14,9 @@ const PORT = process.env.PORT || 5000;
 //     }
 // });
 
-const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
 
 app.use(express.json())
     .use(express.urlencoded({extended: false}))
-    .use('/api', usersRouter)
+    .use('/api/auth', authRouter)
     .listen(PORT, () => console.log(`Running server on ${PORT}`));
