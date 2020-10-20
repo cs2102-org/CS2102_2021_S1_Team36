@@ -22,6 +22,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { HttpClientModule } from '@angular/common/http';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ForumComponent } from './components/general/forum/forum.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -40,7 +41,8 @@ FullCalendarModule.registerPlugins([
     AutoDropdownComponent,
     PetOwnerBidsComponent,
     CaretakerBidsComponent,
-    StatsComponent
+    StatsComponent,
+    ForumComponent
   ],
   imports: [
     BrowserModule,
