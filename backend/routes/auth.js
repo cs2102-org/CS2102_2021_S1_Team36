@@ -22,15 +22,18 @@ router.post("/login", async (req, res) => {
   const { rows } = await pool.query(
     "SELECT * FROM Users WHERE email=$1;"
   , [email]);
-  const passwordStored = rows[0].password;
-  const validPass = await bcrypt.compare(passwordStored, password);
-  if (rows.length < 1 || !validPass) {
-    return res.status(404).json({ error: "User not found" });
+
+  if (rows.length > 0) {
+    const passwordStored = rows[0].password;
+    const validPass = await bcrypt.compare(password, passwordStored);
+    if (validPass) {
+      return jwt.sign(rows[0], 'secretkey', (err, token) => {
+        return res.status(200).json({token});
+      });
+    }
   } 
 
-  jwt.sign(rows[0], 'secretkey', (err, token) => {
-    return res.status(200).json({token});
-  });
+  return res.status(404).json({ error: "User not found" });
 });
 
 // User signup
