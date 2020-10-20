@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<LoginComponent>,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.authService.loginErrorService.subscribe(errors => {
       this.errors = errors;
@@ -33,6 +35,10 @@ export class LoginComponent implements OnInit {
     this.authService.login(loginDetails);
     this.authService.loginNotiService.subscribe(message => {
       this.dialogRef.close();
+      if (this.router.url === '/signup') {
+        console.log("here");
+        this.router.navigateByUrl('caretaker-availabilities');
+      }
     });
   }
 }
