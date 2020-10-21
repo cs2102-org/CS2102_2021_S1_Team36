@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS PetTypes CASCADE;
 DROP TABLE IF EXISTS Posts CASCADE;
 DROP TABLE IF EXISTS Comments CASCADE;
 DROP TABLE IF EXISTS PartTimeAvail CASCADE;
-DROP TABLE IF EXISTS FullTimeAvail CASCADE;
+DROP TABLE IF EXISTS FullTimeLeave CASCADE;
 
 DROP TYPE IF EXISTS transfer_type;
 DROP TYPE IF EXISTS payment_type;
@@ -37,13 +37,15 @@ CREATE TABLE Caretakers (
 );
 
 CREATE TABLE PartTimeAvail ( -- records the part time availability
-    email VARCHAR(30) PRIMARY KEY REFERENCES Caretakers(email) ON DELETE CASCADE,
-    work_date TIMESTAMP
+    email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
+    work_date TIMESTAMP,
+    PRIMARY KEY (email, work_date)
 ); -- check that user is actually a part timer
 
-CREATE TABLE FullTimeAvail ( -- records the full time availability
-    email VARCHAR(30) PRIMARY KEY REFERENCES Caretakers(email) ON DELETE CASCADE,
-    leave_date TIMESTAMP
+CREATE TABLE FullTimeLeave ( -- records the full time availability
+    email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
+    leave_date TIMESTAMP,
+    PRIMARY KEY (email, leave_date)
 ); -- check that user is actually a full timer
 
 CREATE TABLE PetOwners (
@@ -271,6 +273,13 @@ INSERT INTO TakecarePrice VALUES (60, 60, 'oranus@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice VALUES (50, 100, 'percy@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice VALUES (70, 80, 'patrick@gmail.com', 'Turtle');
 
+INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-10-25');
+INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-25');
+INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-26');
+INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-27');
+INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-28');
+INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-25');
+INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-26');
 
 INSERT INTO BidsFor VALUES ('alice@gmail.com', 'bernie@gmail.com', 'roger',
 '2020-10-25', '2020-10-26', 5,

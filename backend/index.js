@@ -4,6 +4,13 @@ const pool = require('./sql');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// middle ware
+var bodyParser = require('body-parser')
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
+
 app.get('/', async(req, res) => {
     try {
         const test = await pool.query('SELECT * FROM test');
@@ -26,41 +33,53 @@ app.get('/user', async(req, res) => {
 app.get('/user/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const user = await pool.query(
+        const users = await pool.query(
             "SELECT * FROM Users WHERE email = $1",
             [email]
         );
-        res.send(user.rows[0])
+        res.json(users.rows[0]); 
     } catch (err) {
         console.error(err);
     }
 });
 
-app.post('/user/:email', async(req, res) => {
+// get full time leave whole table
+app.get('/fulltime/leave/', async(req, res) => {
+    try {
+        const allLeave = await pool.query(
+            "SELECT * FROM FullTimeLeave",
+        );
+        res.json(allLeave.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get full time leave of someone 
+app.get('/fulltime/leave/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const user = await pool.query(
-            'SELECT * FROM Users WHERE email = $1',
+        const leaves = await pool.query(
+            "SELECT * FROM FullTimeLeave WHERE email = $1",
             [email]
         );
-        res.json("sent email");
-        res.json(user.rows);
+        res.json(leaves.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
-app.get('/user/create/', async(req, res) => {
-    try {
-        const test = await pool.query('SELECT * FROM test');
-        console.log(test);
-        res.json(test.rows);
-    } catch (err) {
-        console.error(err);
-    }
-});
 
-// examples
+
+
+
+
+
+
+
+
+
+// examples ------------------------------------------
 app.get('/todos', async(req, res) => {
     try {
         const allTodos = await pool.query("SELECT * FROM todo");
