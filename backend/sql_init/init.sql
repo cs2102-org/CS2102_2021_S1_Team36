@@ -103,10 +103,10 @@ CREATE TABLE Posts (
 );
 
 CREATE TABLE Comments (
-    content TEXT,
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     date_time TIMESTAMP,
     title TEXT REFERENCES Posts(title),
-    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+    content TEXT,
     PRIMARY KEY(title, email, date_time)
 );
 
@@ -177,6 +177,36 @@ INSERT INTO Users VALUES ('percy', 'percy@gmail.com', 'percy is a caretaker of p
 INSERT INTO Caretakers VALUES ('percy@gmail.com', true, 5);
 INSERT INTO Users VALUES ('patrick', 'patrick@gmail.com', 'patrick is a caretaker of pcs', 'pwpatrick');
 INSERT INTO Caretakers VALUES ('patrick@gmail.com', true, 1);
+
+INSERT INTO Users VALUES ('waldo', 'waldo@gmail.com', 'waldo is a part time caretaker of pcs', 'pwwaldo');
+INSERT INTO Caretakers VALUES ('waldo@gmail.com', false, 5);
+INSERT INTO Users VALUES ('wally', 'wally@gmail.com', 'wally is a part time caretaker of pcs', 'pwwally');
+INSERT INTO Caretakers VALUES ('wally@gmail.com', false, 5);
+INSERT INTO Users VALUES ('walter', 'walter@gmail.com', 'walter is a part time caretaker of pcs', 'pwwalter');
+INSERT INTO Caretakers VALUES ('walter@gmail.com', false, 0);
+INSERT INTO Users VALUES ('wendy', 'wendy@gmail.com', 'wendy is a part time caretaker of pcs', 'pwwendy');
+INSERT INTO Caretakers VALUES ('wendy@gmail.com', false, 5);
+INSERT INTO Users VALUES ('wesley', 'wesley@gmail.com', 'wesley is a part time caretaker of pcs', 'pwwesley');
+INSERT INTO Caretakers VALUES ('wesley@gmail.com', false, 0);
+INSERT INTO Users VALUES ('whitney', 'whitney@gmail.com', 'whitney is a part time caretaker of pcs', 'pwwhitney');
+INSERT INTO Caretakers VALUES ('whitney@gmail.com', false, 1);
+INSERT INTO Users VALUES ('wilfred', 'wilfred@gmail.com', 'wilfred is a part time caretaker of pcs', 'pwwilfred');
+INSERT INTO Caretakers VALUES ('wilfred@gmail.com', false, 1);
+INSERT INTO Users VALUES ('xavier', 'xavier@gmail.com', 'xavier is a part time caretaker of pcs', 'pwxavier');
+INSERT INTO Caretakers VALUES ('xavier@gmail.com', false, 0);
+INSERT INTO Users VALUES ('xenia', 'xenia@gmail.com', 'xenia is a part time caretaker of pcs', 'pwxenia');
+INSERT INTO Caretakers VALUES ('xenia@gmail.com', false, 5);
+INSERT INTO Users VALUES ('xiaoping', 'xiaoping@gmail.com', 'xiaoping is a part time caretaker of pcs', 'pwxiaoping');
+INSERT INTO Caretakers VALUES ('xiaoping@gmail.com', false, 2);
+INSERT INTO Users VALUES ('xiaoming', 'xiaoming@gmail.com', 'xiaoming is a part time caretaker of pcs', 'pwxiaoming');
+INSERT INTO Caretakers VALUES ('xiaoming@gmail.com', false, 2);
+INSERT INTO Users VALUES ('xiaodong', 'xiaodong@gmail.com', 'xiaodong is a part time caretaker of pcs', 'pwxiaodong');
+INSERT INTO Caretakers VALUES ('xiaodong@gmail.com', false, 2);
+INSERT INTO Users VALUES ('xiaolong', 'xiaolong@gmail.com', 'xiaolong is a part time caretaker of pcs', 'pwxiaolong');
+INSERT INTO Caretakers VALUES ('xiaolong@gmail.com', false, 2);
+INSERT INTO Users VALUES ('xiaobao', 'xiaobao@gmail.com', 'xiaobao is a part time caretaker of pcs', 'pwxiaobao');
+INSERT INTO Caretakers VALUES ('xiaobao@gmail.com', false, 1);
+
 
 INSERT INTO PetTypes VALUES ('Dog');
 INSERT INTO PetTypes VALUES ('Cat');
@@ -283,6 +313,24 @@ INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-26');
 insert into fulltimeleave values ('cassie@gmail.com', '2020-10-10');
 insert into fulltimeleave values ('cassie@gmail.com', '2020-10-11');
 
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-21');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-22');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-23');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-24');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-25');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-26');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-27');
+INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-25');
+INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-26');
+INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-27');
+INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-28');
+INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-26');
+INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-27');
+INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-28');
+INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-29');
+INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-30');
+
+
 INSERT INTO BidsFor VALUES ('alice@gmail.com', 'bernie@gmail.com', 'roger',
 '2020-10-25', '2020-10-26', 5,
 90, 100,
@@ -318,4 +366,93 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'cassie@gmail.com', 'cloud',
 '2020-10-24', '2020-10-26', 4,
 90, 100,
 true, true, '2', '2', NULL
+);
+
+INSERT INTO Posts VALUES ('alice@gmail.com', 'How to teach dog to sit',
+'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?',
+'2020-09-25');
+INSERT INTO Comments VALUES (
+    'bob@gmail.com', '2020-09-26',
+    'How to teach dog to sit',
+    'you need to do progressive training, like in NS'
+);
+INSERT INTO Comments VALUES (
+    'dickson@gmail.com', '2020-09-26',
+    'How to teach dog to sit',
+    'i think you shouldnt own pets if you dont even know this basic stuff'
+);
+INSERT INTO Comments VALUES (
+    'gaston@gmail.com', '2020-09-26',
+    'How to teach dog to sit',
+    'dickson dont be mean to people everyoen has to start somewhere'
+);
+INSERT INTO Comments VALUES (
+    'gordan@gmail.com', '2020-09-27',
+    'How to teach dog to sit',
+    'have you tried giving him treats every time your dog does it correctly?'
+);
+INSERT INTO Comments VALUES (
+    'patrick@gmail.com', '2020-09-27',
+    'How to teach dog to sit',
+    'have you tried beating him with a slipper???'
+);
+INSERT INTO Comments VALUES (
+    'alice@gmail.com', '2020-09-27',
+    'How to teach dog to sit',
+    'noo...i would never hurt my precious dog'
+);
+INSERT INTO Comments VALUES (
+    'wally@gmail.com', '2020-09-27',
+    'How to teach dog to sit',
+    'you need to be dominant so your dog knows you are pack leader'
+);
+INSERT INTO Comments VALUES (
+    'xiaoming@gmail.com', '2020-09-27',
+    'How to teach dog to sit',
+    'eh pm me i am expert because i watch youtube'
+);
+
+
+INSERT INTO Posts VALUES ('bob@gmail.com', 'How to make cat not scratch me',
+'My cat keeps scratching my leg, how can i make him stop?',
+'2020-09-27');
+INSERT INTO Comments VALUES (
+    'dickson@gmail.com', '2020-09-27',
+    'How to make cat not scratch me',
+    'Have you tried not having a leg? the cat then cannot scratch your leg'
+);
+INSERT INTO Comments VALUES (
+    'gaston@gmail.com', '2020-09-28',
+    'How to make cat not scratch me',
+    'I have that same problem, pls help dont ignore!'
+);
+INSERT INTO Comments VALUES (
+    'lexus@gmail.com', '2020-09-28',
+    'How to make cat not scratch me',
+    'Your cat is just following its natural instincts, dont stop it'
+);
+INSERT INTO Comments VALUES (
+    'moses@gmail.com', '2020-09-28',
+    'How to make cat not scratch me',
+    'Why even buy cats, dogs are way better'
+);
+INSERT INTO Comments VALUES (
+    'percy@gmail.com', '2020-09-29',
+    'How to make cat not scratch me',
+    'moses please stay on topic dont derail the convo'
+);
+INSERT INTO Comments VALUES (
+    'moses@gmail.com', '2020-09-29',
+    'How to make cat not scratch me',
+    'stop being such a goody two shoes percy'
+);
+INSERT INTO Comments VALUES (
+    'monsta@gmail.com', '2020-09-29',
+    'How to make cat not scratch me',
+    'pro tip: rub yur cats face on your leg, it wont want to scratch itself'
+);
+INSERT INTO Comments VALUES (
+    'cassie@gmail.com', '2020-10-20',
+    'How to make cat not scratch me',
+    'omg i tried that and can confirm it works for me! thank you so much!'
 );

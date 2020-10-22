@@ -158,6 +158,35 @@ app.get('/caretaker/avail/type/:type', async(req, res) => {
     }
 });
 
+// get all bids by a specified petowner
+app.get('/bids/madeby/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = await pool.query(
+            "select * from bidsfor where owner_email = $1;",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get all bids for a specified caretaker
+app.get('/bids/madefor/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = await pool.query(
+            "select * from bidsfor where caretaker_email = $1;",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
 
 
 
