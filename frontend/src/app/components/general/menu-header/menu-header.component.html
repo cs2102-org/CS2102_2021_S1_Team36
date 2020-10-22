@@ -1,4 +1,5 @@
  <div class="menu-header">
+    <div id="button-home" [routerLink] = "['']">Home</div>
     <div *ngIf="!isLogged; else elseBlock" id="button-login">
         <button (click)="openLogin()">Sign In</button>
     </div>
@@ -29,6 +30,4 @@
     <div id="button-forum" [routerLink] = "['/forum']">Forum</div>
     <div id="button-find-caretakers" [routerLink] = "['/caretaker-availabilities']">Find CareTakers</div>
 </div>
-
-
 

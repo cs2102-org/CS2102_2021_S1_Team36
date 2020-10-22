@@ -1,0 +1,10 @@
+.background {
+    background: url('./img/pets.png') no-repeat center center fixed;
+    height: 90vh;
+}
+
+.title {
+    text-align: center;
+    padding-top: 10%;
+    font-size: 35px;
+}
