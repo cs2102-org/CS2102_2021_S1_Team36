@@ -186,7 +186,31 @@ app.get('/bids/madefor/:email', async(req, res) => {
     }
 });
 
+// get all Posts
+app.get('/forum/', async(req, res) => {
+    try {
+        const sql = await pool.query(
+            "select * from posts",
+        );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
+// get all comments for a specified Post
+app.get('/forum/:title', async(req, res) => {
+    try {
+        const { title } = req.params;
+        const sql = await pool.query(
+            "select * from comments where title = $1;",
+            [title]
+        );
+        res.json(sql.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 
 
