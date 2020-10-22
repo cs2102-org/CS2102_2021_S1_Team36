@@ -43,7 +43,7 @@ router.post("/signup", async (req, res) => {
   try {
     await pool.query(
       "INSERT INTO Users VALUES ($1, $2, $3, $4);"
-    , [name, email, hash, desc]);
+    , [name, email, desc, hash]);
   } catch (e) {
     return res.status(404).json({ error: e.toString() });
   }

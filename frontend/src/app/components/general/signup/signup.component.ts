@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ValidatorFn, FormGroup, ValidationErrors, FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginComponent } from '../login/login.component';
 
 @Component({
@@ -17,6 +18,7 @@ export class SignupComponent implements OnInit {
     return password && passwordConfirm &&
       password.value === passwordConfirm.value ? null : { notMatched: true };
   };
+  signUpSuccess: Boolean = false;
 
   signUpForm = new FormGroup(
     {
@@ -31,13 +33,22 @@ export class SignupComponent implements OnInit {
     },
     { validators: this.passwordMatchValidator }
   );
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {}
 
   onSubmit() {
     const signUpDetails = this.signUpForm.value;
-    console.log(signUpDetails);
+    this.authService.signUp(signUpDetails);
+    this.authService.loginNotiService.subscribe(message => {
+      if (message == "Signup success") {
+        this.signUpSuccess=true;
+        this.signUpForm.reset();
+      }
+    });
   }
   
   openLogin() {
