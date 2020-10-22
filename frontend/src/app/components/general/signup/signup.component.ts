@@ -14,7 +14,6 @@ export class SignupComponent implements OnInit {
   ): ValidationErrors | null => {
     const password = control.get('password');
     const passwordConfirm = control.get('password_confirm');
-
     return password && passwordConfirm &&
       password.value === passwordConfirm.value ? null : { notMatched: true };
   };
@@ -25,6 +24,10 @@ export class SignupComponent implements OnInit {
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', Validators.required),
       password_confirm: new FormControl(''),
+      description: new FormControl(''),
+      pet_owner: new FormControl(''),
+      caretaker: new FormControl(''),
+      caretaker_type: new FormControl('')
     },
     { validators: this.passwordMatchValidator }
   );
@@ -34,6 +37,7 @@ export class SignupComponent implements OnInit {
 
   onSubmit() {
     const signUpDetails = this.signUpForm.value;
+    console.log(signUpDetails);
   }
   
   openLogin() {
