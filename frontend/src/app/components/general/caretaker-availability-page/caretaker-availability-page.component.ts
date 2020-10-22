@@ -10,9 +10,11 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 export class CaretakerAvailabilityPageComponent implements OnInit {
   filterForm = new FormGroup({
     search: new FormControl(''),
-    date: new FormControl(''),
+    dateFrom: new FormControl(''),
+    dateTo: new FormControl(''),
     petType: new FormControl(''),
-    price: new FormControl(''),
+    priceFrom: new FormControl(''),
+    priceTo: new FormControl(''),
     minRating: new FormControl('')
   });
 
