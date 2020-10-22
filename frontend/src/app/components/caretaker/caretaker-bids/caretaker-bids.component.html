@@ -1,6 +1,6 @@
 <div id="#content">
     <div class="column-left">
-        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit(filterForm.value)">
 
             <div class="text-bar">
               <p><label>Search:</label></p>
@@ -16,6 +16,13 @@
               <p><label>Type of Pet:</label></p>
               <p><input type="text" formControlName="petType"></p>
             </div>
+
+            <div class="text-bar">
+              <p><label>Price:</label></p>
+              <p><input type="text" formControlName="price"></p>
+            </div>
+
+            <button class="button" type="submit">Search</button>
           </form>
     </div>
     <div class="column-right">

@@ -1,4 +1,5 @@
  <div class="menu-header">
+    <div id="button-home" [routerLink] = "['']">Home</div>
     <div *ngIf="!isLogged; else elseBlock" id="button-login">
         <button (click)="openLogin()">Sign In</button>
     </div>
@@ -13,7 +14,7 @@
         </div>
     </app-auto-dropdown>
     <app-auto-dropdown id="button-caretaker">
-        <div trigger>Care Taker</div>
+        <div trigger>Caretaker</div>
         <div content>
             <span mat-menu-item [routerLink] = "['/caretaker-bids']">Bids</span>
             <span mat-menu-item>Declare Leave</span>
@@ -27,8 +28,6 @@
         </div>
     </app-auto-dropdown>
     <div id="button-forum" [routerLink] = "['/forum']">Forum</div>
-    <div id="button-find-caretakers" [routerLink] = "['/caretaker-availabilities']">Find CareTakers</div>
+    <div id="button-find-caretakers" [routerLink] = "['/caretaker-availabilities']">Find Caretakers</div>
 </div>
-
-
 

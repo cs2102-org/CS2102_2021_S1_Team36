@@ -10,7 +10,9 @@ export class PetOwnerBidsComponent implements OnInit {
   filterForm = new FormGroup({
     search: new FormControl(''),
     date: new FormControl(''),
-    petType: new FormControl('')
+    petType: new FormControl(''),
+    price: new FormControl(''),
+    minRating: new FormControl('')
   });
 
   constructor() { }
@@ -18,7 +20,8 @@ export class PetOwnerBidsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSubmit() {
+  onSubmit(searchParam) {
     console.log('SENT');
+    console.log(searchParam);
   }
 }

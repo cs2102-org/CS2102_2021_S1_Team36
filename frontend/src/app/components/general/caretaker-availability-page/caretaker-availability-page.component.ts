@@ -10,8 +10,12 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 export class CaretakerAvailabilityPageComponent implements OnInit {
   filterForm = new FormGroup({
     search: new FormControl(''),
-    date: new FormControl(''),
-    petType: new FormControl('')
+    dateFrom: new FormControl(''),
+    dateTo: new FormControl(''),
+    petType: new FormControl(''),
+    priceFrom: new FormControl(''),
+    priceTo: new FormControl(''),
+    minRating: new FormControl('')
   });
 
   heroes: any[] = [
@@ -42,8 +46,9 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSubmit() {
+  onSubmit(searchParam) {
     console.log('SENT');
+    console.log(searchParam);
   }
 }
 
