@@ -18,7 +18,8 @@ export class CaretakerBidsComponent implements OnInit {
   ngOnInit(): void {
   }
   
-  onSubmit() {
+  onSubmit(searchParam) {
     console.log('SENT');
+    console.log(searchParam);
   }
 }
