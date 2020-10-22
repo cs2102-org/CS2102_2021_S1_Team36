@@ -21,8 +21,8 @@ CREATE TYPE payment_type AS ENUM('1', '2', '3');
 CREATE TABLE Users (
     name VARCHAR(30) NOT NULL,
     email VARCHAR(30) PRIMARY KEY,
-    password VARCHAR(60) NOT NULL,
-    description VARCHAR(255)
+    description VARCHAR(255),
+    password VARCHAR(60) NOT NULL
 );
 
 CREATE TABLE Caretakers (
