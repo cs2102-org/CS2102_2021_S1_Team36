@@ -110,6 +110,22 @@ CREATE TABLE Comments (
     PRIMARY KEY(title, email, date_time)
 );
 
+-- CREATE TABLE Posts (
+-- 	post_id SERIAL PRIMARY KEY,
+--     email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
+--     title VARCHAR(255),
+--     content TEXT,
+--     last_modified TIMESTAMP
+-- );
+
+-- CREATE TABLE Comments (
+-- 	post_id SERIAL PRIMARY KEY,
+--     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+--     date_time TIMESTAMP,
+--     title TEXT REFERENCES Posts(title),
+--     content TEXT
+-- );
+
 INSERT INTO Users VALUES ('alice', 'alice@gmail.com', 'alice is a petowner of pcs', 'pwalice');
 INSERT INTO PetOwners VALUES ('alice@gmail.com');
 INSERT INTO Users VALUES ('bob', 'bob@gmail.com', 'bob is a petowner of pcs', 'pwbob');
