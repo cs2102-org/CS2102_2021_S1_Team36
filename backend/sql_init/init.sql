@@ -280,6 +280,8 @@ INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-27');
 INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-28');
 INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-25');
 INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-26');
+insert into fulltimeleave values ('cassie@gmail.com', '2020-10-10');
+insert into fulltimeleave values ('cassie@gmail.com', '2020-10-11');
 
 INSERT INTO BidsFor VALUES ('alice@gmail.com', 'bernie@gmail.com', 'roger',
 '2020-10-25', '2020-10-26', 5,
@@ -311,4 +313,9 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'gordan@gmail.com', 'sammy',
 '2020-10-24', '2020-10-26', 4,
 90, 100,
 false, false, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'cassie@gmail.com', 'cloud',
+'2020-10-24', '2020-10-26', 4,
+90, 100,
+true, true, '2', '2', NULL
 );

@@ -69,6 +69,95 @@ app.get('/fulltime/leave/:email', async(req, res) => {
     }
 });
 
+// queries to view caretaker availability
+
+// view all caretakers
+app.get('/caretaker/avail', async(req, res) => {
+    try {
+        const cts = await pool.query(
+            "SELECT * FROM Caretakers;",
+        );
+        res.json(cts.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view all caretakers availability
+app.get('/caretaker/avail/all', async(req, res) => {
+    try {
+        const sql = await pool.query(
+            "select email, leave_date as na_start_date, 1 as na_num_days from fulltimeleave \
+            UNION \
+            select caretaker_email as email, bid_date as na_start_date, number_of_days as na_num_days from bidsfor where is_confirmed = true;"
+        );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view a certain caretakers availability
+app.get('/caretaker/avail/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = await pool.query(
+            "select leave_date as date, 1 as num_days from \
+            fulltimeleave where email=$1 \
+            UNION \
+            select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = $1 and is_confirmed = true;",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view all caretakers available for a date range
+// accounts for their leave and their confirmed bids
+app.get('/caretaker/avail/range', async(req, res) => {
+    try {
+        var startdate = req.body.startdate;
+        var numdays = req.body.numdays;
+        const sql = await pool.query(
+            "select email from caretakers C1 \
+            where not exists ( \
+            select 1 from (select leave_date as date, 1 as num_days from fulltimeleave where email=C1.email UNION select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = C1.email and is_confirmed = true) as NA \
+            where ($1 <= NA.date and TO_TIMESTAMP($1, 'YYYY-MM-DD') + interval '1' day * $2 >= NA.date) \
+            or (NA.date < $1 and NA.date + interval '1' day * NA.num_days >= $1));",
+            [startdate, numdays]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
+// -- select TO_TIMESTAMP('2020-10-26', 'YYYY-MM-DD') + interval '1' day from fulltimeleave;
+// -- select leave_date + interval '1' day * 4 from fulltimeleave;
+// select email from caretakers C1
+// where not exists (
+// select 1 from (select leave_date as date, 1 as num_days from fulltimeleave where email=C1.email UNION select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = C1.email and is_confirmed = true) as NA
+// where ('2020-10-28' <= NA.date and TO_TIMESTAMP('2020-10-28', 'YYYY-MM-DD') + interval '1' day * 2 >= NA.date)
+// or (NA.date < '2020-10-28' and NA.date + interval '1' day * NA.num_days >= '2020-10-28'));
+
+// find all caretakers who can look after a specified pet type
+app.get('/caretaker/avail/type/:type', async(req, res) => {
+    try {
+        const { type } = req.params;
+        const sql = await pool.query(
+            "select email from caretakers C1 \
+            where exists (select 1 from takecareprice where email = C1.email and species = $1);",
+            [type]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 
 
