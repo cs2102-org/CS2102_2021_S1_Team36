@@ -3,11 +3,11 @@
 </div>
 <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <p>
-        <label>Email:</label>
+        <label>Email: </label>
         <input type="email" formControlName="email">
     </p>
     <p>
-        <label>Password:</label>
+        <label>Password: </label>
         <input type="password" formControlName="password">
     </p>
     <button class="button" type="button"[routerLink] = "['/signup']" mat-dialog-close> Signup </button>
