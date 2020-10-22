@@ -10,7 +10,9 @@ export class PetOwnerBidsComponent implements OnInit {
   filterForm = new FormGroup({
     search: new FormControl(''),
     date: new FormControl(''),
-    petType: new FormControl('')
+    petType: new FormControl(''),
+    price: new FormControl(''),
+    minRating: new FormControl('')
   });
 
   constructor() { }
