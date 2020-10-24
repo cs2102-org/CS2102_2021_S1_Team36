@@ -48,17 +48,25 @@
 
       <ul class="caretakers">
         <li *ngFor="let caretaker of caretakers">
-          <h4>{{caretaker.name}}</h4>
-          <p>{{caretaker.rating}}</p>
+          <h3>{{caretaker.name}}</h3>
+          <p>Rating: {{caretaker.rating}}</p>
           <p>{{caretaker.type}}</p>
-            <div *ngFor="let pet of caretaker.takesCare | keyvalue">
-              <p>{{pet.key}}</p>
-              <p>{{pet.value}}</p>
-            </div>
+            <table>
+              <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
+                <td>{{pet.key}}</td>
+                <td>${{pet.value}}</td>
+              </tr>
+          </table>
         </li>
       </ul>
     </div>
     <div class="column-right">
+      <h2>Availability</h2>
+      <h3>Click the dates you wish to bid</h3>
+      <div *ngIf="datesSelected.length !== 0">
+        <p>Dates chosen: </p>
+        <span *ngFor="let date of datesSelected;">{{date}}, </span>
+      </div>
       <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
 </div>

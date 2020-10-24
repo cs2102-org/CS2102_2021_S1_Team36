@@ -10,14 +10,17 @@
   width: 27%;
   padding: 30px;
   padding-right: 0px;
+  padding-bottom: 0px;
   float: left;
   word-wrap: break-word;
 }
 
 .column-right {
   width: 35%;
-  padding-top: 7%;
+  padding-top: 1%;
   float: left;
+  height: 90vh;
+  overflow-y: auto;
 }
 
 #content {
@@ -39,7 +42,7 @@
   padding: 0;
   width: 25vw;
   overflow-y: auto;
-  max-height: 80vh;
+  max-height: 75vh;
 }
 
 .caretakers li {
