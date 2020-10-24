@@ -94,6 +94,3 @@ CREATE TABLE Comments (
     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     PRIMARY KEY(title, email, date_time)
 );
-
-INSERT INTO Users values ('Tom', 'tom@gmail.com', '123');
-INSERT INTO Users values ('Jane', 'jane@gmail.com', '321');
