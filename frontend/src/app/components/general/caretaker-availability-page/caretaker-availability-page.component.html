@@ -40,19 +40,25 @@
             <button class="button" type="submit">Search</button>
           </form>
     </div>
-    <div class="column-right">
-        <h2>List of Caretakers</h2>
-        <button>Show All</button>
-        <button>Recommended</button>
-        <button>Previously Transacted</button>
+    <div class="column-center">
+      <h2>List of Caretakers</h2>
+      <button>Show All</button>
+      <button>Recommended</button>
+      <button>Previously Transacted</button>
 
-        <ul class="heroes">
-          <li *ngFor="let hero of heroes">
-            <h4>{{hero.name}}</h4>
-            <p>{{hero.Rating}}</p>
-            <p>{{hero.from}} to {{hero.to}}</p>
-            <p>{{hero.price}}</p>
-          </li>
-        </ul>
+      <ul class="caretakers">
+        <li *ngFor="let caretaker of caretakers">
+          <h4>{{caretaker.name}}</h4>
+          <p>{{caretaker.rating}}</p>
+          <p>{{caretaker.type}}</p>
+            <div *ngFor="let pet of caretaker.takesCare | keyvalue">
+              <p>{{pet.key}}</p>
+              <p>{{pet.value}}</p>
+            </div>
+        </li>
+      </ul>
+    </div>
+    <div class="column-right">
+      <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
 </div>

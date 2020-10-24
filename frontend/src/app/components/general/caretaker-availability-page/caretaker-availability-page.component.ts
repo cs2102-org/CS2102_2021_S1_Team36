@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -8,6 +9,17 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
   styleUrls: ['./caretaker-availability-page.component.css']
 })
 export class CaretakerAvailabilityPageComponent implements OnInit {
+  @ViewChild('calendar') calendarComponent: FullCalendarComponent;
+
+  calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    dateClick: this.handleDateClick.bind(this), // bind is important!
+    events: [
+      { title: 'event 1', date: '2019-04-01' },
+      { title: 'event 2', date: '2019-04-02' }
+    ]
+  };
+
   filterForm = new FormGroup({
     search: new FormControl(''),
     dateFrom: new FormControl(''),
@@ -18,28 +30,21 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     minRating: new FormControl('')
   });
 
-  heroes: any[] = [
-    { id: 1, name: 'Dr Nice', Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd'] },
-    { id: 2, name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 3, name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 4, name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 5, name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 6, name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 7, name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 8, name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 9, name: 'Magma' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 10, name: 'Tornado' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 1, name: 'Dr Nice' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 2, name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 3, name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 4, name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 5, name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 6, name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 7, name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 8, name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']}
+  caretakers: any[] = [
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    
   ];
-
-  selectedHero;
 
   constructor() { }
 
@@ -50,26 +55,28 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     console.log('SENT');
     console.log(searchParam);
   }
+
+  handleDateClick(arg) {
+    alert('date click! ' + arg.dateStr)
+  }
+
 }
 
 
-      //  <span class="badge">{{hero.id}}</span> 
-
-
-//                   <<mat-form-field appearance="fill">
-//   <mat-label>Enter a date range</mat-label>
-//   <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-//     <input matStartDate formControlName="start" placeholder="Start date">
-//     <input matEndDate formControlName="end" placeholder="End date">
-//   </mat-date-range-input>
-//   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-//   <mat-date-range-picker #picker></mat-date-range-picker>
-
-//   <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-//   <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-// </mat-form-field>
-
-// new FormGroup({
-//       start: new FormControl(),
-//       end: new FormControl()
-//     })
+    // { name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Magma' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Tornado' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Dr Nice' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
+    // { name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']}
