@@ -1,5 +1,5 @@
 const express = require('express');
-const pool = require('../sql');
+const pool = require('../db');
 const { json, response } = require('express');
 
 const pcsRouter = express.Router();

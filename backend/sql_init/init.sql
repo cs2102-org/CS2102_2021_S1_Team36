@@ -19,10 +19,10 @@ CREATE TYPE transfer_type AS ENUM('1', '2', '3');
 CREATE TYPE payment_type AS ENUM('1', '2', '3');
 
 CREATE TABLE Users (
-    name VARCHAR(30),
+    name VARCHAR(30) NOT NULL,
     email VARCHAR(30) PRIMARY KEY,
-    description VARCHAR(255),
-    password VARCHAR(30)
+    password VARCHAR(60) NOT NULL,
+    description VARCHAR(255)
 );
 
 CREATE TABLE Caretakers (
@@ -94,3 +94,6 @@ CREATE TABLE Comments (
     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     PRIMARY KEY(title, email, date_time)
 );
+
+INSERT INTO Users values ('Tom', 'tom@gmail.com', '123');
+INSERT INTO Users values ('Jane', 'jane@gmail.com', '321');
