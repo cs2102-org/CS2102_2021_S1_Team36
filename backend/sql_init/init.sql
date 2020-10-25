@@ -2,7 +2,8 @@ DROP DATABASE IF EXISTS pcs;
 
 CREATE DATABASE pcs;
 
-\c pcs;
+-- \c pcs; 
+-- removed for initialising on Heroku (doesnt work if supplied with this line of code to Heroku)
 
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS CareTakers CASCADE;

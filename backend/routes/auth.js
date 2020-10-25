@@ -9,11 +9,12 @@ const saltRounds = 10;
 const authRouter = express.Router();
 
 authRouter.get("/", async (req, res) => {
-  const { rows } = await pool.query(
-    "SELECT * FROM Users;"
-  );
+  // const { rows } = await pool.query(
+  //   "SELECT * FROM Users;"
+  // );
 
-  return res.status(200).json(rows);
+  // return res.status(200).json(rows);
+  res.send('herllo!');
 });
 
 // User login
