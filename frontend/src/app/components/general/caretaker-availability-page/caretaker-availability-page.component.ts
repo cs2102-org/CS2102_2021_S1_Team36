@@ -13,10 +13,20 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
 
   datesSelected: String[] = [];
 
+  selectedCaretaker;
+
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     height: 450,
     dateClick: this.handleDateClick.bind(this),
+    validRange: function(nowDate) {
+      const aYearFromNow = new Date(nowDate);
+      aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
+      return {
+        start: nowDate,
+        end:  aYearFromNow
+      };
+    },
     events: [
       { title: 'event 1', date: '2019-04-01' },
       { title: 'event 2', date: '2019-04-02' }
@@ -34,18 +44,18 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   });
 
   caretakers: any[] = [
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 1, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
     
   ];
 
@@ -63,23 +73,13 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     this.datesSelected.push(arg.dateStr);
   }
 
+  select(caretaker){
+    this.selectedCaretaker = caretaker;
+    // alert(this.selectedCaretaker.name);
+  }
+
+  showHide(){
+    event.stopPropagation();
+  }
+
 }
-
-
-    // { name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Magma' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Tornado' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Dr Nice' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    // { name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']}

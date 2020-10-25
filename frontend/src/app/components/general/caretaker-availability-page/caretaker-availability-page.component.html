@@ -47,22 +47,25 @@
       <button>Previously Transacted</button>
 
       <ul class="caretakers">
-        <li *ngFor="let caretaker of caretakers">
-          <h3>{{caretaker.name}}</h3>
-          <p>Rating: {{caretaker.rating}}</p>
-          <p>{{caretaker.type}}</p>
-            <table>
-              <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
-                <td>{{pet.key}}</td>
-                <td>${{pet.value}}</td>
-              </tr>
-          </table>
+        <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">
+          <div [ngClass]="selectedCaretaker != null && caretaker.id == selectedCaretaker.id ? 'selected': 'not-selected'">
+            <h3>{{caretaker.name}}</h3>
+            <p>Rating: {{caretaker.rating}}</p>
+            <p>{{caretaker.type}}</p>
+            <button (click)="showHide()">show</button>
+              <table>
+                <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
+                  <td>{{pet.key}}</td>
+                  <td>${{pet.value}}</td>
+                </tr>
+            </table>
+          </div>
         </li>
       </ul>
     </div>
     <div class="column-right">
       <h2>Availability</h2>
-      <h3>Click the dates you wish to bid</h3>
+      <a target="_blank" [routerLink] = "['/bid-caretaker']"><button>Bid Now</button></a>
       <div *ngIf="datesSelected.length !== 0">
         <p>Dates chosen: </p>
         <span *ngFor="let date of datesSelected;">{{date}}, </span>

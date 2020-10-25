@@ -52,7 +52,6 @@
   margin: .5em;
   padding: .3em 0;
   border-radius: 4px;
-  border: 1px solid rgb(182, 182, 182);
 }
 
 .caretakers li:nth-child(odd) {
@@ -65,3 +64,21 @@
   left: .1em;
 }
 
+.selected {
+  background: rgba(253, 166, 4, 0.412);
+  border: 1px solid rgb(182, 182, 182);
+} 
+
+.not-selected {
+  border: 1px solid rgb(182, 182, 182);
+}
+
+table {
+  border-collapse: collapse;
+  width:60%;
+  margin: 20px;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
