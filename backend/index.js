@@ -11,16 +11,17 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
 
-app.get('/', async(req, res) => {
+app.get('/test', async(req, res) => {
     try {
-        const test = await pool.query('SELECT * FROM test');
-        console.log(test);
-        res.json(test.rows);
+        const msql = await pool.query('SELECT * FROM Users');
+        console.log(msql);
+        res.json(msql.rows);
     } catch (err) {
         console.error(err);
     }
 });
 
+// get all users
 app.get('/user', async(req, res) => {
     try {
         const users = await pool.query("SELECT * FROM Users");
@@ -30,21 +31,22 @@ app.get('/user', async(req, res) => {
     }
 });
 
-app.get('/user/:email', async(req, res) => {
+// get the pets of a specified user
+app.get('/user/owns/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const users = await pool.query(
-            "SELECT * FROM Users WHERE email = $1",
+        const pets = await pool.query(
+            "SELECT * FROM Pets WHERE email = $1",
             [email]
         );
-        res.json(users.rows[0]); 
+        res.json(pets.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
-// get full time leave whole table
-app.get('/fulltime/leave/', async(req, res) => {
+// get the fullTimeLeave table
+app.get('/caretaker/ft/leave/', async(req, res) => {
     try {
         const allLeave = await pool.query(
             "SELECT * FROM FullTimeLeave",
@@ -55,24 +57,22 @@ app.get('/fulltime/leave/', async(req, res) => {
     }
 });
 
-// get full time leave of someone 
-app.get('/fulltime/leave/:email', async(req, res) => {
+// get the fullTimeLeave of a specified full time caretaker
+app.get('/caretaker/ft/leave/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const leaves = await pool.query(
             "SELECT * FROM FullTimeLeave WHERE email = $1",
             [email]
         );
-        res.json(leaves.rows); 
+        res.json(leaves.rows);
     } catch (err) {
         console.error(err);
     }
-});
-
-// queries to view caretaker availability
+}); // todo: check that specified caretaker is actually full time
 
 // view all caretakers
-app.get('/caretaker/avail', async(req, res) => {
+app.get('/caretaker/all', async(req, res) => {
     try {
         const cts = await pool.query(
             "SELECT * FROM Caretakers;",
@@ -83,22 +83,23 @@ app.get('/caretaker/avail', async(req, res) => {
     }
 });
 
-// view all caretakers availability
-app.get('/caretaker/avail/all', async(req, res) => {
+// view all caretakers non-availability (na)
+// i.e. for each caretaker, all the confirmed bids and all their leave dates
+app.get('/caretaker/ft/na/all', async(req, res) => {
     try {
-        const sql = await pool.query(
+        const msql = await pool.query(
             "select email, leave_date as na_start_date, 1 as na_num_days from fulltimeleave \
             UNION \
             select caretaker_email as email, bid_date as na_start_date, number_of_days as na_num_days from bidsfor where is_confirmed = true;"
         );
-        res.json(sql.rows); 
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
-// view a certain caretakers availability
-app.get('/caretaker/avail/:email', async(req, res) => {
+// view a specified fulltime caretakers non-availability
+app.get('/caretaker/ft/na/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
@@ -114,19 +115,42 @@ app.get('/caretaker/avail/:email', async(req, res) => {
     }
 });
 
-// view all caretakers available for a date range
+// view all full time caretakers available for a specified date range
 // accounts for their leave and their confirmed bids
-app.get('/caretaker/avail/range', async(req, res) => {
+app.get('/caretaker/ft/na/range', async(req, res) => {
     try {
         var startdate = req.body.startdate;
         var numdays = req.body.numdays;
         const sql = await pool.query(
-            "select email from caretakers C1 \
-            where not exists ( \
+            "select C1.email from caretakers C1 \
+            where C1.is_fulltime = True \
+            and not exists ( \
             select 1 from (select leave_date as date, 1 as num_days from fulltimeleave where email=C1.email UNION select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = C1.email and is_confirmed = true) as NA \
             where ($1 <= NA.date and TO_TIMESTAMP($1, 'YYYY-MM-DD') + interval '1' day * $2 >= NA.date) \
             or (NA.date < $1 and NA.date + interval '1' day * NA.num_days >= $1));",
             [startdate, numdays]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get the availability of a specified part time worker
+// i.e. their available dates - dates where they have confirmed bids
+app.get('/caretaker/pt/avail/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = await pool.query(
+            "select work_date as date, 1 as num_days from parttimeavail P1 \
+            where P1.email = $1 \
+            and \
+            NOT EXISTS \
+            (SELECT bid_date AS date, number_of_days AS num_days FROM bidsfor \
+            WHERE caretaker_email = $1 \
+            AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
+            );",
+            [email]
             );
         res.json(sql.rows); 
     } catch (err) {
@@ -144,73 +168,86 @@ app.get('/caretaker/avail/range', async(req, res) => {
 // or (NA.date < '2020-10-28' and NA.date + interval '1' day * NA.num_days >= '2020-10-28'));
 
 // find all caretakers who can look after a specified pet type
-app.get('/caretaker/avail/type/:type', async(req, res) => {
+app.get('/caretaker/type/:type', async(req, res) => {
     try {
         const { type } = req.params;
-        const sql = await pool.query(
+        const msql = await pool.query(
             "select email from caretakers C1 \
             where exists (select 1 from takecareprice where email = C1.email and species = $1);",
             [type]
             );
-        res.json(sql.rows); 
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get all bids (the whole BidsFor table)
+app.get('/bids/all', async(req, res) => {
+    try {
+        const msql = await pool.query(
+            "select * from bidsfor;",
+            );
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
 // get all bids by a specified petowner
-app.get('/bids/madeby/:email', async(req, res) => {
+app.get('/bids/by/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const sql = await pool.query(
+        const msql = await pool.query(
             "select * from bidsfor where owner_email = $1;",
             [email]
             );
-        res.json(sql.rows); 
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
 // get all bids for a specified caretaker
-app.get('/bids/madefor/:email', async(req, res) => {
+app.get('/bids/for/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const sql = await pool.query(
+        const msql = await pool.query(
             "select * from bidsfor where caretaker_email = $1;",
             [email]
             );
-        res.json(sql.rows); 
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
 
-// get all Posts
-app.get('/forum/', async(req, res) => {
-    try {
-        const sql = await pool.query(
-            "select * from posts",
-        );
-        res.json(sql.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
+// todo: change this to use id
+// // get all Posts
+// app.get('/forum/', async(req, res) => {
+//     try {
+//         const msql = await pool.query(
+//             "select * from posts",
+//         );
+//         res.json(msql.rows); 
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
-// get all comments for a specified Post
-app.get('/forum/:title', async(req, res) => {
-    try {
-        const { title } = req.params;
-        const sql = await pool.query(
-            "select * from comments where title = $1;",
-            [title]
-        );
-        res.json(sql.rows);
-    } catch (err) {
-        console.error(err);
-    }
-});
+// // get all comments for a specified Post
+// app.get('/forum/:title', async(req, res) => {
+//     try {
+//         const { title } = req.params;
+//         const msql = await pool.query(
+//             "select * from comments where title = $1;",
+//             [title]
+//         );
+//         res.json(msql.rows);
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 
 

@@ -329,6 +329,13 @@ INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-26');
 insert into fulltimeleave values ('cassie@gmail.com', '2020-10-10');
 insert into fulltimeleave values ('cassie@gmail.com', '2020-10-11');
 
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-01');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-02');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-03');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-04');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-05');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-06');
+INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-07');
 INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-21');
 INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-22');
 INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-23');
@@ -383,6 +390,17 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'cassie@gmail.com', 'cloud',
 90, 100,
 true, true, '2', '2', NULL
 );
+INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
+'2020-10-24', '2020-10-25', 2,
+90, 100,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
+'2020-10-25', '2020-10-02', 3,
+90, 100,
+true, true, '2', '2', NULL
+);
+
 
 INSERT INTO Posts VALUES ('alice@gmail.com', 'How to teach dog to sit',
 'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?',
