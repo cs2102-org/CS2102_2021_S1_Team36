@@ -231,6 +231,56 @@ app.get('/bids/for/:email', async(req, res) => {
     }
 });
 
+// get the working dates of a specified caretaker in a specified interval
+app.get('/pcs/getwork/range/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        var startdate = req.body.startdate;
+        var enddate = req.body.enddate;
+        const msql = await pool.query(
+            "select bid_date as start_date, number_of_days from bidsfor \
+            where caretaker_email = $1 and is_confirmed = true \
+            and $2 <= bid_date \
+            and date(bid_date) + interval '1' * (number_of_days - 1) <= date(enddate) \
+            UNION \
+            select $2 as start_date, \
+            EXTRACT(EPOCH FROM ( \
+            	(date(bid_date) + interval '1' day * (number_of_days))- date($2) \
+            )) / 86400 as number_of_days \
+            from  bidsfor \
+            where caretaker_email = $1 and is_confirmed = true \
+            and bid_date < $2 \
+            and date($2) <= date(bid_date) + interval '1' day * (number_of_days - 1) \
+            and date(bid_date) + interval '1' day * (number_of_days - 1) <= date($3) \
+            UNION \
+            select $2 as start_date, \
+            EXTRACT(EPOCH FROM ( \
+            	'2021-05-03' - bid_date \
+            )) / 86400 + 1 as number_of_days \
+            from  bidsfor \
+            where caretaker_email = $1 and is_confirmed = true \
+            and $2 <= bid_date \
+            and bid_date <= $3 \
+            and $3 < bid_date + interval '1' day * (number_of_days - 1) \
+            UNION \
+            (select $2 as start_date, \
+            date($3) - date($2) + 1 as number_of_days \
+            from bidsfor \
+            where caretaker_email = $1 and is_confirmed = true \
+            and bid_date < $2 \
+            and $3 < bid_date + interval '1' day * (number_of_days - 1));",
+            [email, startdate, numdays]
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
+
+
+
 // todo: change this to use id
 // // get all Posts
 // app.get('/forum/', async(req, res) => {

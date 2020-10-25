@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS pcs;
-
-CREATE DATABASE pcs;
-
-\c pcs;
-
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS CareTakers CASCADE;
 DROP TABLE IF EXISTS PetOwners CASCADE;
@@ -246,6 +240,7 @@ INSERT INTO Pets VALUES ('dickson@gmail.com', 'sammy', 'needs a lot of care', 's
 INSERT INTO Pets VALUES ('dickson@gmail.com', 'cloud', 'needs a lot of care', 'cloud is a Lion owned by dickson', 'Lion');
 INSERT INTO Pets VALUES ('farquard@gmail.com', 'millie', 'scared of thunder', 'millie is a Lion owned by farquard', 'Lion');
 INSERT INTO Pets VALUES ('farquard@gmail.com', 'rufus', 'needs alone time', 'rufus is a Hamster owned by farquard', 'Hamster');
+INSERT INTO Pets VALUES ('farquard@gmail.com', 'dufus', 'needs alone time', 'dufus is a Dog owned by farquard', 'Dog');
 INSERT INTO Pets VALUES ('gaston@gmail.com', 'axa', 'hates dogs', 'axa is a Hamster owned by gaston', 'Hamster');
 INSERT INTO Pets VALUES ('gaston@gmail.com', 'abby', 'needs blanket to sleep', 'abby is a Mouse owned by gaston', 'Mouse');
 INSERT INTO Pets VALUES ('hassan@gmail.com', 'alfie', 'needs more water', 'alfie is a Mouse owned by hassan', 'Mouse');
@@ -287,8 +282,6 @@ INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Dog');
 INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Cat');
 INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Dog');
 INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Cat');
 INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Dog');
 INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Cat');
 INSERT INTO TakecarePrice VALUES (80, 100, 'lokister@gmail.com', 'Dog');
@@ -310,7 +303,6 @@ INSERT INTO TakecarePrice VALUES (70, 80, 'diggory@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice VALUES (70, 80, 'familia@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Turtle');
 INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Budgie');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Chicken');
 INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Snake');
 INSERT INTO TakecarePrice VALUES (80, 100, 'lokister@gmail.com', 'Horse');
 INSERT INTO TakecarePrice VALUES (60, 60, 'monsta@gmail.com', 'Monkey');
@@ -318,6 +310,11 @@ INSERT INTO TakecarePrice VALUES (70, 80, 'natasha@gmail.com', 'Lion');
 INSERT INTO TakecarePrice VALUES (60, 60, 'oranus@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice VALUES (50, 100, 'percy@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice VALUES (70, 80, 'patrick@gmail.com', 'Turtle');
+
+
+INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Dog');
+INSERT INTO TakecarePrice VALUES (70, 90, 'jackson@gmail.com', 'Cat');
+INSERT INTO TakecarePrice VALUES (70, 100, 'jackson@gmail.com', 'Hamster');
 
 INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-10-25');
 INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-25');
@@ -400,6 +397,33 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
 90, 100,
 true, true, '2', '2', NULL
 );
+
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'millie',
+'2020-10-25', '2021-01-01', 1,
+90, 100,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
+'2020-10-25', '2021-02-01', 2,
+90, 110,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
+'2020-10-26', '2021-03-01', 3,
+90, 110,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
+'2020-10-25', '2021-04-01', 4,
+90, 150,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
+'2020-10-26', '2021-05-01', 5,
+90, 150,
+true, true, '2', '2', NULL
+);
+
 
 
 INSERT INTO Posts VALUES ('alice@gmail.com', 'How to teach dog to sit',
