@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import {MatDatepickerModule} from '@angular/material/datepicker';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 
 @Component({
@@ -44,7 +43,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   });
 
   caretakers: any[] = [
-    { id: 1, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
+    { id: 1, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {} },
     { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
     { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
     { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
@@ -78,8 +77,9 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     // alert(this.selectedCaretaker.name);
   }
 
-  showHide(){
+  showHide(caretaker){
     event.stopPropagation();
+    caretaker.takesCare['random'] = 30;
   }
 
 }

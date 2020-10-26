@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
+import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -43,6 +44,7 @@ FullCalendarModule.registerPlugins([
     CaretakerBidsComponent,
     StatsComponent,
     ForumComponent
+    CaretakerMakeBidComponent
   ],
   imports: [
     BrowserModule,

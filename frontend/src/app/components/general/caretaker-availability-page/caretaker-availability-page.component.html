@@ -48,23 +48,27 @@
 
       <ul class="caretakers">
         <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">
-          <div [ngClass]="selectedCaretaker != null && caretaker.id == selectedCaretaker.id ? 'selected': 'not-selected'">
-            <h3>{{caretaker.name}}</h3>
-            <p>Rating: {{caretaker.rating}}</p>
-            <p>{{caretaker.type}}</p>
-            <button (click)="showHide()">show</button>
-              <table>
-                <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
-                  <td>{{pet.key}}</td>
-                  <td>${{pet.value}}</td>
-                </tr>
+          <div [ngClass]="selectedCaretaker != undefined && caretaker.id == selectedCaretaker.id ? 'selected': 'not-selected'">
+            <table class="caretaker">
+                <tr>
+                <th> <h3>{{caretaker.name}}</h3></th>
+                <td>Rating: {{caretaker.rating}}</td>
+                <td>{{caretaker.type}}</td>
+                <td><button (click)="showHide(caretaker)">Show Price</button><td>
+              </tr>
+            </table>
+            <table class="pets">
+              <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
+                <td>{{pet.key}}</td>
+                <td>${{pet.value}}</td>
+              </tr>
             </table>
           </div>
         </li>
       </ul>
     </div>
-    <div class="column-right">
-      <h2>Availability</h2>
+    <div *ngIf="selectedCaretaker != undefined" class="column-right">
+      <h2>Availability of {{selectedCaretaker.name}}</h2>
       <a target="_blank" [routerLink] = "['/bid-caretaker']"><button>Bid Now</button></a>
       <div *ngIf="datesSelected.length !== 0">
         <p>Dates chosen: </p>

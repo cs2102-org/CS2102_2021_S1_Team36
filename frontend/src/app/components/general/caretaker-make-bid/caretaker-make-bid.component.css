@@ -1,0 +1,7 @@
+.column-left {
+  width: 32%;
+  padding-left: 10%;
+  padding-top: 2%;
+  float: left;
+  word-wrap: break-word;
+}

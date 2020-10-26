@@ -8,6 +8,7 @@ import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet
 import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
 import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-summary-page/caretaker-summary-page.component';
 import { ForumComponent } from './components/general/forum/forum.component';
+import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'caretaker-bids', component: CaretakerBidsComponent },
   { path: 'caretaker-summary', component: CaretakerSummaryPageComponent },
   { path: 'forum', component: ForumComponent }
+  { path: 'bid-caretaker', component: CaretakerMakeBidComponent }
 ];
 
 @NgModule({
