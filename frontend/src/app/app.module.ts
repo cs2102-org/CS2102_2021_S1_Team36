@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
+import { PostComponent } from './components/general/forum/post/post.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -42,7 +43,8 @@ FullCalendarModule.registerPlugins([
     PetOwnerBidsComponent,
     CaretakerBidsComponent,
     StatsComponent,
-    ForumComponent
+    ForumComponent,
+    PostComponent
   ],
   imports: [
     BrowserModule,
