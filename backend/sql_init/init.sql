@@ -386,6 +386,7 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'gordan@gmail.com', 'sammy',
 90, 100,
 false, false, '2', '2', NULL
 );
+
 INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'cassie@gmail.com', 'cloud',
 '2020-10-24', '2020-10-26', 4,
 90, 100,
@@ -402,27 +403,27 @@ INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
 true, true, '2', '2', NULL
 );
 INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
-'2020-10-25', '2020-04-01', 4,
+'2020-10-25', '2021-04-01', 4,
 90, 150,
 true, true, '2', '2', NULL
 );
 INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
-'2020-10-26', '2020-05-01', 5,
+'2020-10-26', '2021-05-01', 5,
 90, 150,
 true, true, '2', '2', NULL
 );
 INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'millie',
-'2020-10-25', '2020-01-01', 1,
+'2020-10-25', '2021-01-01', 1,
 90, 100,
 true, true, '2', '2', NULL
 );
 INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
-'2020-10-25', '2020-02-01', 2,
+'2020-10-25', '2021-02-01', 2,
 90, 110,
 true, true, '2', '2', NULL
 );
 INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
-'2020-10-26', '2020-03-01', 3,
+'2020-10-26', '2021-03-01', 3,
 90, 110,
 true, true, '2', '2', NULL
 );

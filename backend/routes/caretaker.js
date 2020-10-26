@@ -82,20 +82,33 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 
 // view all full time caretakers available for a specified date range
 // accounts for their leave and their confirmed bids
-caretakerRouter.get('/ft/na/range', async(req, res) => {
+caretakerRouter.get('/ft/unavail/range', async(req, res) => {
     try {
         var startdate = req.body.startdate;
         var numdays = req.body.numdays;
-        const sql = await pool.query(
+        // var startdate = '2020-10-11';
+        // var numdays = 5;
+        const msql = await pool.query(
             "select C1.email from caretakers C1 \
-            where C1.is_fulltime = True \
+            where C1.is_fulltime = True  \
             and not exists ( \
-            select 1 from (select leave_date as date, 1 as num_days from fulltimeleave where email=C1.email UNION select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = C1.email and is_confirmed = true) as NA \
-            where ($1 <= NA.date and TO_TIMESTAMP($1, 'YYYY-MM-DD') + interval '1' day * $2 >= NA.date) \
-            or (NA.date < $1 and NA.date + interval '1' day * NA.num_days >= $1));",
+            (select leave_date as date, 1 as num_days \
+            from fulltimeleave \
+            where email=C1.email and \
+            $1::date <= leave_date and \
+            leave_date <= $1::date + interval '1' day * ($2 - 1)) \
+            UNION \
+            (select bid_date as date, number_of_days as num_days \
+            from bidsfor \
+            where caretaker_email = C1.email and is_confirmed = true \
+            and NOT ( \
+            bid_date::date + interval '1' day * (number_of_days - 1) < $1::date \
+            OR $1::date + interval '1' day * ($2 - 1) < bid_date::date \
+            )) \
+            );",
             [startdate, numdays]
-            );
-        res.json(sql.rows); 
+        );
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
