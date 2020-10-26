@@ -352,7 +352,7 @@ INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-27');
 INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-28');
 INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-29');
 INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-30');
-
+INSERT INTO PartTimeAvail VALUES ('xiaoming@gmail.com', '2015-01-01');
 
 INSERT INTO BidsFor VALUES ('alice@gmail.com', 'bernie@gmail.com', 'roger',
 '2020-10-25', '2020-10-26', 5,
