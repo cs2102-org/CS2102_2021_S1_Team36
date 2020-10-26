@@ -139,11 +139,11 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select work_date as date, 1 as num_days from parttimeavail P1 \
+            "select to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail P1 \
             where P1.email = $1 \
             and \
             NOT EXISTS \
-            (SELECT bid_date AS date, number_of_days AS num_days FROM bidsfor \
+            (SELECT bid_date AS start, number_of_days AS num_days FROM bidsfor \
             WHERE caretaker_email = $1 \
             AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
             );",
@@ -174,16 +174,20 @@ caretakerRouter.get('/type/:type', async(req, res) => {
 caretakerRouter.get('/active', async(req, res) => {
     try {
         const msql = await pool.query(
-            "select email, is_fulltime, U1.name, rating \
+            "select * from \
+            (select email, U1.name, rating, \
+                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
             from caretakers NATURAL JOIN users as U1 \
             where is_fulltime = true \
             UNION  \
-            select email, is_fulltime, U2.name, rating \
+            select email, U2.name, rating, \
+                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
             FROM \
             (select DISTINCT email, false as is_fulltime \
             from parttimeavail  \
             where date(NOW()::timestamp) <= work_date and work_date <= date(NOW()::timestamp) + interval '2' year) as active \
-            NATURAL JOIN caretakers NATURAL JOIN users as U2;"
+            NATURAL JOIN caretakers NATURAL JOIN users as U2) as Temp\
+            order by rating desc;"
             );
         res.json(msql.rows); 
     } catch (err) {
