@@ -57,7 +57,7 @@ ul {
 
 .fixed-bg {
   background-image: url("./img/rabbit.jpg");
-  min-height: 500px;
+  min-height: 1200px;
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
