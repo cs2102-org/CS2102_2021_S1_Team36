@@ -174,11 +174,11 @@ caretakerRouter.get('/type/:type', async(req, res) => {
 caretakerRouter.get('/active', async(req, res) => {
     try {
         const msql = await pool.query(
-            "select email, is_fulltime, U1.name, description, rating \
+            "select email, is_fulltime, U1.name, rating \
             from caretakers NATURAL JOIN users as U1 \
             where is_fulltime = true \
             UNION  \
-            select email, is_fulltime, U2.name, description, rating \
+            select email, is_fulltime, U2.name, rating \
             FROM \
             (select DISTINCT email, false as is_fulltime \
             from parttimeavail  \
