@@ -57,8 +57,14 @@ authRouter.post("/signup", async (req, res) => {
   // const hash = await bcrypt.hash(password, saltRounds);
   try {
     await pool.query(
-      "INSERT INTO Users VALUES ($1, $2, $3, $4);"
-    , [name, email, desc, password]);
+      "INSERT INTO Users VALUES ($1, $2, $3, $4);",
+    [name, email, desc, password]);
+
+    if (pet_owner) {
+      await pool.query(
+        "INSERT INTO PetOwners VALUES (email);",
+      [email]);
+    }
   } catch (e) {
     return res.status(404).json({ error: e.toString() });
   }
