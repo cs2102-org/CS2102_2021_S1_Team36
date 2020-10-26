@@ -38,13 +38,13 @@ CREATE TABLE Caretakers (
 
 CREATE TABLE PartTimeAvail ( -- records the part time availability
     email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
-    work_date TIMESTAMP,
+    work_date DATE,
     PRIMARY KEY (email, work_date)
 ); -- check that user is actually a part timer
 
 CREATE TABLE FullTimeLeave ( -- records the full time availability
     email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
-    leave_date TIMESTAMP,
+    leave_date DATE,
     PRIMARY KEY (email, leave_date)
 ); -- check that user is actually a full timer
 
@@ -74,7 +74,7 @@ CREATE TABLE BidsFor (
     caretaker_email VARCHAR(30) REFERENCES CareTakers(email),
     pet_name VARCHAR(30),
     submission_time TIMESTAMP,
-    bid_date TIMESTAMP,
+    bid_date DATE,
     number_of_days INTEGER,
     price DECIMAL(10,2),
     amount_bidded DECIMAL(10,2),
