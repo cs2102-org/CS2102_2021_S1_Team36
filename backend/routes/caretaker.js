@@ -161,16 +161,23 @@ caretakerRouter.get('/type/:type', async(req, res) => {
 caretakerRouter.get('/active', async(req, res) => {
     try {
         const msql = await pool.query(
-            "select email, is_fulltime from caretakers where is_fulltime = true \
-            UNION \
-            select DISTINCT email, false as is_fulltime from parttimeavail \
-            where date(NOW()::timestamp) <= work_date and work_date <= date(NOW()::timestamp) + interval '2' year;"
+            "select email, is_fulltime, U1.name, description, rating \
+            from caretakers NATURAL JOIN users as U1 \
+            where is_fulltime = true \
+            UNION  \
+            select email, is_fulltime, U2.name, description, rating \
+            FROM \
+            (select DISTINCT email, false as is_fulltime \
+            from parttimeavail  \
+            where date(NOW()::timestamp) <= work_date and work_date <= date(NOW()::timestamp) + interval '2' year) as active \
+            NATURAL JOIN caretakers NATURAL JOIN users as U2;"
             );
         res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
+
 
 
 

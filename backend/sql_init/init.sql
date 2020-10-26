@@ -25,8 +25,8 @@ CREATE TYPE payment_type AS ENUM('1', '2', '3');
 CREATE TABLE Users (
     name VARCHAR(30) NOT NULL,
     email VARCHAR(30) PRIMARY KEY,
-    password VARCHAR(60) NOT NULL,
-    description VARCHAR(255)
+    description VARCHAR(255),
+    password VARCHAR(60) NOT NULL
 );
 
 CREATE TABLE Caretakers (
@@ -246,6 +246,7 @@ INSERT INTO Pets VALUES ('dickson@gmail.com', 'sammy', 'needs a lot of care', 's
 INSERT INTO Pets VALUES ('dickson@gmail.com', 'cloud', 'needs a lot of care', 'cloud is a Lion owned by dickson', 'Lion');
 INSERT INTO Pets VALUES ('farquard@gmail.com', 'millie', 'scared of thunder', 'millie is a Lion owned by farquard', 'Lion');
 INSERT INTO Pets VALUES ('farquard@gmail.com', 'rufus', 'needs alone time', 'rufus is a Hamster owned by farquard', 'Hamster');
+INSERT INTO Pets VALUES ('farquard@gmail.com', 'dufus', 'needs alone time', 'rufus is a Dog owned by farquard', 'Dog');
 INSERT INTO Pets VALUES ('gaston@gmail.com', 'axa', 'hates dogs', 'axa is a Hamster owned by gaston', 'Hamster');
 INSERT INTO Pets VALUES ('gaston@gmail.com', 'abby', 'needs blanket to sleep', 'abby is a Mouse owned by gaston', 'Mouse');
 INSERT INTO Pets VALUES ('hassan@gmail.com', 'alfie', 'needs more water', 'alfie is a Mouse owned by hassan', 'Mouse');
@@ -398,6 +399,31 @@ true, true, '2', '2', NULL
 INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
 '2020-10-25', '2020-10-02', 3,
 90, 100,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
+'2020-10-25', '2020-04-01', 4,
+90, 150,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
+'2020-10-26', '2020-05-01', 5,
+90, 150,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'millie',
+'2020-10-25', '2020-01-01', 1,
+90, 100,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
+'2020-10-25', '2020-02-01', 2,
+90, 110,
+true, true, '2', '2', NULL
+);
+INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
+'2020-10-26', '2020-03-01', 3,
+90, 110,
 true, true, '2', '2', NULL
 );
 
