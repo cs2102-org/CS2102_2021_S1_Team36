@@ -57,7 +57,7 @@ CREATE TABLE PetTypes ( -- enumerates the types of pets there are, like Dog, Cat
 );
 
 CREATE TABLE Pets (
-    email VARCHAR(30) REFERENCES PetOwners(email),
+    email VARCHAR(30) REFERENCES PetOwners(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     special_requirements VARCHAR(255),
     description VARCHAR(255),
@@ -71,7 +71,7 @@ CREATE TABLE PcsAdmins (
 
 CREATE TABLE BidsFor (
     owner_email VARCHAR(30),
-    caretaker_email VARCHAR(30) REFERENCES CareTakers(email),
+    caretaker_email VARCHAR(30) REFERENCES CareTakers(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     submission_time TIMESTAMP,
     bid_date DATE,
@@ -83,7 +83,7 @@ CREATE TABLE BidsFor (
     payment_type payment_type,
     transfer_type transfer_type,
     rating DECIMAL(10, 1) CHECK (rating >= 0 AND rating <= 5), --can add text for the review
-    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
+    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 );
 
@@ -96,16 +96,16 @@ CREATE TABLE TakecarePrice (
 );
 
 CREATE TABLE Posts (
-    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
+    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE CASCADE,
     title VARCHAR(255) PRIMARY KEY,
     content TEXT,
     last_modified TIMESTAMP
 );
 
 CREATE TABLE Comments (
-    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE CASCADE,
     date_time TIMESTAMP,
-    title TEXT REFERENCES Posts(title),
+    title TEXT REFERENCES Posts(title)  ON DELETE CASCADE,
     content TEXT,
     PRIMARY KEY(title, email, date_time)
 );

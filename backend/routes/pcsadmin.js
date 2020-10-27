@@ -18,7 +18,7 @@ pcsRouter.delete('/user', async (req, res) => {
     await pool.query(
         `
         DELETE FROM Users 
-        WHERE name = ($1) AND email = ($2)
+        WHERE name = $1 AND email = $2 
         `,
         [name, email],
     );
