@@ -24,6 +24,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
 import { PostComponent } from './components/general/forum/post/post.component';
+import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -44,7 +45,8 @@ FullCalendarModule.registerPlugins([
     CaretakerBidsComponent,
     StatsComponent,
     ForumComponent,
-    PostComponent
+    PostComponent,
+    CreatePostComponent
   ],
   imports: [
     BrowserModule,

@@ -9,6 +9,7 @@ import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/ca
 import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-summary-page/caretaker-summary-page.component';
 import { ForumComponent } from './components/general/forum/forum.component';
 import { PostComponent } from './components/general/forum/post/post.component';
+import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,7 +19,8 @@ const routes: Routes = [
   { path: 'caretaker-bids', component: CaretakerBidsComponent },
   { path: 'caretaker-summary', component: CaretakerSummaryPageComponent },
   { path: 'forum', component: ForumComponent },
-  { path: 'post', component: PostComponent}
+  { path: 'post', component: PostComponent},
+  { path: 'create-post', component: CreatePostComponent}
 ];
 
 @NgModule({
