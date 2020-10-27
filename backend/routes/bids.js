@@ -74,6 +74,8 @@ bidsRouter.get('/hist/range/:email', async(req, res) => {
         const { email } = req.params;
         startdate = req.body.startdate;
         enddate = req.body.enddate;
+        // startdate = '2020-01-01';
+        // enddate = '2021-03-01';
         const msql = await pool.query(
             "select * from \
             (select caretaker_email, \
@@ -109,6 +111,23 @@ bidsRouter.get('/earnings/range', async(req, res) => {
             [startdate, enddate]
             );
         res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// Add rating to a Bidsfor entry
+// rating must be 0 <= rating <= 5
+bidsRouter.post('/rate', async (req, res) => {
+    try {
+        const { rating, owner_email, caretaker_email, pet_name, submission_time } = req.body;
+        // console.log(req.body);
+        const sql = await pool.query(
+            "UPDATE bidsfor SET rating = $1 \
+            WHERE owner_email=$2 AND caretaker_email=$3 AND pet_name=$4 AND submission_time=$5;",
+            [rating, owner_email, caretaker_email, pet_name, submission_time]
+        );
+        res.status(200).send(`Updated bidsfor with: ${owner_email}, ${caretaker_email}, ${pet_name}, ${submission_time} with rating ${rating}`);
     } catch (err) {
         console.error(err);
     }
