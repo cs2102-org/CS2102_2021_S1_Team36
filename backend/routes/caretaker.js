@@ -7,8 +7,20 @@ const bodyParser = require('body-parser')
 const caretakerRouter = express.Router();
 
 /*
-to test the endpoints here, use /api/caretaker/ in front of the urls
+to test the endpoints here, use http://localhost:5000/api/caretaker/ in front of the urls
 */
+
+// insert new caretaker
+// default rating = 3
+caretakerRouter.post('/new', async(req, res) => {
+    try {
+        const {email, full_time, rating} = req.body;
+        console.log(email);
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 // get the fullTimeLeave table
 caretakerRouter.get('/ft/leave/all', async(req, res) => {
