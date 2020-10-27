@@ -74,6 +74,8 @@ bidsRouter.get('/hist/range/:email', async(req, res) => {
         const { email } = req.params;
         startdate = req.body.startdate;
         enddate = req.body.enddate;
+        // startdate = '2020-01-01';
+        // enddate = '2021-03-01';
         const msql = await pool.query(
             "select * from \
             (select caretaker_email, \
