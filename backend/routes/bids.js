@@ -48,6 +48,40 @@ bidsRouter.get('/for/:email', async(req, res) => {
     }
 });
 
+// add a bid
+bidsRouter.post('/add', async(req, res) => {
+    try {
+        const { owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price,
+                amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating } = req.body;
+        const msql = await pool.query(
+            "INSERT INTO BidsFor(owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price, \
+            amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating) \
+            VALUES \
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
+            [owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price,
+             amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating]
+            );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+/* test example:
+    "owner_email" : "peter@gmail.com",
+    "caretaker_email" : "cassie@gmail.com",
+    "pet_name" : "boomer",
+    "submission_time" : "2020-10-25",
+    "start_date" : "2020-10-26",
+    "end_date" : "2020-10-30",
+    "price" : 100,
+    "amount_bidded" : 200,
+    "is_confirmed" : true,
+    "is_paid" : false,
+    "payment_type" : "1",
+    "transfer_type" : "2",
+    "rating" : null,
+*/
+
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
 bidsRouter.get('/hist/:email', async(req, res) => {

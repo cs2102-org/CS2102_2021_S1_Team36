@@ -82,6 +82,7 @@ caretakerRouter.get('/ft/leave/all', async(req, res) => {
 });
 
 // get the fullTimeLeave of a specified full time caretaker
+ // todo: check that specified caretaker is actually full time
 caretakerRouter.get('/ft/leave/:email', async(req, res) => {
     try {
         const { email } = req.params;
@@ -94,7 +95,6 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
         console.error(err);
     }
 }); // todo: check that specified caretaker is actually full time
-
 
 
 // view all caretakers non-availability (na)
@@ -218,6 +218,23 @@ caretakerRouter.get('/type/:type', async(req, res) => {
         console.error(err);
     }
 });
+
+// add a species that a caretaker can take care of
+caretakerRouter.post('/type/add/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const { species, base_price, daily_price } = req.body;
+        const msql = await pool.query(
+            "INSERT INTO TakecarePrice(email, species, base_price, daily_price) \
+            VALUES ($1, $2, $3, $4);",
+            [email, species, base_price, daily_price]
+            );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 // find all active caretakers, i.e. all fulltime + all parttime who have a avail date in the last two years
 caretakerRouter.get('/active', async(req, res) => {
