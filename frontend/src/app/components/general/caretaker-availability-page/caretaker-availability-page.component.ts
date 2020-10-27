@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
+import { Subscription } from 'rxjs';
+import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -10,14 +12,12 @@ import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 export class CaretakerAvailabilityPageComponent implements OnInit {
   @ViewChild('calendar') calendarComponent: FullCalendarComponent;
 
-  datesSelected: String[] = [];
-
   selectedCaretaker;
+  placeholderDate: String;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     height: 450,
-    dateClick: this.handleDateClick.bind(this),
     validRange: function(nowDate) {
       const aYearFromNow = new Date(nowDate);
       aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
@@ -26,10 +26,8 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
         end:  aYearFromNow
       };
     },
-    events: [
-      { title: 'event 1', date: '2019-04-01' },
-      { title: 'event 2', date: '2019-04-02' }
-    ]
+    events: [],
+    eventBackgroundColor: 'grey',
   };
 
   filterForm = new FormGroup({
@@ -42,25 +40,27 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     minRating: new FormControl('')
   });
 
+  caretakersSubscription: Subscription;
   caretakers: any[] = [
     { id: 1, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} },
-    
+    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} }
   ];
 
-  constructor() { }
+  constructor(private caretakerService: CaretakerService) { }
 
   ngOnInit(): void {
+    let aDate = new Date();
+    aDate.setDate(aDate.getDate() - 1);
+    this.placeholderDate = aDate.toISOString().slice(0,10);
+    this.getActiveCaretakers();
+  }
+
+  getActiveCaretakers() {
+    this.caretakersSubscription = this.caretakerService.getActiveCaretakers().subscribe((caretakers) => {
+      let id = 1;
+      caretakers.map(elem => {elem.id = id++;});
+      this.caretakers = caretakers;
+    });
   }
 
   onSubmit(searchParam) {
@@ -68,13 +68,17 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     console.log(searchParam);
   }
 
-  handleDateClick(arg) {
-    this.datesSelected.push(arg.dateStr);
-  }
-
   select(caretaker){
-    this.selectedCaretaker = caretaker;
-    // alert(this.selectedCaretaker.name);
+    if (caretaker.type == "Part Time") {
+      this.caretakerService.getAvailPartTimeCareTaker(caretaker.email).subscribe((dates) => {
+        dates.push({"date": this.placeholderDate});
+        dates.map(elem => {elem.display = 'inverse-background'; elem.groupId= 'yes';});
+        this.calendarOptions.events = dates;
+        this.selectedCaretaker = caretaker;  
+      });
+    } else {
+      this.calendarOptions.events = [];
+    }
   }
 
   showHide(caretaker){

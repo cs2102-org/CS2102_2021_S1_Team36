@@ -70,10 +70,6 @@
     <div *ngIf="selectedCaretaker != undefined" class="column-right">
       <h2>Availability of {{selectedCaretaker.name}}</h2>
       <a target="_blank" [routerLink] = "['/bid-caretaker']"><button>Bid Now</button></a>
-      <div *ngIf="datesSelected.length !== 0">
-        <p>Dates chosen: </p>
-        <span *ngFor="let date of datesSelected;">{{date}}, </span>
-      </div>
       <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
 </div>
