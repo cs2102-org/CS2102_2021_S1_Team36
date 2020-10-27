@@ -31,7 +31,7 @@ CREATE TABLE Users (
 
 CREATE TABLE Caretakers (
     email VARCHAR(30) PRIMARY KEY REFERENCES Users(email) ON DELETE CASCADE,
-    is_fulltime BOOLEAN,
+    is_fulltime BOOLEAN NOT NULL,
     rating INTEGER,
     CHECK (0 <= rating AND rating <= 5)
 );
@@ -40,20 +40,21 @@ CREATE TABLE PartTimeAvail ( -- records the part time availability
     email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
     work_date DATE,
     PRIMARY KEY (email, work_date)
-); -- check that user is actually a part timer
+);
+-- todo: check that user is actually a part timer
 
 CREATE TABLE FullTimeLeave ( -- records the full time availability
     email VARCHAR(30) REFERENCES Caretakers(email) ON DELETE CASCADE,
-    leave_date DATE,
+    leave_date DATE NOT NULL,
     PRIMARY KEY (email, leave_date)
-); -- check that user is actually a full timer
+); -- todo: check that user is actually a full timer
 
 CREATE TABLE PetOwners (
     email VARCHAR(30) PRIMARY KEY REFERENCES Users(email) ON DELETE CASCADE
 );
 
 CREATE TABLE PetTypes ( -- enumerates the types of pets there are, like Dog, Cat, etc
-    species VARCHAR(30) PRIMARY KEY
+    species VARCHAR(30) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE Pets (
@@ -74,8 +75,8 @@ CREATE TABLE BidsFor (
     caretaker_email VARCHAR(30) REFERENCES CareTakers(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     submission_time TIMESTAMP,
-    bid_date DATE,
-    number_of_days INTEGER,
+    start_date DATE,
+    end_date DATE,
     price DECIMAL(10,2),
     amount_bidded DECIMAL(10,2),
     is_confirmed BOOLEAN,
@@ -85,7 +86,7 @@ CREATE TABLE BidsFor (
     rating DECIMAL(10, 1) CHECK (rating >= 0 AND rating <= 5), --can add text for the review
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
-);
+); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
@@ -96,424 +97,509 @@ CREATE TABLE TakecarePrice (
 );
 
 CREATE TABLE Posts (
-    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE CASCADE,
-    title VARCHAR(255) PRIMARY KEY,
-    content TEXT,
-    last_modified TIMESTAMP
+	post_id SERIAL PRIMARY KEY,
+    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
+    title VARCHAR(255),
+    cont TEXT,
+    last_modified TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE Comments (
-    email VARCHAR(30) REFERENCES Users(email) ON DELETE CASCADE,
-    date_time TIMESTAMP,
-    title TEXT REFERENCES Posts(title)  ON DELETE CASCADE,
-    content TEXT,
-    PRIMARY KEY(title, email, date_time)
+	post_id INTEGER REFERENCES Posts(post_id),
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+    date_time TIMESTAMP DEFAULT NOW(),
+    cont TEXT,
+    PRIMARY KEY (post_id, email, date_time)
 );
 
--- CREATE TABLE Posts (
--- 	post_id SERIAL PRIMARY KEY,
---     email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
---     title VARCHAR(255),
---     content TEXT,
---     last_modified TIMESTAMP
--- );
+INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
+INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a petowner of pcs', 'pwpeter');
+INSERT INTO PetOwners(email) VALUES ('peter@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('patty', 'patty@gmail.com', 'patty is a petowner of pcs', 'pwpatty');
+INSERT INTO PetOwners(email) VALUES ('patty@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('pattison', 'pattison@gmail.com', 'pattison is a petowner of pcs', 'pwpattison');
+INSERT INTO PetOwners(email) VALUES ('pattison@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('parthia', 'parthia@gmail.com', 'parthia is a petowner of pcs', 'pwparthia');
+INSERT INTO PetOwners(email) VALUES ('parthia@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('parthus', 'parthus@gmail.com', 'parthus is a petowner of pcs', 'pwparthus');
+INSERT INTO PetOwners(email) VALUES ('parthus@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('paragon', 'paragon@gmail.com', 'paragon is a petowner of pcs', 'pwparagon');
+INSERT INTO PetOwners(email) VALUES ('paragon@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('parata', 'parata@gmail.com', 'parata is a petowner of pcs', 'pwparata');
+INSERT INTO PetOwners(email) VALUES ('parata@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('pistachio', 'pistachio@gmail.com', 'pistachio is a petowner of pcs', 'pwpistachio');
+INSERT INTO PetOwners(email) VALUES ('pistachio@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('peran', 'peran@gmail.com', 'peran is a petowner of pcs', 'pwperan');
+INSERT INTO PetOwners(email) VALUES ('peran@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('perry', 'perry@gmail.com', 'perry is a petowner of pcs', 'pwperry');
+INSERT INTO PetOwners(email) VALUES ('perry@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('pearl', 'pearl@gmail.com', 'pearl is a petowner of pcs', 'pwpearl');
+INSERT INTO PetOwners(email) VALUES ('pearl@gmail.com');
 
--- CREATE TABLE Comments (
--- 	post_id SERIAL PRIMARY KEY,
---     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
---     date_time TIMESTAMP,
---     title TEXT REFERENCES Posts(title),
---     content TEXT
--- );
+INSERT INTO Users(name, email, description, password) VALUES ('cassie', 'cassie@gmail.com', 'cassie is a full time caretaker of pcs', 'pwcassie');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cassie@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('carrie', 'carrie@gmail.com', 'carrie is a full time caretaker of pcs', 'pwcarrie');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('carrie@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('carl', 'carl@gmail.com', 'carl is a full time caretaker of pcs', 'pwcarl');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('carl@gmail.com', true, 4);
+INSERT INTO Users(name, email, description, password) VALUES ('carlos', 'carlos@gmail.com', 'carlos is a full time caretaker of pcs', 'pwcarlos');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('carlos@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('caren', 'caren@gmail.com', 'caren is a full time caretaker of pcs', 'pwcaren');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('caren@gmail.com', true, 5);
+INSERT INTO Users(name, email, description, password) VALUES ('canneth', 'canneth@gmail.com', 'canneth is a full time caretaker of pcs', 'pwcanneth');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('canneth@gmail.com', true, 1);
+INSERT INTO Users(name, email, description, password) VALUES ('cain', 'cain@gmail.com', 'cain is a full time caretaker of pcs', 'pwcain');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cain@gmail.com', true, 4);
+INSERT INTO Users(name, email, description, password) VALUES ('carmen', 'carmen@gmail.com', 'carmen is a full time caretaker of pcs', 'pwcarmen');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('carmen@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('cejudo', 'cejudo@gmail.com', 'cejudo is a full time caretaker of pcs', 'pwcejudo');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cejudo@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('celine', 'celine@gmail.com', 'celine is a full time caretaker of pcs', 'pwceline');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('celine@gmail.com', true, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('cevan', 'cevan@gmail.com', 'cevan is a full time caretaker of pcs', 'pwcevan');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cevan@gmail.com', true, 5);
+INSERT INTO Users(name, email, description, password) VALUES ('catarth', 'catarth@gmail.com', 'catarth is a full time caretaker of pcs', 'pwcatarth');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('catarth@gmail.com', true, 1);
+INSERT INTO Users(name, email, description, password) VALUES ('columbus', 'columbus@gmail.com', 'columbus is a full time caretaker of pcs', 'pwcolumbus');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('columbus@gmail.com', true, 2);
 
-INSERT INTO Users VALUES ('alice', 'alice@gmail.com', 'alice is a petowner of pcs', 'pwalice');
-INSERT INTO PetOwners VALUES ('alice@gmail.com');
-INSERT INTO Users VALUES ('bob', 'bob@gmail.com', 'bob is a petowner of pcs', 'pwbob');
-INSERT INTO PetOwners VALUES ('bob@gmail.com');
-INSERT INTO Users VALUES ('charlie', 'charlie@gmail.com', 'charlie is a petowner of pcs', 'pwcharlie');
-INSERT INTO PetOwners VALUES ('charlie@gmail.com');
-INSERT INTO Users VALUES ('dickson', 'dickson@gmail.com', 'dickson is a petowner of pcs', 'pwdickson');
-INSERT INTO PetOwners VALUES ('dickson@gmail.com');
-INSERT INTO Users VALUES ('farquard', 'farquard@gmail.com', 'farquard is a petowner of pcs', 'pwfarquard');
-INSERT INTO PetOwners VALUES ('farquard@gmail.com');
-INSERT INTO Users VALUES ('gaston', 'gaston@gmail.com', 'gaston is a petowner of pcs', 'pwgaston');
-INSERT INTO PetOwners VALUES ('gaston@gmail.com');
-INSERT INTO Users VALUES ('hassan', 'hassan@gmail.com', 'hassan is a petowner of pcs', 'pwhassan');
-INSERT INTO PetOwners VALUES ('hassan@gmail.com');
-INSERT INTO Users VALUES ('ignatius', 'ignatius@gmail.com', 'ignatius is a petowner of pcs', 'pwignatius');
-INSERT INTO PetOwners VALUES ('ignatius@gmail.com');
-INSERT INTO Users VALUES ('jospeh', 'jospeh@gmail.com', 'jospeh is a petowner of pcs', 'pwjospeh');
-INSERT INTO PetOwners VALUES ('jospeh@gmail.com');
-INSERT INTO Users VALUES ('kamaru', 'kamaru@gmail.com', 'kamaru is a petowner of pcs', 'pwkamaru');
-INSERT INTO PetOwners VALUES ('kamaru@gmail.com');
-INSERT INTO Users VALUES ('lexus', 'lexus@gmail.com', 'lexus is a petowner of pcs', 'pwlexus');
-INSERT INTO PetOwners VALUES ('lexus@gmail.com');
-INSERT INTO Users VALUES ('moses', 'moses@gmail.com', 'moses is a petowner of pcs', 'pwmoses');
-INSERT INTO PetOwners VALUES ('moses@gmail.com');
-INSERT INTO Users VALUES ('naruto', 'naruto@gmail.com', 'naruto is a petowner of pcs', 'pwnaruto');
-INSERT INTO PetOwners VALUES ('naruto@gmail.com');
-INSERT INTO Users VALUES ('obito', 'obito@gmail.com', 'obito is a petowner of pcs', 'pwobito');
-INSERT INTO PetOwners VALUES ('obito@gmail.com');
-INSERT INTO Users VALUES ('peter', 'peter@gmail.com', 'peter is a petowner of pcs', 'pwpeter');
-INSERT INTO PetOwners VALUES ('peter@gmail.com');
-INSERT INTO Users VALUES ('quillo', 'quillo@gmail.com', 'quillo is a petowner of pcs', 'pwquillo');
-INSERT INTO PetOwners VALUES ('quillo@gmail.com');
-INSERT INTO Users VALUES ('ramirez', 'ramirez@gmail.com', 'ramirez is a petowner of pcs', 'pwramirez');
-INSERT INTO PetOwners VALUES ('ramirez@gmail.com');
-INSERT INTO Users VALUES ('stefan', 'stefan@gmail.com', 'stefan is a petowner of pcs', 'pwstefan');
-INSERT INTO PetOwners VALUES ('stefan@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('xiaoping', 'xiaoping@gmail.com', 'xiaoping is a part time caretaker of pcs', 'pwxiaoping');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaoping@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaoming', 'xiaoming@gmail.com', 'xiaoming is a part time caretaker of pcs', 'pwxiaoming');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaoming@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaodong', 'xiaodong@gmail.com', 'xiaodong is a part time caretaker of pcs', 'pwxiaodong');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaodong@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaolong', 'xiaolong@gmail.com', 'xiaolong is a part time caretaker of pcs', 'pwxiaolong');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaolong@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaobao', 'xiaobao@gmail.com', 'xiaobao is a part time caretaker of pcs', 'pwxiaobao');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaobao@gmail.com', false, 1);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaorong', 'xiaorong@gmail.com', 'xiaorong is a part time caretaker of pcs', 'pwxiaorong');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaorong@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaohong', 'xiaohong@gmail.com', 'xiaohong is a part time caretaker of pcs', 'pwxiaohong');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaohong@gmail.com', false, 2);
+INSERT INTO Users(name, email, description, password) VALUES ('xiaozong', 'xiaozong@gmail.com', 'xiaozong is a part time caretaker of pcs', 'pwxiaozong');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaozong@gmail.com', false, 2);
 
-INSERT INTO Users VALUES ('alex', 'alex@gmail.com', 'alex is a caretaker of pcs', 'pwalex');
-INSERT INTO Caretakers VALUES ('alex@gmail.com', true, 4);
-INSERT INTO Users VALUES ('bernie', 'bernie@gmail.com', 'bernie is a caretaker of pcs', 'pwbernie');
-INSERT INTO Caretakers VALUES ('bernie@gmail.com', true, 0);
-INSERT INTO Users VALUES ('cassie', 'cassie@gmail.com', 'cassie is a caretaker of pcs', 'pwcassie');
-INSERT INTO Caretakers VALUES ('cassie@gmail.com', true, 0);
-INSERT INTO Users VALUES ('diggory', 'diggory@gmail.com', 'diggory is a caretaker of pcs', 'pwdiggory');
-INSERT INTO Caretakers VALUES ('diggory@gmail.com', true, 1);
-INSERT INTO Users VALUES ('familia', 'familia@gmail.com', 'familia is a caretaker of pcs', 'pwfamilia');
-INSERT INTO Caretakers VALUES ('familia@gmail.com', true, 1);
-INSERT INTO Users VALUES ('gordan', 'gordan@gmail.com', 'gordan is a caretaker of pcs', 'pwgordan');
-INSERT INTO Caretakers VALUES ('gordan@gmail.com', true, 0);
-INSERT INTO Users VALUES ('hammy', 'hammy@gmail.com', 'hammy is a caretaker of pcs', 'pwhammy');
-INSERT INTO Caretakers VALUES ('hammy@gmail.com', true, 5);
-INSERT INTO Users VALUES ('jackson', 'jackson@gmail.com', 'jackson is a caretaker of pcs', 'pwjackson');
-INSERT INTO Caretakers VALUES ('jackson@gmail.com', true, 1);
-INSERT INTO Users VALUES ('konstance', 'konstance@gmail.com', 'konstance is a caretaker of pcs', 'pwkonstance');
-INSERT INTO Caretakers VALUES ('konstance@gmail.com', true, 3);
-INSERT INTO Users VALUES ('lokister', 'lokister@gmail.com', 'lokister is a caretaker of pcs', 'pwlokister');
-INSERT INTO Caretakers VALUES ('lokister@gmail.com', true, 2);
-INSERT INTO Users VALUES ('monsta', 'monsta@gmail.com', 'monsta is a caretaker of pcs', 'pwmonsta');
-INSERT INTO Caretakers VALUES ('monsta@gmail.com', true, 0);
-INSERT INTO Users VALUES ('natasha', 'natasha@gmail.com', 'natasha is a caretaker of pcs', 'pwnatasha');
-INSERT INTO Caretakers VALUES ('natasha@gmail.com', true, 1);
-INSERT INTO Users VALUES ('oranus', 'oranus@gmail.com', 'oranus is a caretaker of pcs', 'pworanus');
-INSERT INTO Caretakers VALUES ('oranus@gmail.com', true, 0);
-INSERT INTO Users VALUES ('percy', 'percy@gmail.com', 'percy is a caretaker of pcs', 'pwpercy');
-INSERT INTO Caretakers VALUES ('percy@gmail.com', true, 5);
-INSERT INTO Users VALUES ('patrick', 'patrick@gmail.com', 'patrick is a caretaker of pcs', 'pwpatrick');
-INSERT INTO Caretakers VALUES ('patrick@gmail.com', true, 1);
+INSERT INTO PetTypes(species) VALUES ('Dog');
+INSERT INTO PetTypes(species) VALUES ('Cat');
+INSERT INTO PetTypes(species) VALUES ('Hamster');
+INSERT INTO PetTypes(species) VALUES ('Mouse');
+INSERT INTO PetTypes(species) VALUES ('Bird');
+INSERT INTO PetTypes(species) VALUES ('Horse');
+INSERT INTO PetTypes(species) VALUES ('Turtle');
+INSERT INTO PetTypes(species) VALUES ('Snake');
+INSERT INTO PetTypes(species) VALUES ('Monkey');
+INSERT INTO PetTypes(species) VALUES ('Lion');
 
-INSERT INTO Users VALUES ('waldo', 'waldo@gmail.com', 'waldo is a part time caretaker of pcs', 'pwwaldo');
-INSERT INTO Caretakers VALUES ('waldo@gmail.com', false, 5);
-INSERT INTO Users VALUES ('wally', 'wally@gmail.com', 'wally is a part time caretaker of pcs', 'pwwally');
-INSERT INTO Caretakers VALUES ('wally@gmail.com', false, 5);
-INSERT INTO Users VALUES ('walter', 'walter@gmail.com', 'walter is a part time caretaker of pcs', 'pwwalter');
-INSERT INTO Caretakers VALUES ('walter@gmail.com', false, 0);
-INSERT INTO Users VALUES ('wendy', 'wendy@gmail.com', 'wendy is a part time caretaker of pcs', 'pwwendy');
-INSERT INTO Caretakers VALUES ('wendy@gmail.com', false, 5);
-INSERT INTO Users VALUES ('wesley', 'wesley@gmail.com', 'wesley is a part time caretaker of pcs', 'pwwesley');
-INSERT INTO Caretakers VALUES ('wesley@gmail.com', false, 0);
-INSERT INTO Users VALUES ('whitney', 'whitney@gmail.com', 'whitney is a part time caretaker of pcs', 'pwwhitney');
-INSERT INTO Caretakers VALUES ('whitney@gmail.com', false, 1);
-INSERT INTO Users VALUES ('wilfred', 'wilfred@gmail.com', 'wilfred is a part time caretaker of pcs', 'pwwilfred');
-INSERT INTO Caretakers VALUES ('wilfred@gmail.com', false, 1);
-INSERT INTO Users VALUES ('xavier', 'xavier@gmail.com', 'xavier is a part time caretaker of pcs', 'pwxavier');
-INSERT INTO Caretakers VALUES ('xavier@gmail.com', false, 0);
-INSERT INTO Users VALUES ('xenia', 'xenia@gmail.com', 'xenia is a part time caretaker of pcs', 'pwxenia');
-INSERT INTO Caretakers VALUES ('xenia@gmail.com', false, 5);
-INSERT INTO Users VALUES ('xiaoping', 'xiaoping@gmail.com', 'xiaoping is a part time caretaker of pcs', 'pwxiaoping');
-INSERT INTO Caretakers VALUES ('xiaoping@gmail.com', false, 2);
-INSERT INTO Users VALUES ('xiaoming', 'xiaoming@gmail.com', 'xiaoming is a part time caretaker of pcs', 'pwxiaoming');
-INSERT INTO Caretakers VALUES ('xiaoming@gmail.com', false, 2);
-INSERT INTO Users VALUES ('xiaodong', 'xiaodong@gmail.com', 'xiaodong is a part time caretaker of pcs', 'pwxiaodong');
-INSERT INTO Caretakers VALUES ('xiaodong@gmail.com', false, 2);
-INSERT INTO Users VALUES ('xiaolong', 'xiaolong@gmail.com', 'xiaolong is a part time caretaker of pcs', 'pwxiaolong');
-INSERT INTO Caretakers VALUES ('xiaolong@gmail.com', false, 2);
-INSERT INTO Users VALUES ('xiaobao', 'xiaobao@gmail.com', 'xiaobao is a part time caretaker of pcs', 'pwxiaobao');
-INSERT INTO Caretakers VALUES ('xiaobao@gmail.com', false, 1);
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('panter@gmail.com', 'roger', 'needs a lot of care', 'roger is a Dog owned by panter', 'Dog');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peter@gmail.com', 'boomer', 'needs alone time', 'boomer is a Cat owned by peter', 'Cat');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('patty@gmail.com', 'jerry', 'scared of thunder', 'jerry is a Hamster owned by patty', 'Hamster');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pattison@gmail.com', 'tom', 'scared of vaccumm', 'tom is a Mouse owned by pattison', 'Mouse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthia@gmail.com', 'felix', 'likes apples', 'felix is a Bird owned by parthia', 'Bird');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthus@gmail.com', 'roscoe', 'allergic to peanuts', 'roscoe is a Horse owned by parthus', 'Horse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('paragon@gmail.com', 'sammy', 'allergic to grass', 'sammy is a Turtle owned by paragon', 'Turtle');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parata@gmail.com', 'cloud', 'scared of snakes', 'cloud is a Snake owned by parata', 'Snake');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pistachio@gmail.com', 'millie', 'hates cats', 'millie is a Monkey owned by pistachio', 'Monkey');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peran@gmail.com', 'rufus', 'hates dogs', 'rufus is a Lion owned by peran', 'Lion');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('perry@gmail.com', 'axa', 'needs blanket to sleep', 'axa is a Dog owned by perry', 'Dog');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pearl@gmail.com', 'abby', 'needs to drink 100 plus', 'abby is a Cat owned by pearl', 'Cat');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('panter@gmail.com', 'alfie', 'needs a lot of care', 'alfie is a Hamster owned by panter', 'Hamster');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peter@gmail.com', 'bandit', 'needs alone time', 'bandit is a Mouse owned by peter', 'Mouse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('patty@gmail.com', 'biscuit', 'scared of thunder', 'biscuit is a Bird owned by patty', 'Bird');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pattison@gmail.com', 'buster', 'scared of vaccumm', 'buster is a Horse owned by pattison', 'Horse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthia@gmail.com', 'chad', 'likes apples', 'chad is a Turtle owned by parthia', 'Turtle');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthus@gmail.com', 'charlie', 'allergic to peanuts', 'charlie is a Snake owned by parthus', 'Snake');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('paragon@gmail.com', 'chewie', 'allergic to grass', 'chewie is a Monkey owned by paragon', 'Monkey');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parata@gmail.com', 'chippy', 'scared of snakes', 'chippy is a Lion owned by parata', 'Lion');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pistachio@gmail.com', 'choco', 'hates cats', 'choco is a Dog owned by pistachio', 'Dog');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peran@gmail.com', 'daisy', 'hates dogs', 'daisy is a Cat owned by peran', 'Cat');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('perry@gmail.com', 'digger', 'needs blanket to sleep', 'digger is a Hamster owned by perry', 'Hamster');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pearl@gmail.com', 'fergie', 'needs to drink 100 plus', 'fergie is a Mouse owned by pearl', 'Mouse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('panter@gmail.com', 'fido', 'needs a lot of care', 'fido is a Bird owned by panter', 'Bird');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peter@gmail.com', 'freddie', 'needs alone time', 'freddie is a Horse owned by peter', 'Horse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('patty@gmail.com', 'ginger', 'scared of thunder', 'ginger is a Turtle owned by patty', 'Turtle');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pattison@gmail.com', 'gizmo', 'scared of vaccumm', 'gizmo is a Snake owned by pattison', 'Snake');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthia@gmail.com', 'gus', 'likes apples', 'gus is a Monkey owned by parthia', 'Monkey');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parthus@gmail.com', 'hugo', 'allergic to peanuts', 'hugo is a Lion owned by parthus', 'Lion');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('paragon@gmail.com', 'jacky', 'allergic to grass', 'jacky is a Dog owned by paragon', 'Dog');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('parata@gmail.com', 'jake', 'scared of snakes', 'jake is a Cat owned by parata', 'Cat');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pistachio@gmail.com', 'jaxson', 'hates cats', 'jaxson is a Hamster owned by pistachio', 'Hamster');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peran@gmail.com', 'logan', 'hates dogs', 'logan is a Mouse owned by peran', 'Mouse');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('perry@gmail.com', 'lucky', 'needs blanket to sleep', 'lucky is a Bird owned by perry', 'Bird');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pearl@gmail.com', 'maddie', 'needs to drink 100 plus', 'maddie is a Horse owned by pearl', 'Horse');
 
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'cassie@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'cassie@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 80, 'cassie@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'carrie@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'carrie@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 90, 'carrie@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (40, 80, 'carl@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (50, 90, 'carl@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 120, 'carl@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'carlos@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'carlos@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (110, 110, 'carlos@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (50, 100, 'caren@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 110, 'caren@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (110, 160, 'caren@gmail.com', 'Turtle');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 80, 'canneth@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 90, 'canneth@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (140, 150, 'canneth@gmail.com', 'Snake');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (40, 80, 'cain@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (50, 90, 'cain@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (120, 160, 'cain@gmail.com', 'Monkey');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'carmen@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'carmen@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (150, 150, 'carmen@gmail.com', 'Lion');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'cejudo@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'cejudo@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 80, 'cejudo@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 60, 'celine@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 70, 'celine@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 90, 'celine@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (50, 100, 'cevan@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (60, 110, 'cevan@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 140, 'cevan@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 80, 'catarth@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 90, 'catarth@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (120, 130, 'catarth@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'columbus@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'columbus@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (140, 160, 'columbus@gmail.com', 'Turtle');
 
-INSERT INTO PetTypes VALUES ('Dog');
-INSERT INTO PetTypes VALUES ('Cat');
-INSERT INTO PetTypes VALUES ('Horse');
-INSERT INTO PetTypes VALUES ('Monkey');
-INSERT INTO PetTypes VALUES ('Lion');
-INSERT INTO PetTypes VALUES ('Hamster');
-INSERT INTO PetTypes VALUES ('Mouse');
-INSERT INTO PetTypes VALUES ('Turtle');
-INSERT INTO PetTypes VALUES ('Budgie');
-INSERT INTO PetTypes VALUES ('Chicken');
-INSERT INTO PetTypes VALUES ('Snake');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaoping@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaoping@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (100, 120, 'xiaoping@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaoming@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaoming@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (110, 130, 'xiaoming@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaodong@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaodong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (120, 140, 'xiaodong@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaolong@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaolong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (130, 150, 'xiaolong@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (70, 80, 'xiaobao@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 90, 'xiaobao@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (130, 140, 'xiaobao@gmail.com', 'Turtle');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaorong@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaorong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (150, 170, 'xiaorong@gmail.com', 'Snake');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaohong@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaohong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (160, 180, 'xiaohong@gmail.com', 'Monkey');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaozong@gmail.com', 'Dog');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (90, 110, 'xiaozong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(base_price, daily_price, email, species) VALUES (170, 190, 'xiaozong@gmail.com', 'Lion');
 
-INSERT INTO Pets VALUES ('alice@gmail.com', 'roger', 'needs blanket to sleep', 'roger is a Dog owned by alice', 'Dog');
-INSERT INTO Pets VALUES ('alice@gmail.com', 'boomer', 'needs more water', 'boomer is a Cat owned by alice', 'Cat');
-INSERT INTO Pets VALUES ('bob@gmail.com', 'jerry', 'hates cats', 'jerry is a Cat owned by bob', 'Cat');
-INSERT INTO Pets VALUES ('bob@gmail.com', 'tom', 'allergic to grass', 'tom is a Horse owned by bob', 'Horse');
-INSERT INTO Pets VALUES ('charlie@gmail.com', 'felix', 'needs a lot of care', 'felix is a Horse owned by charlie', 'Horse');
-INSERT INTO Pets VALUES ('charlie@gmail.com', 'roscoe', 'needs alone time', 'roscoe is a Monkey owned by charlie', 'Monkey');
-INSERT INTO Pets VALUES ('dickson@gmail.com', 'sammy', 'needs a lot of care', 'sammy is a Monkey owned by dickson', 'Monkey');
-INSERT INTO Pets VALUES ('dickson@gmail.com', 'cloud', 'needs a lot of care', 'cloud is a Lion owned by dickson', 'Lion');
-INSERT INTO Pets VALUES ('farquard@gmail.com', 'millie', 'scared of thunder', 'millie is a Lion owned by farquard', 'Lion');
-INSERT INTO Pets VALUES ('farquard@gmail.com', 'rufus', 'needs alone time', 'rufus is a Hamster owned by farquard', 'Hamster');
-INSERT INTO Pets VALUES ('farquard@gmail.com', 'dufus', 'needs alone time', 'rufus is a Dog owned by farquard', 'Dog');
-INSERT INTO Pets VALUES ('gaston@gmail.com', 'axa', 'hates dogs', 'axa is a Hamster owned by gaston', 'Hamster');
-INSERT INTO Pets VALUES ('gaston@gmail.com', 'abby', 'needs blanket to sleep', 'abby is a Mouse owned by gaston', 'Mouse');
-INSERT INTO Pets VALUES ('hassan@gmail.com', 'alfie', 'needs more water', 'alfie is a Mouse owned by hassan', 'Mouse');
-INSERT INTO Pets VALUES ('hassan@gmail.com', 'bandit', 'needs a lot of care', 'bandit is a Turtle owned by hassan', 'Turtle');
-INSERT INTO Pets VALUES ('ignatius@gmail.com', 'biscuit', 'scared of vaccumm', 'biscuit is a Turtle owned by ignatius', 'Turtle');
-INSERT INTO Pets VALUES ('ignatius@gmail.com', 'buster', 'scared of thunder', 'buster is a Budgie owned by ignatius', 'Budgie');
-INSERT INTO Pets VALUES ('jospeh@gmail.com', 'chad', 'needs blanket to sleep', 'chad is a Budgie owned by jospeh', 'Budgie');
-INSERT INTO Pets VALUES ('jospeh@gmail.com', 'charlie', 'needs alone time', 'charlie is a Chicken owned by jospeh', 'Chicken');
-INSERT INTO Pets VALUES ('kamaru@gmail.com', 'chewie', 'needs a lot of care', 'chewie is a Chicken owned by kamaru', 'Chicken');
-INSERT INTO Pets VALUES ('kamaru@gmail.com', 'chippy', 'needs a lot of care', 'chippy is a Snake owned by kamaru', 'Snake');
-INSERT INTO Pets VALUES ('lexus@gmail.com', 'choco', 'needs blanket to sleep', 'choco is a Snake owned by lexus', 'Snake');
-INSERT INTO Pets VALUES ('lexus@gmail.com', 'daisy', 'needs blanket to sleep', 'daisy is a Dog owned by lexus', 'Dog');
-INSERT INTO Pets VALUES ('moses@gmail.com', 'digger', 'needs more water', 'digger is a Dog owned by moses', 'Dog');
-INSERT INTO Pets VALUES ('moses@gmail.com', 'fergie', 'needs more water', 'fergie is a Cat owned by moses', 'Cat');
-INSERT INTO Pets VALUES ('naruto@gmail.com', 'fido', 'needs blanket to sleep', 'fido is a Cat owned by naruto', 'Cat');
-INSERT INTO Pets VALUES ('naruto@gmail.com', 'freddie', 'needs alone time', 'freddie is a Horse owned by naruto', 'Horse');
-INSERT INTO Pets VALUES ('obito@gmail.com', 'ginger', 'needs more water', 'ginger is a Horse owned by obito', 'Horse');
-INSERT INTO Pets VALUES ('obito@gmail.com', 'gizmo', 'needs blanket to sleep', 'gizmo is a Monkey owned by obito', 'Monkey');
-INSERT INTO Pets VALUES ('peter@gmail.com', 'gus', 'hates cats', 'gus is a Monkey owned by peter', 'Monkey');
-INSERT INTO Pets VALUES ('peter@gmail.com', 'hugo', 'hates dogs', 'hugo is a Lion owned by peter', 'Lion');
-INSERT INTO Pets VALUES ('quillo@gmail.com', 'jacky', 'needs more water', 'jacky is a Lion owned by quillo', 'Lion');
-INSERT INTO Pets VALUES ('quillo@gmail.com', 'jake', 'needs blanket to sleep', 'jake is a Hamster owned by quillo', 'Hamster');
-INSERT INTO Pets VALUES ('ramirez@gmail.com', 'jaxson', 'needs alone time', 'jaxson is a Hamster owned by ramirez', 'Hamster');
-INSERT INTO Pets VALUES ('ramirez@gmail.com', 'logan', 'needs a lot of care', 'logan is a Mouse owned by ramirez', 'Mouse');
-INSERT INTO Pets VALUES ('stefan@gmail.com', 'lucky', 'needs more water', 'lucky is a Mouse owned by stefan', 'Mouse');
-INSERT INTO Pets VALUES ('stefan@gmail.com', 'maddie', 'needs a lot of care', 'maddie is a Turtle owned by stefan', 'Turtle');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-04-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-01-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carrie@gmail.com', '2020-04-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-01-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carl@gmail.com', '2020-04-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-01-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carlos@gmail.com', '2020-04-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-01-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-01-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-01-31');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-02-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-04-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-04-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('caren@gmail.com', '2020-05-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-02-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('canneth@gmail.com', '2020-05-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-02-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cain@gmail.com', '2020-05-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-02-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('carmen@gmail.com', '2020-05-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-02-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-02-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-02-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-02-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-03-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-03-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-03-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-03-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-03-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-05-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-05-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-05-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-05-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-05-31');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-06-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-06-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-06-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cejudo@gmail.com', '2020-06-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-03-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-03');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-04');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-05');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-06');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-07');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-08');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-09');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('celine@gmail.com', '2020-06-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-03-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-10');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-11');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-12');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-13');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-14');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-15');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-16');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cevan@gmail.com', '2020-06-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-03-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-17');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-18');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-19');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-20');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-21');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-22');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-23');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('catarth@gmail.com', '2020-06-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-03-31');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-04-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-04-02');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-24');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-25');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-26');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-27');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-28');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-29');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-06-30');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-07-01');
+INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020-07-02');
 
-INSERT INTO TakecarePrice VALUES (40, 80, 'alex@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (40, 80, 'alex@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (60, 60, 'bernie@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (60, 60, 'bernie@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (60, 60, 'cassie@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (60, 60, 'cassie@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'diggory@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'diggory@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'familia@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'familia@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (80, 100, 'lokister@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (80, 100, 'lokister@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (60, 60, 'monsta@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (60, 60, 'monsta@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'natasha@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'natasha@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (60, 60, 'oranus@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (60, 60, 'oranus@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (50, 100, 'percy@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (50, 100, 'percy@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (70, 80, 'patrick@gmail.com', 'Dog');
-INSERT INTO TakecarePrice VALUES (70, 80, 'patrick@gmail.com', 'Cat');
-INSERT INTO TakecarePrice VALUES (40, 80, 'alex@gmail.com', 'Horse');
-INSERT INTO TakecarePrice VALUES (60, 60, 'bernie@gmail.com', 'Monkey');
-INSERT INTO TakecarePrice VALUES (60, 60, 'cassie@gmail.com', 'Lion');
-INSERT INTO TakecarePrice VALUES (70, 80, 'diggory@gmail.com', 'Hamster');
-INSERT INTO TakecarePrice VALUES (70, 80, 'familia@gmail.com', 'Mouse');
-INSERT INTO TakecarePrice VALUES (60, 60, 'gordan@gmail.com', 'Turtle');
-INSERT INTO TakecarePrice VALUES (50, 100, 'hammy@gmail.com', 'Budgie');
-INSERT INTO TakecarePrice VALUES (70, 80, 'jackson@gmail.com', 'Chicken');
-INSERT INTO TakecarePrice VALUES (90, 120, 'konstance@gmail.com', 'Snake');
-INSERT INTO TakecarePrice VALUES (80, 100, 'lokister@gmail.com', 'Horse');
-INSERT INTO TakecarePrice VALUES (60, 60, 'monsta@gmail.com', 'Monkey');
-INSERT INTO TakecarePrice VALUES (70, 80, 'natasha@gmail.com', 'Lion');
-INSERT INTO TakecarePrice VALUES (60, 60, 'oranus@gmail.com', 'Hamster');
-INSERT INTO TakecarePrice VALUES (50, 100, 'percy@gmail.com', 'Mouse');
-INSERT INTO TakecarePrice VALUES (70, 80, 'patrick@gmail.com', 'Turtle');
-
-INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-10-25');
-INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-25');
-INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-26');
-INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-27');
-INSERT INTO fulltimeleave VALUES ('alex@gmail.com', '2020-11-28');
-INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-25');
-INSERT INTO fulltimeleave VALUES ('bernie@gmail.com', '2020-10-26');
-insert into fulltimeleave values ('cassie@gmail.com', '2020-10-10');
-insert into fulltimeleave values ('cassie@gmail.com', '2020-10-11');
-
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-01');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-02');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-03');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-04');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-05');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-06');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-07');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-21');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-22');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-23');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-24');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-25');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-26');
-INSERT INTO PartTimeAvail VALUES ('waldo@gmail.com', '2020-10-27');
-INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-25');
-INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-26');
-INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-27');
-INSERT INTO PartTimeAvail VALUES ('wally@gmail.com', '2020-10-28');
-INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-26');
-INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-27');
-INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-28');
-INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-29');
-INSERT INTO PartTimeAvail VALUES ('walter@gmail.com', '2020-10-30');
-INSERT INTO PartTimeAvail VALUES ('xiaoming@gmail.com', '2015-01-01');
-
-INSERT INTO BidsFor VALUES ('alice@gmail.com', 'bernie@gmail.com', 'roger',
-'2020-10-25', '2020-10-26', 5,
-90, 100,
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'roger',
+'2020-10-25', '2020-01-01', '2020-01-01',
+100, 110,
 false, false, '1', '1', 5
 );
-INSERT INTO BidsFor VALUES ('bob@gmail.com', 'bernie@gmail.com', 'jerry',
-'2020-10-26', '2020-10-26', 3,
-90, 100,
-false, false, '1', '1', NULL
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'alfie',
+'2020-10-25', '2020-01-01', '2020-01-05',
+80, 130,
+false, false, '1', '1', 5
 );
-INSERT INTO BidsFor VALUES ('charlie@gmail.com', 'bernie@gmail.com', 'felix',
-'2020-10-24', '2020-10-27', 3,
-90, 100,
-false, false, '1', '1', NULL
-);
-
-INSERT INTO BidsFor VALUES ('charlie@gmail.com', 'gordan@gmail.com', 'roscoe',
-'2020-10-24', '2020-10-25', 3,
-90, 100,
-false, false, '1', '1', NULL
-);
-INSERT INTO BidsFor VALUES ('charlie@gmail.com', 'gordan@gmail.com', 'roscoe',
-'2020-10-25', '2020-10-27', 3,
-90, 100,
-false, false, '1', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'gordan@gmail.com', 'sammy',
-'2020-10-24', '2020-10-26', 4,
-90, 100,
-false, false, '2', '2', NULL
-);
-
-INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'cassie@gmail.com', 'cloud',
-'2020-10-24', '2020-10-26', 4,
-90, 100,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
-'2020-10-24', '2020-10-25', 2,
-90, 100,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('dickson@gmail.com', 'waldo@gmail.com', 'cloud',
-'2020-10-25', '2020-10-02', 3,
-90, 100,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
-'2020-10-25', '2021-04-01', 4,
-90, 150,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'dufus',
-'2020-10-26', '2021-05-01', 5,
-90, 150,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'millie',
-'2020-10-25', '2021-01-01', 1,
-90, 100,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
-'2020-10-25', '2021-02-01', 2,
-90, 110,
-true, true, '2', '2', NULL
-);
-INSERT INTO BidsFor VALUES ('farquard@gmail.com', 'jackson@gmail.com', 'rufus',
-'2020-10-26', '2021-03-01', 3,
-90, 110,
-true, true, '2', '2', NULL
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'carl@gmail.com', 'fido',
+'2020-10-26', '2020-01-01', '2020-01-05',
+80, 110,
+false, false, '1', '1', 5
 );
 
 
-INSERT INTO Posts VALUES ('alice@gmail.com', 'How to teach dog to sit',
-'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?',
-'2020-09-25');
-INSERT INTO Comments VALUES (
-    'bob@gmail.com', '2020-09-26',
-    'How to teach dog to sit',
+
+INSERT INTO Posts(post_id, email, title, cont) VALUES (1, 'panter@gmail.com', 'How to teach dog to sit',
+'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?');
+
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'peter@gmail.com', '2020-09-26',
     'you need to do progressive training, like in NS'
 );
-INSERT INTO Comments VALUES (
-    'dickson@gmail.com', '2020-09-26',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patty@gmail.com', '2020-09-26',
     'i think you shouldnt own pets if you dont even know this basic stuff'
 );
-INSERT INTO Comments VALUES (
-    'gaston@gmail.com', '2020-09-26',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'pattison@gmail.com', '2020-09-26',
     'dickson dont be mean to people everyoen has to start somewhere'
 );
-INSERT INTO Comments VALUES (
-    'gordan@gmail.com', '2020-09-27',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'parthia@gmail.com', '2020-09-27',
     'have you tried giving him treats every time your dog does it correctly?'
 );
-INSERT INTO Comments VALUES (
-    'patrick@gmail.com', '2020-09-27',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'parthus@gmail.com', '2020-09-27',
     'have you tried beating him with a slipper???'
 );
-INSERT INTO Comments VALUES (
-    'alice@gmail.com', '2020-09-27',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'paragon@gmail.com', '2020-09-27',
     'noo...i would never hurt my precious dog'
 );
-INSERT INTO Comments VALUES (
-    'wally@gmail.com', '2020-09-27',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'parata@gmail.com', '2020-09-27',
     'you need to be dominant so your dog knows you are pack leader'
 );
-INSERT INTO Comments VALUES (
-    'xiaoming@gmail.com', '2020-09-27',
-    'How to teach dog to sit',
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'xiaoming@gmail.com', '2020-09-27',
     'eh pm me i am expert because i watch youtube'
 );
 
 
-INSERT INTO Posts VALUES ('bob@gmail.com', 'How to make cat not scratch me',
-'My cat keeps scratching my leg, how can i make him stop?',
-'2020-09-27');
-INSERT INTO Comments VALUES (
-    'dickson@gmail.com', '2020-09-27',
-    'How to make cat not scratch me',
-    'Have you tried not having a leg? the cat then cannot scratch your leg'
+INSERT INTO Posts(post_id, email, title, cont) VALUES (2, 'cassie@gmail.com', 'How to make cat like me',
+'why does my cat hate me so much??');
+
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'peter@gmail.com', '2020-09-26',
+    'either it likes you or it doesnt, you can only accept the outcome'
 );
-INSERT INTO Comments VALUES (
-    'gaston@gmail.com', '2020-09-28',
-    'How to make cat not scratch me',
-    'I have that same problem, pls help dont ignore!'
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'patty@gmail.com', '2020-09-26',
+    'I think you need to give her some space'
 );
-INSERT INTO Comments VALUES (
-    'lexus@gmail.com', '2020-09-28',
-    'How to make cat not scratch me',
-    'Your cat is just following its natural instincts, dont stop it'
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'pattison@gmail.com', '2020-09-26',
+    'hey i have the same problem too'
 );
-INSERT INTO Comments VALUES (
-    'moses@gmail.com', '2020-09-28',
-    'How to make cat not scratch me',
-    'Why even buy cats, dogs are way better'
-);
-INSERT INTO Comments VALUES (
-    'percy@gmail.com', '2020-09-29',
-    'How to make cat not scratch me',
-    'moses please stay on topic dont derail the convo'
-);
-INSERT INTO Comments VALUES (
-    'moses@gmail.com', '2020-09-29',
-    'How to make cat not scratch me',
-    'stop being such a goody two shoes percy'
-);
-INSERT INTO Comments VALUES (
-    'monsta@gmail.com', '2020-09-29',
-    'How to make cat not scratch me',
-    'pro tip: rub yur cats face on your leg, it wont want to scratch itself'
-);
-INSERT INTO Comments VALUES (
-    'cassie@gmail.com', '2020-10-20',
-    'How to make cat not scratch me',
-    'omg i tried that and can confirm it works for me! thank you so much!'
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'parthia@gmail.com', '2020-09-27',
+    'Does this work for dogs also?'
 );
