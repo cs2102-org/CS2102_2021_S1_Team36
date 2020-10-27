@@ -10,13 +10,60 @@ const caretakerRouter = express.Router();
 to test the endpoints here, use http://localhost:5000/api/caretaker/ in front of the urls
 */
 
+// takes in two date objects
+// i.e. start = new Date('2020-01-01')
+// return arr of all the days in between
+var getDaysArray = function(start, end) {
+    for(var arr=[],dt=new Date(start); dt<=end; dt.setDate(dt.getDate()+1)){
+        arr.push(new Date(dt));
+    }
+    return arr;
+};
+
+// Give a specified caretaker leave on the interval [start_date, end_date]
+// todo: check for overlaps with existing leave dates
+caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
+    try {
+        const {email} = req.params;
+        var {start_date, end_date} = req.body;
+        start_date = new Date(start_date);
+        end_date = new Date(end_date);
+
+        console.log(email, start_date, end_date);
+        var arr = getDaysArray(start_date, end_date);
+        var leave_date;
+        for (var i = 0; i < arr.length; i++) {
+            leave_date = `${arr[i].getFullYear()}-${arr[i].getMonth()+1}-${arr[i].getDate()}`;
+            "INSERT INTO FullTimeLeave(email, leave_date) VALUES ()"
+            const msql = await pool.query(
+                "INSERT INTO FullTimeLeave(email, leave_date) VALUES ($1, $2)",
+                [email, leave_date]
+            );
+        }
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // insert new caretaker
-// default rating = 3
 caretakerRouter.post('/new', async(req, res) => {
     try {
         const {email, full_time, rating} = req.body;
         console.log(email);
         res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view all caretakers
+caretakerRouter.get('/all', async(req, res) => {
+    try {
+        const cts = await pool.query(
+            "SELECT * FROM Caretakers;",
+        );
+        res.json(cts.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -48,17 +95,7 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
     }
 }); // todo: check that specified caretaker is actually full time
 
-// view all caretakers
-caretakerRouter.get('/all', async(req, res) => {
-    try {
-        const cts = await pool.query(
-            "SELECT * FROM Caretakers;",
-        );
-        res.json(cts.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
+
 
 // view all caretakers non-availability (na)
 // i.e. for each caretaker, all the confirmed bids and all their leave dates
