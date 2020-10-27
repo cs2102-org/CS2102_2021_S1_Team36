@@ -105,7 +105,7 @@ CREATE TABLE Posts (
 );
 
 CREATE TABLE Comments (
-	post_id INTEGER REFERENCES Posts(post_id),
+	post_id INTEGER REFERENCES Posts(post_id) ON DELETE CASCADE,
     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     date_time TIMESTAMP DEFAULT NOW(),
     cont TEXT,
