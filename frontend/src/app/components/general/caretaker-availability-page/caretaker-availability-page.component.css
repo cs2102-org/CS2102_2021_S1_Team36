@@ -23,10 +23,10 @@
   overflow-y: auto;
 }
 
-#content {
-   width: 50%;
-   max-width: 20;
-}
+/* .content {
+  background: url('./img/Golden-Retriever.png') no-repeat right bottom fixed;
+  height: 90vh;
+} */
 
 .form {
   padding-top: 10%;

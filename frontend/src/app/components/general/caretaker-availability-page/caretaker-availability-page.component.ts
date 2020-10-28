@@ -1,8 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import { Subscription } from 'rxjs';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -41,12 +44,9 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   });
 
   caretakersSubscription: Subscription;
-  caretakers: any[] = [
-    { id: 1, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {} },
-    { id: 2, name: 'Dr Nice', rating: 5, type: "Full Time", takesCare: {'Dogs': 10, 'Cat': 20} }
-  ];
+  caretakers: any[] = [];
 
-  constructor(private caretakerService: CaretakerService) { }
+  constructor(private caretakerService: CaretakerService, private router: Router) { }
 
   ngOnInit(): void {
     let aDate = new Date();
@@ -79,6 +79,14 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     } else {
       this.calendarOptions.events = [];
     }
+  }
+
+  openMakeBid() {
+    const encrypted =  Base64.stringify(Utf8.parse(JSON.stringify(this.selectedCaretaker)));
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/bid-caretaker/' + encrypted])
+    );
+    window.open(url);
   }
 
   showHide(caretaker){

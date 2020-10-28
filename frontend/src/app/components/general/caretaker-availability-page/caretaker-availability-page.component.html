@@ -1,4 +1,4 @@
-<div id="#content">
+<div class="content">
     <div class="column-left">
         <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit(filterForm.value)">
 
@@ -69,7 +69,7 @@
     </div>
     <div *ngIf="selectedCaretaker != undefined" class="column-right">
       <h2>Availability of {{selectedCaretaker.name}}</h2>
-      <a target="_blank" [routerLink] = "['/bid-caretaker']"><button>Bid Now</button></a>
+      <button (click)="openMakeBid()">Bid Now/See More</button>
       <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
 </div>
