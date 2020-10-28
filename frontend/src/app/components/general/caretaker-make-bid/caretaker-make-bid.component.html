@@ -10,16 +10,34 @@
 </div>
 
 <div class="column-right">
-    <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm.value)">
+    <div *ngIf="isLogged">
+        <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
+            <p>Choose the dates by clicking and dragging on the calendar</p>
+            <p>You have chosen: {{bidForm.get('dateFrom').value}} - {{bidForm.get('dateTo').value}}</p>
+            <p><label>Choose which pet: </label>
+            <select type="text" formControlName="petName">
+                <option></option>
+                <option *ngFor="let pet of pets">
+                    {{ pet.pet_name }}
+                </option>
+            </select></p>
 
-        <div class="text-bar">
-            <p><label>Type of Pet:</label></p>
-            <p><input type="text" formControlName="petType"></p>
-        </div>
+            <p><label>Transfer Type: </label>
+            <select type="text" formControlName="transferType">
+                <option></option>
+                <option>I deliver</option>
+                <option>Caretaker pick up</option>
+                <option>Transfer through physical building of PCS</option>
+            </select></p>
 
-        <p>{{bidForm.get('dateFrom').value}}</p>
-        <p>{{bidForm.get('dateTo').value}}</p>
+            <p><label>Payment Type: </label>
+            <select type="text" formControlName="paymentType">
+                <option></option>
+                <option>Cash</option>
+                <option>Credit Card</option>
+            </select></p>
 
-        <button class="button" type="submit">Search</button>
-    </form>
+            <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
+        </form>
+    </div>
 </div>

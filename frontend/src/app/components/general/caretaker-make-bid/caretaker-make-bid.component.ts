@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarOptions, FullCalendarComponent, isDateSpansEqual, sliceEventStore } from '@fullcalendar/angular';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
@@ -41,14 +42,19 @@ export class CaretakerMakeBidComponent implements OnInit {
   placeholderDate: String;
 
   bidForm = new FormGroup({
-    dateFrom: new FormControl(''),
-    dateTo: new FormControl(''),
-    petType: new FormControl(''),
+    dateFrom: new FormControl('', Validators.required),
+    dateTo: new FormControl('', Validators.required),
+    petName: new FormControl('', Validators.required),
+    submissionTime: new FormControl(''),
+    caretakerEmail: new FormControl(''),
+    paymentType: new FormControl('', Validators.required),
+    transferType: new FormControl('', Validators.required),
   });
 
   constructor(private caretakerService: CaretakerService, 
     private route: ActivatedRoute,
-    private petOwnerService: PetownerService) { }
+    private petOwnerService: PetownerService,
+    private authService: AuthService) { }
 
   ngOnInit(): void {
     this.checkIsLogged();
@@ -80,7 +86,17 @@ export class CaretakerMakeBidComponent implements OnInit {
   checkIsLogged() {
     if (localStorage.getItem('accessToken') != null) {
       this.isLogged = true;
+      this.getPetOwnerPets();
     }
+    this.authService.loginNotiService
+      .subscribe(message => {
+        if (message == "Login success") {
+          this.isLogged=true;
+          this.getPetOwnerPets();
+        } else {
+          this.isLogged=false;
+        }
+      });
   }
 
   selectAllowable(selectInfo) {
@@ -120,8 +136,10 @@ export class CaretakerMakeBidComponent implements OnInit {
     return dateArray;
   }
 
-  onSubmit(sd) {
-    console.log("yes");
+  onSubmit(bidForm) {
+    bidForm.controls['submissionTime'].setValue(new Date());
+    bidForm.controls['caretakerEmail'].setValue(this.caretaker.email);
+    console.log(bidForm.value);
   }
 
   selectBidDate(selectionInfo) {
