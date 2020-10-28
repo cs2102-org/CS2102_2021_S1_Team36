@@ -18,14 +18,14 @@ export class CaretakerMakeBidComponent implements OnInit {
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
-    validRange: function(nowDate) {
-      const aYearFromNow = new Date(nowDate);
-      aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
-      return {
-        start: nowDate,
-        end:  aYearFromNow
-      };
-    },
+    // validRange: function(nowDate) {
+    //   const aYearFromNow = new Date(nowDate);
+    //   aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
+    //   return {
+    //     start: nowDate,
+    //     end:  aYearFromNow
+    //   };
+    // },
     selectable: true,
     unselectAuto: false,
     height: 450,
@@ -79,7 +79,18 @@ export class CaretakerMakeBidComponent implements OnInit {
         this.calendarOptions.events = dates;
       });
     } else {
-      this.calendarOptions.events = [];
+      this.caretakerService.getAvailFullTimeCareTaker(this.caretaker.email).subscribe((dates) => {
+        dates.map(function(date) { 
+          let aDate = new Date(date.end);
+          aDate.setDate(aDate.getDate() + 1);
+          date.display = 'background';
+          date.groupId = 'No'; 
+          date.end = aDate.toISOString().slice(0,10);
+          return date;
+        });
+        this.calendarOptions.events = dates; 
+        this.dates = dates.map(a => [a.start, a.end]);
+      });
     }
   }
 
@@ -106,15 +117,28 @@ export class CaretakerMakeBidComponent implements OnInit {
     var endDate = selectInfo.end;
     endDate.setDate(endDate.getDate() + 1);
     while (currentDate < endDate) {
-        dateArray.push(new Date (currentDate));
-        var result = new Date(currentDate);
-        result.setDate(currentDate.getDate() + 1);
-        currentDate = result;
+      dateArray.push(new Date (currentDate));
+      var result = new Date(currentDate);
+      result.setDate(currentDate.getDate() + 1);
+      currentDate = result;
     }
     dateArray = dateArray.map(a => a.toISOString().slice(0,10));
-    for (let date of dateArray) {
-      if (this.dates.indexOf(date) < 0) {
-        return false;
+    if (this.caretaker.type == "Part Time") {
+      for (let date of dateArray) {
+        if (this.dates.indexOf(date) < 0) {
+          return false;
+        }
+      }
+    } else {
+      for (let date of dateArray) {
+        const checkDate = new Date(date)
+        for (let dateRange of this.dates) {
+          const startDate = new Date(dateRange[0]);
+          const endDate = new Date(dateRange[1]);
+          if (startDate <= checkDate && checkDate < endDate) {
+            return false;
+          }
+        }
       }
     }
     return true;

@@ -10,7 +10,7 @@
 </div>
 
 <div class="column-right">
-    <div *ngIf="isLogged">
+    <div *ngIf="isLogged; else elseBlock">
         <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
             <p>Choose the dates by clicking and dragging on the calendar</p>
             <p>You have chosen: {{bidForm.get('dateFrom').value}} - {{bidForm.get('dateTo').value}}</p>
@@ -40,4 +40,7 @@
             <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
         </form>
     </div>
+    <ng-template #elseBlock>
+        <h2>Please Login to bid</h2>
+    </ng-template>
 </div>
