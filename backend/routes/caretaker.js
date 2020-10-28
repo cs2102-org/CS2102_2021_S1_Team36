@@ -10,13 +10,67 @@ const caretakerRouter = express.Router();
 to test the endpoints here, use http://localhost:5000/api/caretaker/ in front of the urls
 */
 
+// takes in two date objects
+// i.e. start = new Date('2020-01-01')
+// return arr of all the days in between
+var getDaysArray = function(start, end) {
+    for(var arr=[],dt=new Date(start); dt<=end; dt.setDate(dt.getDate()+1)){
+        arr.push(new Date(dt));
+    }
+    return arr;
+};
+
+// dateString is YYYY-mm-dd
+var incDate = function(dateString, numDays) {
+    dt = new Date(dateString)
+    dt.setDate(dt.getDate() + 1)
+    dts = `${dt.getFullYear()}-${dt.getMonth()+1}-${dt.getDate()}`;
+    return dts
+};
+
+// Give a specified caretaker leave on the interval [start_date, end_date]
+// todo: check for overlaps with existing leave dates
+caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
+    try {
+        const {email} = req.params;
+        var {start_date, end_date} = req.body;
+        start_date = new Date(start_date);
+        end_date = new Date(end_date);
+
+        console.log(email, start_date, end_date);
+        var arr = getDaysArray(start_date, end_date);
+        var leave_date;
+        for (var i = 0; i < arr.length; i++) {
+            leave_date = `${arr[i].getFullYear()}-${arr[i].getMonth()+1}-${arr[i].getDate()}`;
+            const msql = await pool.query(
+                "INSERT INTO FullTimeLeave(email, leave_date) VALUES ($1, $2)",
+                [email, leave_date]
+            );
+        }
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // insert new caretaker
-// default rating = 3
 caretakerRouter.post('/new', async(req, res) => {
     try {
         const {email, full_time, rating} = req.body;
         console.log(email);
         res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view all caretakers
+caretakerRouter.get('/all', async(req, res) => {
+    try {
+        const cts = await pool.query(
+            "SELECT * FROM Caretakers;",
+        );
+        res.json(cts.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -35,6 +89,7 @@ caretakerRouter.get('/ft/leave/all', async(req, res) => {
 });
 
 // get the fullTimeLeave of a specified full time caretaker
+ // todo: check that specified caretaker is actually full time
 caretakerRouter.get('/ft/leave/:email', async(req, res) => {
     try {
         const { email } = req.params;
@@ -48,42 +103,42 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
     }
 }); // todo: check that specified caretaker is actually full time
 
-// view all caretakers
-caretakerRouter.get('/all', async(req, res) => {
-    try {
-        const cts = await pool.query(
-            "SELECT * FROM Caretakers;",
-        );
-        res.json(cts.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
 
 // view all caretakers non-availability (na)
 // i.e. for each caretaker, all the confirmed bids and all their leave dates
 caretakerRouter.get('/ft/na/all', async(req, res) => {
     try {
         const msql = await pool.query(
-            "select email, leave_date as na_start_date, 1 as na_num_days from fulltimeleave \
+            "select email, leave_date as start_date, leave_date as end_date from fulltimeleave \
             UNION \
-            select caretaker_email as email, bid_date as na_start_date, number_of_days as na_num_days from bidsfor where is_confirmed = true;"
+            select \
+                caretaker_email as email, \
+                start_date, \
+                end_date \
+            from bidsfor where is_confirmed = true;"
         );
         res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
+// test
+
 
 // view a specified fulltime caretakers non-availability
 caretakerRouter.get('/ft/na/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select leave_date as date, 1 as num_days from \
-            fulltimeleave where email=$1 \
+            "select email, leave_date as start, leave_date as end from fulltimeleave where email = $1 \
             UNION \
-            select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = $1 and is_confirmed = true;",
+            select \
+                caretaker_email as email, \
+                start_date as start, \
+                end_date as end \
+            from bidsfor where \
+                caretaker_email = $1 and \
+                is_confirmed = true;",
             [email]
             );
         res.json(sql.rows); 
@@ -94,52 +149,31 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 
 // view all full time caretakers available for a specified date range
 // accounts for their leave and their confirmed bids
+// range is specified as start_date, end_date inclusive
 caretakerRouter.get('/ft/unavail/range', async(req, res) => {
     try {
-        var startdate = req.body.startdate;
-        var numdays = req.body.numdays;
+        var { start_date, end_date } = req.body;
+        end_date = incDate(end_date);
         // var startdate = '2020-10-11';
         // var numdays = 5;
         const msql = await pool.query(
             "select C1.email from caretakers C1 \
             where C1.is_fulltime = True  \
             and not exists ( \
-            (select leave_date as date, 1 as num_days \
+            (select leave_date as na_date \
             from fulltimeleave \
             where email=C1.email and \
-            $1::date <= leave_date and \
-            leave_date <= $1::date + interval '1' day * ($2 - 1)) \
+            (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date)) \
             UNION \
-            (select bid_date as date, number_of_days as num_days \
+            (select start_date as na_date \
             from bidsfor \
             where caretaker_email = C1.email and is_confirmed = true \
-            and NOT ( \
-            bid_date::date + interval '1' day * (number_of_days - 1) < $1::date \
-            OR $1::date + interval '1' day * ($2 - 1) < bid_date::date \
-            )) \
-            );",
-            [startdate, numdays]
+            and \
+            (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
+            ));",
+            [start_date, end_date]
         );
         res.json(msql.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
-
-// get the availability of all part time caretaker
-// i.e. their available dates - dates where they have confirmed bids
-caretakerRouter.get('/pt/avail/all', async(req, res) => {
-    try {
-        const sql = await pool.query(
-            "select email, work_date as date, 1 as num_days from parttimeavail P1 \
-            where \
-            NOT EXISTS \
-            (SELECT bid_date AS date, number_of_days AS num_days FROM bidsfor \
-            WHERE caretaker_email = email \
-            AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
-            );"
-            );
-        res.json(sql.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -151,13 +185,13 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail P1 \
-            where P1.email = $1 \
-            and \
-            NOT EXISTS \
-            (SELECT start_date AS start from BidsFor\
-            WHERE caretaker_email = $1 \
-            AND start_date <= P1.work_date AND P1.work_date <= end_date \
+            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
+            where email = $1 and \
+            not exists ( \
+            select 1 from bidsfor where \
+                is_confirmed = true and \
+                caretaker_email = $1 and \
+                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
             );",
             [email]
             );
@@ -166,6 +200,36 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
         console.error(err);
     }
 });
+
+// get all caretakers (ft and pt) that are avail for the entire given range
+// caretakerRouter.get('/avail/range', async(req, res) => {
+//     try {
+//         var { start_date, end_date } = req.body;
+//         const sql = await pool.query(
+//             "select C1.email from caretakers C1 \
+//             where C1.is_fulltime = True  \
+//             and not exists ( \
+//             (select leave_date as na_date \
+//             from fulltimeleave \
+//             where email=C1.email and \
+//             (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date)) \
+//             UNION \
+//             (select start_date as na_date \
+//             from bidsfor \
+//             where caretaker_email = C1.email and is_confirmed = true \
+//             and \
+//             (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
+//             )); \
+//             UNION \
+
+//             ",
+//             [start_date, end_date]
+//             );
+//         res.json(sql.rows); 
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 // find all caretakers who can look after a specified pet type
 caretakerRouter.get('/type/:type', async(req, res) => {
@@ -181,6 +245,38 @@ caretakerRouter.get('/type/:type', async(req, res) => {
         console.error(err);
     }
 });
+
+// given email
+// return all pets and price that email can take care of 
+caretakerRouter.get('/caresfor/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select species, base_price, daily_price from takecareprice where email = $1;",
+            [email]
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// add a species that a caretaker can take care of
+caretakerRouter.post('/type/add/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const { species, base_price, daily_price } = req.body;
+        const msql = await pool.query(
+            "INSERT INTO TakecarePrice(email, species, base_price, daily_price) \
+            VALUES ($1, $2, $3, $4);",
+            [email, species, base_price, daily_price]
+            );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 // find all active caretakers, i.e. all fulltime + all parttime who have a avail date in the last two years
 caretakerRouter.get('/active', async(req, res) => {
@@ -207,6 +303,36 @@ caretakerRouter.get('/active', async(req, res) => {
     }
 });
 
+// filter endpoint
+// filter by:
+// substring: caretakers name contains substr
+// availability: caretakers available for (start_date, end_date)
+// pet type: caretakers can take care of pet_type
+// price: caretaker price for pet_type in range [min, max]
+// rating: caretaker rating >= rating
+
+// caretakerRouter.get('/filter', async(req, res) => {
+//     try {
+//         var { substr, start_date, end_date, pet_type, price, rating } = req.body;
+//         const msql = await pool.query(
+//             "select email from caretakers NATURAL JOIN users where
+//                 (rating >= 2 or 2 is null) and
+//                 (name LIKE '%' || $1 || '%' or $1 is null)
+//             INTERSECT
+//             select email from takecareprice
+//             where
+//                 (species = $4 or $4 is null) and
+//                 (daily_price >= $5 or $5 is null) and 
+//                 (daily_price <= $6 or $6 is null)
+//             INTERSECT
+
+//             [substr, start_date, end_date, pet_type, min, max, rating]
+//         );
+//         res.json(msql.rows); 
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 
 
