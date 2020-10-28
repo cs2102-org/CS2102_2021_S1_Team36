@@ -185,7 +185,7 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select email, to_char(work_date, 'YYYY-mm-dd') from parttimeavail \
+            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
             where email = $1 and \
             not exists ( \
             select 1 from bidsfor where \
@@ -200,6 +200,36 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
         console.error(err);
     }
 });
+
+// get all caretakers (ft and pt) that are avail for the entire given range
+// caretakerRouter.get('/avail/range', async(req, res) => {
+//     try {
+//         var { start_date, end_date } = req.body;
+//         const sql = await pool.query(
+//             "select C1.email from caretakers C1 \
+//             where C1.is_fulltime = True  \
+//             and not exists ( \
+//             (select leave_date as na_date \
+//             from fulltimeleave \
+//             where email=C1.email and \
+//             (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date)) \
+//             UNION \
+//             (select start_date as na_date \
+//             from bidsfor \
+//             where caretaker_email = C1.email and is_confirmed = true \
+//             and \
+//             (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
+//             )); \
+//             UNION \
+
+//             ",
+//             [start_date, end_date]
+//             );
+//         res.json(sql.rows); 
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 // find all caretakers who can look after a specified pet type
 caretakerRouter.get('/type/:type', async(req, res) => {
@@ -275,12 +305,34 @@ caretakerRouter.get('/active', async(req, res) => {
 
 // filter endpoint
 // filter by:
-// Caretaker name: find all caretakers whose name has a specified substring
-// Date of availability (Range): find all caretakers available for a superset of the specified interval
-// pet type: find all caretakers who can take care of a specified pet type
-// filter by price range (min, max)
-// filter by min rating
+// substring: caretakers name contains substr
+// availability: caretakers available for (start_date, end_date)
+// pet type: caretakers can take care of pet_type
+// price: caretaker price for pet_type in range [min, max]
+// rating: caretaker rating >= rating
 
+// caretakerRouter.get('/filter', async(req, res) => {
+//     try {
+//         var { substr, start_date, end_date, pet_type, price, rating } = req.body;
+//         const msql = await pool.query(
+//             "select email from caretakers NATURAL JOIN users where
+//                 (rating >= 2 or 2 is null) and
+//                 (name LIKE '%' || $1 || '%' or $1 is null)
+//             INTERSECT
+//             select email from takecareprice
+//             where
+//                 (species = $4 or $4 is null) and
+//                 (daily_price >= $5 or $5 is null) and 
+//                 (daily_price <= $6 or $6 is null)
+//             INTERSECT
+
+//             [substr, start_date, end_date, pet_type, min, max, rating]
+//         );
+//         res.json(msql.rows); 
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 
 
