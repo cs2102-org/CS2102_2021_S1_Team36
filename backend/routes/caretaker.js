@@ -130,12 +130,13 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select email, leave_date as start, leave_date as end from fulltimeleave where email = $1 \
+            "select email, to_char(leave_date, 'YYYY-mm-dd') as start, to_char(leave_date, 'YYYY-mm-dd') as end \
+            from fulltimeleave where email = $1 \
             UNION \
             select \
                 caretaker_email as email, \
-                start_date as start, \
-                end_date as end \
+                to_char(start_date, 'YYYY-mm-dd') as start, \
+                to_char(end_date, 'YYYY-mm-dd') as end \
             from bidsfor where \
                 caretaker_email = $1 and \
                 is_confirmed = true;",
