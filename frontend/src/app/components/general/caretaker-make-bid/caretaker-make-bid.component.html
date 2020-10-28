@@ -1,7 +1,8 @@
-<div>
+<div *ngIf="caretaker != null">
     <h3>{{caretaker.name}}</h3>
     <h3>Rating: {{caretaker.rating}}</h3>
     <h3>{{caretaker.type}}</h3>
+    <p>{{caretaker.description}}</p>
     <table>
         <tr *ngFor="let pet of takesCare">
             <td>{{pet.species}}</td>
@@ -23,8 +24,8 @@
             <p><label>Choose which pet: </label>
             <select type="text" formControlName="petName">
                 <option></option>
-                <option *ngFor="let pet of pets">
-                    {{ pet.pet_name }}
+                <option *ngFor="let pet of pets | keyvalue">
+                    {{ pet.key }}
                 </option>
             </select></p>
 
@@ -42,6 +43,14 @@
                 <option>Cash</option>
                 <option>Credit Card</option>
             </select></p>
+
+            <p>Current Min Price: ${{currentMinPrice}}</p>
+
+            <p><label>Bid Price: </label>
+            <input type="number" formControlName="bidPrice"></p>
+            <p *ngIf="bidForm.get('bidPrice').touched && bidForm.get('bidPrice').invalid">
+                Bid Price cannot be less than {{ currentMinPrice }}. 
+            </p>
 
             <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
         </form>

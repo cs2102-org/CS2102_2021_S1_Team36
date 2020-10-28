@@ -111,7 +111,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   }
 
   openMakeBid() {
-    const encrypted =  Base64.stringify(Utf8.parse(JSON.stringify(this.selectedCaretaker)));
+    const encrypted =  Base64.stringify(Utf8.parse(this.selectedCaretaker.email));
     const url = this.router.serializeUrl(
       this.router.createUrlTree(['/bid-caretaker/' + encrypted])
     );

@@ -304,6 +304,22 @@ caretakerRouter.get('/active', async(req, res) => {
     }
 });
 
+// Get detailed information of specified caretaker
+caretakerRouter.get('/detailed/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "SELECT email, description, rating, name, \
+            CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END\
+            FROM Users NATURAL JOIN Caretakers WHERE email = $1;",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // filter endpoint
 // filter by:
 // substring: caretakers name contains substr

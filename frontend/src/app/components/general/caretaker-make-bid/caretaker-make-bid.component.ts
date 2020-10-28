@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarOptions, FullCalendarComponent, isDateSpansEqual, sliceEventStore } from '@fullcalendar/angular';
 import Base64 from 'crypto-js/enc-base64';
@@ -18,14 +18,14 @@ export class CaretakerMakeBidComponent implements OnInit {
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
-    // validRange: function(nowDate) {
-    //   const aYearFromNow = new Date(nowDate);
-    //   aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
-    //   return {
-    //     start: nowDate,
-    //     end:  aYearFromNow
-    //   };
-    // },
+    validRange: function(nowDate) {
+      const aYearFromNow = new Date(nowDate);
+      aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
+      return {
+        start: nowDate,
+        end:  aYearFromNow
+      };
+    },
     selectable: true,
     unselectAuto: false,
     height: 450,
@@ -41,6 +41,8 @@ export class CaretakerMakeBidComponent implements OnInit {
   caretaker;
   takesCare;
   placeholderDate: String;
+  currentMinPrice: number = 0;
+  numberOfBidDays: number = 0;
 
   bidForm = new FormGroup({
     dateFrom: new FormControl('', Validators.required),
@@ -50,6 +52,7 @@ export class CaretakerMakeBidComponent implements OnInit {
     caretakerEmail: new FormControl(''),
     paymentType: new FormControl('', Validators.required),
     transferType: new FormControl('', Validators.required),
+    bidPrice: new FormControl('', [Validators.required, (control: AbstractControl) => Validators.min(this.currentMinPrice)(control)]),
   });
 
   constructor(private caretakerService: CaretakerService, 
@@ -62,14 +65,33 @@ export class CaretakerMakeBidComponent implements OnInit {
     aDate.setDate(aDate.getDate() - 1);
     this.placeholderDate = aDate.toISOString().slice(0,10);
     this.findCaretaker();
+    this.petNameFormChangeSubscribe();
+  }
+
+  petNameFormChangeSubscribe() {
+    this.bidForm.get("petName").valueChanges.subscribe(selectedValue  => {
+      const price = this.pets[selectedValue];
+      for (let pet of this.takesCare) {
+        if (pet.species == price) {
+          this.currentMinPrice = parseFloat(pet.daily_price) * this.numberOfBidDays;
+        }
+      }
+    });
   }
 
   findCaretaker() {
     const caretakerHashed = this.route.snapshot.paramMap.get("caretaker");
-    this.caretaker = JSON.parse(Utf8.stringify(Base64.parse(caretakerHashed)));
-    this.checkIsLogged();
-    this.loadCalendar();
-    this.findTakeCares();
+    const email = Utf8.stringify(Base64.parse(caretakerHashed));
+    this.getCaretaker(email);
+  }
+
+  getCaretaker(email) {
+    this.caretakerService.getCareTakerDetails(email).subscribe((caretaker) => {
+      this.caretaker = caretaker[0];
+      this.checkIsLogged();
+      this.loadCalendar();
+      this.findTakeCares();
+    });
   }
 
   findTakeCares() {
@@ -154,7 +176,10 @@ export class CaretakerMakeBidComponent implements OnInit {
 
   getPetOwnerPets() {
     this.petOwnerService.getPetOwnerPetsWithCaretaker(this.caretaker.email).subscribe((pets) => {
-      this.pets = pets;
+      this.pets = pets.reduce((accumulator, currentValue) => {
+        accumulator[currentValue.pet_name + '(' + currentValue.species + ')'] = currentValue.species;
+        return accumulator;
+      }, {});
     });
   }
 
@@ -176,10 +201,17 @@ export class CaretakerMakeBidComponent implements OnInit {
 
   selectBidDate(selectionInfo) {
     const startDate = selectionInfo.start;
+    const endDate = selectionInfo.end;
+    this.numberOfBidDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24); 
     startDate.setDate(startDate.getDate() + 1);
     this.bidForm.controls['dateFrom'].setValue(startDate.toISOString().slice(0,10));
-    this.bidForm.controls['dateTo'].setValue(selectionInfo.end.toISOString().slice(0,10));
-    // console.log(this.bidForm);
+    this.bidForm.controls['dateTo'].setValue(endDate.toISOString().slice(0,10));
+    const price = this.pets[this.bidForm.get('petName').value];
+      for (let pet of this.takesCare) {
+        if (pet.species == price) {
+          this.currentMinPrice = parseFloat(pet.daily_price) * this.numberOfBidDays;
+        }
+      }
   }
 
 }
