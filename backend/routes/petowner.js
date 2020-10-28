@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
+const { verifyJwt } = require('../auth/index')
 
 const petownerRouter = express.Router();
 
@@ -9,9 +10,10 @@ to test the endpoints here, use http://localhost:5000/api/petowner/ in front of 
 */
 
 // get the pets of a specified user
-petownerRouter.get('/:email/pets', async(req, res) => {
+petownerRouter.get('/pets', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const user = res.locals.user;
+        const email = user.email;
         const pets = await pool.query(
             "SELECT * FROM Pets WHERE email = $1",
             [email]

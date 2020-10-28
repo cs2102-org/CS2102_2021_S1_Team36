@@ -1,6 +1,6 @@
 const express = require('express');
 const pool = require('../db');
-const jwt = require('../auth/index');
+const { jwt } = require('../auth/index');
 const bcrypt = require('bcrypt');
 const { json } = require('express');
 
