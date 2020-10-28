@@ -188,12 +188,12 @@ caretakerRouter.get('/active', async(req, res) => {
         const msql = await pool.query(
             "select * from \
             (select email, U1.name, rating, \
-                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
+                'Full Time' as type\
             from caretakers NATURAL JOIN users as U1 \
             where is_fulltime = true \
             UNION  \
             select email, U2.name, rating, \
-                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
+                'Part Time' as type\
             FROM \
             (select DISTINCT email, false as is_fulltime \
             from parttimeavail  \
