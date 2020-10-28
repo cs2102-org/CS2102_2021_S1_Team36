@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { baseurl, httpOptions } from '../commons.service';
+import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../commons.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class PetownerService {
   constructor(private http: HttpClient) { }
 
   public getPetOwnerPets(): Observable<any> {
-    return this.http.get(baseurl + '/api/petowner/pets', httpOptions);
+    return this.http.get(baseurl + '/api/petowner/pets', getHttpOptionsWithAuth());
   }
 
 }

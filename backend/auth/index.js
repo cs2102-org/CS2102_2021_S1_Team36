@@ -8,11 +8,15 @@ function verifyJwt(req, res, next) {
   }
 
   if (!bearerHeader.startsWith("Bearer ")) {
-    res.status(403).json({"error": "Token has expired"});
+    res.status(403).json({"error": "Invalid format"});
   }
 
   const token = bearerHeader.replace("Bearer ", "");
-  const user = jwt.verify(token, "secretkey");
+  let user;
+  jwt.verify(token, "secretkey", function(err, decoded) {
+    if (err) res.status(403).json({"error": "Please Login"});
+    user = decoded;
+  });
 
   res.locals.user = user;
   next();
