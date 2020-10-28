@@ -14,4 +14,8 @@ export class PetownerService {
     return this.http.get(baseurl + '/api/petowner/pets', getHttpOptionsWithAuth());
   }
 
+  public getPetOwnerPetsWithCaretaker(email): Observable<any> {
+    return this.http.get(baseurl + '/api/petowner/pets/' + email, getHttpOptionsWithAuth());
+  }
+
 }

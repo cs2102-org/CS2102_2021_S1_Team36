@@ -39,6 +39,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   pets;
   dates;
   caretaker;
+  takesCare;
   placeholderDate: String;
 
   bidForm = new FormGroup({
@@ -57,7 +58,6 @@ export class CaretakerMakeBidComponent implements OnInit {
     private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.checkIsLogged();
     let aDate = new Date();
     aDate.setDate(aDate.getDate() - 1);
     this.placeholderDate = aDate.toISOString().slice(0,10);
@@ -67,7 +67,15 @@ export class CaretakerMakeBidComponent implements OnInit {
   findCaretaker() {
     const caretakerHashed = this.route.snapshot.paramMap.get("caretaker");
     this.caretaker = JSON.parse(Utf8.stringify(Base64.parse(caretakerHashed)));
+    this.checkIsLogged();
     this.loadCalendar();
+    this.findTakeCares();
+  }
+
+  findTakeCares() {
+    this.caretakerService.getCareTakerPrice(this.caretaker.email).subscribe((prices) => {
+      this.takesCare = prices;
+    });
   }
 
   loadCalendar() {
@@ -145,7 +153,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   getPetOwnerPets() {
-    this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
+    this.petOwnerService.getPetOwnerPetsWithCaretaker(this.caretaker.email).subscribe((pets) => {
       this.pets = pets;
     });
   }

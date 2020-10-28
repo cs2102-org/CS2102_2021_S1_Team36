@@ -2,6 +2,12 @@
     <h3>{{caretaker.name}}</h3>
     <h3>Rating: {{caretaker.rating}}</h3>
     <h3>{{caretaker.type}}</h3>
+    <table>
+        <tr *ngFor="let pet of takesCare">
+            <td>{{pet.species}}</td>
+            <td>${{pet.daily_price}}</td>
+        </tr>
+    </table>
 </div>
 
 <div class="column-center">
