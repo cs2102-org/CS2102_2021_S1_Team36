@@ -17,8 +17,8 @@ const routes: Routes = [
   { path: 'pet-owner-bids', component: PetOwnerBidsComponent },
   { path: 'caretaker-bids', component: CaretakerBidsComponent },
   { path: 'caretaker-summary', component: CaretakerSummaryPageComponent },
-  { path: 'forum', component: ForumComponent }
-  { path: 'bid-caretaker', component: CaretakerMakeBidComponent }
+  { path: 'forum', component: ForumComponent },
+  { path: 'bid-caretaker/:caretaker', component: CaretakerMakeBidComponent }
 ];
 
 @NgModule({

@@ -43,7 +43,7 @@ FullCalendarModule.registerPlugins([
     PetOwnerBidsComponent,
     CaretakerBidsComponent,
     StatsComponent,
-    ForumComponent
+    ForumComponent,
     CaretakerMakeBidComponent
   ],
   imports: [
