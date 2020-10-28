@@ -155,9 +155,9 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
             where P1.email = $1 \
             and \
             NOT EXISTS \
-            (SELECT bid_date AS start, number_of_days AS num_days FROM bidsfor \
+            (SELECT start_date AS start from BidsFor\
             WHERE caretaker_email = $1 \
-            AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
+            AND start_date <= P1.work_date AND P1.work_date <= end_date \
             );",
             [email]
             );
