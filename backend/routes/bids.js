@@ -89,7 +89,7 @@ bidsRouter.get('/hist/:email', async(req, res) => {
         const { email } = req.params;
         const msql = await pool.query(
             "select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
+            generate_series(start_date, end_date, '1 day'::interval)::date as date, \
             amount_bidded as amount \
             from bidsfor where caretaker_email = $1 and is_confirmed = true",
             [email]
@@ -106,18 +106,17 @@ bidsRouter.get('/hist/:email', async(req, res) => {
 bidsRouter.get('/hist/range/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        startdate = req.body.startdate;
-        enddate = req.body.enddate;
+        var { start_date, end_date } = req.body;
         // startdate = '2020-01-01';
         // enddate = '2021-03-01';
         const msql = await pool.query(
             "select * from \
             (select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
+            generate_series(start_date, end_date, '1 day'::interval)::date as date, \
             amount_bidded as amount \
             from bidsfor where caretaker_email = $1 and is_confirmed = true) as Q1 \
             where $2::date <= Q1.date and Q1.date <= $3::date",
-            [email, startdate, enddate]
+            [email, start_date, end_date]
             );
         res.json(msql.rows); 
     } catch (err) {
@@ -130,19 +129,16 @@ bidsRouter.get('/hist/range/:email', async(req, res) => {
 // only caretakers with nonzero work days appear in the result
 bidsRouter.get('/earnings/range', async(req, res) => {
     try {
-        startdate = req.body.startdate;
-        enddate = req.body.enddate;
-        // startdate = '2020-01-01';
-        // enddate = '2021-03-01';
+        var { start_date, end_date } = req.body;
         const msql = await pool.query(
             "select caretaker_email, COUNT(*) as days_worked, SUM(amount) as total_earnings from \
-            (select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
-            amount_bidded as amount \
-            from bidsfor where is_confirmed = true) as Q1 \
+                (select caretaker_email, \
+                generate_series(start_date, end_date, '1 day'::interval)::date as date, \
+                amount_bidded as amount \
+                from bidsfor where is_confirmed = true) as Q1 \
             where $1::date <= Q1.date and Q1.date <= $2::date \
             group by caretaker_email",
-            [startdate, enddate]
+            [start_date, end_date]
             );
         res.json(msql.rows); 
     } catch (err) {

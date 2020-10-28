@@ -609,7 +609,7 @@ INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
 -- test get available ft caretakers
 INSERT into fulltimeleave (email, leave_date) values ('cassie@gmail.com', '2022-01-01');
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'fido',
-'2020-01-01', '2022-01-05', '2022-01-010',
+'2020-01-01', '2022-01-05', '2022-01-10',
 80, 110,
 true, true, '1', '1', 5
 );
@@ -623,7 +623,7 @@ INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022
 INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-06');
 INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-07');
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
-'2020-01-02', '2022-01-05', '2022-01-010',
+'2020-01-02', '2022-01-05', '2022-01-10',
 80, 110,
 true, true, '1', '1', 5
 );
