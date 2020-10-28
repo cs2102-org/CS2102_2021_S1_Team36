@@ -627,3 +627,65 @@ INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
 80, 110,
 true, true, '1', '1', 5
 );
+
+
+-- test recommends
+-- input pistachio should return celine, cejudo
+-- input patty should return xiaohong
+INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'xiaohong@gmail.com', 'millie',
+'2022-01-01', '2022-01-02', '2022-01-05',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'carl@gmail.com', 'choco',
+'2022-01-01', '2022-01-02', '2022-01-05',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'carlos@gmail.com', 'choco',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+
+INSERT INTO BidsFor VALUES ('patty@gmail.com', 'carlos@gmail.com', 'jerry',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('patty@gmail.com', 'cejudo@gmail.com', 'jerry',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('patty@gmail.com', 'carl@gmail.com', 'biscuit',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('pattison@gmail.com', 'carlos@gmail.com', 'tom',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('pattison@gmail.com', 'celine@gmail.com', 'tom',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'roscoe',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'canneth@gmail.com', 'charlie',
+'2022-01-01', '2022-01-06', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+
+Delete from Takecareprice where email = 'canneth@gmail.com' and species = 'Dog'
+INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaohong@gmail.com', 'Turtle')
+
+
+

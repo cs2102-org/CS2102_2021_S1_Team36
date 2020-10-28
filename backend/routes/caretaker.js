@@ -409,6 +409,38 @@ caretakerRouter.get('/filter', async(req, res) => {
 
 
 
+// find recommended caretakers
+// return email, name rating, is_fulltime
+caretakerRouter.get('/rec/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+
+        const mkView = await pool.query(
+            "CREATE OR REPLACE VIEW potentialCaretakers AS \
+                (select DISTINCT caretaker_email as email from bidsfor where is_confirmed = True and owner_email in \
+                    (select DISTINCT owner_email from bidsfor where is_confirmed = True and caretaker_email in \
+                        (select caretaker_email from bidsfor where owner_email = '" + email + "' and is_confirmed = True))) \
+                EXCEPT \
+                (select caretaker_email as email from bidsfor where owner_email = '" + email + "' and is_confirmed = True);"
+        );
+
+        var selectCaretakers = "select email, name, rating, is_fulltime from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
+            where exists ( \
+	            (select species from takecareprice T1 where T1.email = PC.email) \
+	            INTERSECT \
+	            (select species from pets P1 where P1.email = $1) \
+            );"
+        const msql = await pool.query(
+            selectCaretakers,
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
 module.exports = {
     caretakerRouter
 }
