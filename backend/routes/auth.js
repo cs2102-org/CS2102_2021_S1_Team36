@@ -39,11 +39,11 @@ authRouter.post("/login", async (req, res) => {
 // User signup
 authRouter.post("/signup", async (req, res) => {
   const { name, email, password, desc } = req.body;
-  const hash = await bcrypt.hash(password, saltRounds);
+  // const hash = await bcrypt.hash(password, saltRounds);
   try {
     await pool.query(
       "INSERT INTO Users VALUES ($1, $2, $3, $4);"
-    , [name, email, desc, hash]);
+    , [name, email, desc, password]);
   } catch (e) {
     return res.status(404).json({ error: e.toString() });
   }

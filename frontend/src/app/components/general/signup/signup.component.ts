@@ -19,6 +19,7 @@ export class SignupComponent implements OnInit {
       password.value === passwordConfirm.value ? null : { notMatched: true };
   };
   signUpSuccess: Boolean = false;
+  errorMessage: string = "";
 
   signUpForm = new FormGroup(
     {
@@ -40,13 +41,19 @@ export class SignupComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onSubmit() {
+  onSubmitSignUp() {
     const signUpDetails = this.signUpForm.value;
     this.authService.signUp(signUpDetails);
     this.authService.loginNotiService.subscribe(message => {
       if (message == "Signup success") {
         this.signUpSuccess=true;
         this.signUpForm.reset();
+        this.errorMessage = "";
+      }
+    });
+    this.authService.loginErrorService.subscribe(err => {
+      if (err.indexOf("duplicate key value")) {
+        this.errorMessage = "User already exists!";
       }
     });
   }
