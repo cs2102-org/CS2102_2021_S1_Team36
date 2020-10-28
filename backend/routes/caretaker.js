@@ -216,6 +216,21 @@ caretakerRouter.get('/type/:type', async(req, res) => {
     }
 });
 
+// given email
+// return all pets and price that email can take care of 
+caretakerRouter.get('/caresfor/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select species, base_price, daily_price from takecareprice where email = $1;",
+            [email]
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // add a species that a caretaker can take care of
 caretakerRouter.post('/type/add/:email', async(req, res) => {
     try {
