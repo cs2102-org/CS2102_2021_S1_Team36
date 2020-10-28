@@ -22,4 +22,8 @@ export class CaretakerService {
   public getAvailFullTimeCareTaker(email): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/ft/na/' + email, httpOptions);
   }
+
+   public getCareTakerPrice(email): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/caresfor/' + email, httpOptions);
+  }
 }

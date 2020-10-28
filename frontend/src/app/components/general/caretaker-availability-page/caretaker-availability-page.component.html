@@ -54,13 +54,14 @@
                 <th> <h3>{{caretaker.name}}</h3></th>
                 <td>Rating: {{caretaker.rating}}</td>
                 <td>{{caretaker.type}}</td>
-                <td><button (click)="showHide(caretaker)">Show Price</button><td>
+                <td *ngIf="caretaker.showTakeCare"><button (click)="showHide(caretaker)">Hide</button><td>
+                <td *ngIf="!caretaker.showTakeCare"><button (click)="showHide(caretaker)">Show Price</button><td>
               </tr>
             </table>
             <table class="pets">
-              <tr *ngFor="let pet of caretaker.takesCare | keyvalue">
-                <td>{{pet.key}}</td>
-                <td>${{pet.value}}</td>
+              <tr *ngFor="let pet of caretaker.takesCare">
+                <td>{{pet.species}}</td>
+                <td>${{pet.daily_price}}</td>
               </tr>
             </table>
           </div>

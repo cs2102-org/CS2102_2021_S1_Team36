@@ -58,7 +58,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   getActiveCaretakers() {
     this.caretakersSubscription = this.caretakerService.getActiveCaretakers().subscribe((caretakers) => {
       let id = 1;
-      caretakers.map(elem => {elem.id = id++;});
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
       this.caretakers = caretakers;
     });
   }
@@ -102,7 +102,15 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
 
   showHide(caretaker){
     event.stopPropagation();
-    caretaker.takesCare['random'] = 30;
+    if (!caretaker.showTakeCare) {
+      this.caretakerService.getCareTakerPrice(caretaker.email).subscribe((prices) => {
+        caretaker.takesCare = prices;
+        caretaker.showTakeCare = true;
+      });
+    } else {
+      caretaker.showTakeCare = false;
+      caretaker.takesCare = [];
+    }
   }
 
 }

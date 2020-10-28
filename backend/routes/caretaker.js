@@ -253,7 +253,7 @@ caretakerRouter.get('/caresfor/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const msql = await pool.query(
-            "select species, base_price, daily_price from takecareprice where email = $1;",
+            "select species, daily_price from takecareprice where email = $1 order by species asc;",
             [email]
             );
         res.json(msql.rows); 
