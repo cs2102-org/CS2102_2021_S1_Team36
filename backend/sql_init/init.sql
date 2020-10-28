@@ -79,11 +79,11 @@ CREATE TABLE BidsFor (
     end_date DATE,
     price DECIMAL(10,2),
     amount_bidded DECIMAL(10,2),
-    is_confirmed BOOLEAN,
-    is_paid BOOLEAN,
+    is_confirmed BOOLEAN DEFAULT False,
+    is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) CHECK (rating >= 0 AND rating <= 5), --can add text for the review
+    rating DECIMAL(10, 1) DEFAULT 3 CHECK (rating >= 0 AND rating <= 5), --can add text for the review
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
@@ -602,4 +602,28 @@ INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
 INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
     2, 'parthia@gmail.com', '2020-09-27',
     'Does this work for dogs also?'
+);
+
+
+
+-- test get available ft caretakers
+INSERT into fulltimeleave (email, leave_date) values ('cassie@gmail.com', '2022-01-01');
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'fido',
+'2020-01-01', '2022-01-05', '2022-01-10',
+80, 110,
+true, true, '1', '1', 5
+);
+
+-- test get available pt caretakers
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-01');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-02');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-03');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-04');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-05');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-06');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-07');
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-02', '2022-01-05', '2022-01-07',
+80, 110,
+true, true, '1', '1', 5
 );

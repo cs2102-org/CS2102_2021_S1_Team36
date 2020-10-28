@@ -48,6 +48,54 @@ bidsRouter.get('/for/:email', async(req, res) => {
     }
 });
 
+// add a bid
+bidsRouter.post('/add', async(req, res) => {
+    try {
+        const { owner_email, caretaker_email, pet_name, submission_time, start_date, end_date,
+                amount_bidded, payment_type, transfer_type } = req.body;
+
+        const petSpeciesSql = await pool.query(
+            "select species from pets where email = $1 and pet_name = $2;",
+            [owner_email, pet_name]
+        );
+        var species = petSpeciesSql.rows[0]["species"];
+
+        const priceSql = await pool.query(
+            "select daily_price from Takecareprice where email = $1 and species = $2",
+            [caretaker_email, species]
+        );
+        var price = priceSql.rows[0]["daily_price"];
+        console.log(price);
+
+        const msql = await pool.query(
+            "INSERT INTO BidsFor(owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price, \
+            amount_bidded, payment_type, transfer_type) \
+            VALUES \
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);",
+            [owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price,
+             amount_bidded, payment_type, transfer_type]
+        );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+/* test example:
+    "owner_email" : "peter@gmail.com",
+    "caretaker_email" : "cassie@gmail.com",
+    "pet_name" : "boomer",
+    "submission_time" : "2020-10-25",
+    "start_date" : "2020-10-26",
+    "end_date" : "2020-10-30",
+    "price" : 100,
+    "amount_bidded" : 200,
+    "is_confirmed" : true,
+    "is_paid" : false,
+    "payment_type" : "1",
+    "transfer_type" : "2",
+    "rating" : null,
+*/
+
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
 bidsRouter.get('/hist/:email', async(req, res) => {
@@ -55,7 +103,7 @@ bidsRouter.get('/hist/:email', async(req, res) => {
         const { email } = req.params;
         const msql = await pool.query(
             "select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
+            generate_series(start_date, end_date, '1 day'::interval)::date as date, \
             amount_bidded as amount \
             from bidsfor where caretaker_email = $1 and is_confirmed = true",
             [email]
@@ -72,18 +120,17 @@ bidsRouter.get('/hist/:email', async(req, res) => {
 bidsRouter.get('/hist/range/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        startdate = req.body.startdate;
-        enddate = req.body.enddate;
+        var { start_date, end_date } = req.body;
         // startdate = '2020-01-01';
         // enddate = '2021-03-01';
         const msql = await pool.query(
             "select * from \
             (select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
+            generate_series(start_date, end_date, '1 day'::interval)::date as date, \
             amount_bidded as amount \
             from bidsfor where caretaker_email = $1 and is_confirmed = true) as Q1 \
             where $2::date <= Q1.date and Q1.date <= $3::date",
-            [email, startdate, enddate]
+            [email, start_date, end_date]
             );
         res.json(msql.rows); 
     } catch (err) {
@@ -96,19 +143,16 @@ bidsRouter.get('/hist/range/:email', async(req, res) => {
 // only caretakers with nonzero work days appear in the result
 bidsRouter.get('/earnings/range', async(req, res) => {
     try {
-        startdate = req.body.startdate;
-        enddate = req.body.enddate;
-        // startdate = '2020-01-01';
-        // enddate = '2021-03-01';
+        var { start_date, end_date } = req.body;
         const msql = await pool.query(
             "select caretaker_email, COUNT(*) as days_worked, SUM(amount) as total_earnings from \
-            (select caretaker_email, \
-            generate_series(bid_date::date, bid_date::date + interval '1 day' * (number_of_days - 1), '1 day'::interval)::date as date, \
-            amount_bidded as amount \
-            from bidsfor where is_confirmed = true) as Q1 \
+                (select caretaker_email, \
+                generate_series(start_date, end_date, '1 day'::interval)::date as date, \
+                amount_bidded as amount \
+                from bidsfor where is_confirmed = true) as Q1 \
             where $1::date <= Q1.date and Q1.date <= $2::date \
             group by caretaker_email",
-            [startdate, enddate]
+            [start_date, end_date]
             );
         res.json(msql.rows); 
     } catch (err) {
