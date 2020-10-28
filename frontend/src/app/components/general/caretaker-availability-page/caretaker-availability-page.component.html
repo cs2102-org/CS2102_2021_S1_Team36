@@ -43,8 +43,8 @@
     <div class="column-center">
       <h2>List of Caretakers</h2>
       <button>Show All</button>
-      <button>Recommended</button>
-      <button>Previously Transacted</button>
+      <button *ngIf="isLogged">Recommended</button>
+      <button *ngIf="isLogged">Previously Transacted</button>
 
       <ul class="caretakers">
         <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">

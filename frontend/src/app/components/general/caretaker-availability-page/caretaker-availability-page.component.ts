@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -45,14 +46,17 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
 
   caretakersSubscription: Subscription;
   caretakers: any[] = [];
+  isLogged: boolean = false;
 
-  constructor(private caretakerService: CaretakerService, private router: Router) { }
+  constructor(private caretakerService: CaretakerService, private router: Router,
+    private authService: AuthService) { }
 
   ngOnInit(): void {
     let aDate = new Date();
     aDate.setDate(aDate.getDate() - 1);
     this.placeholderDate = aDate.toISOString().slice(0,10);
     this.getActiveCaretakers();
+    this.checkIsLogged();
   }
 
   getActiveCaretakers() {
@@ -90,6 +94,20 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
         this.selectedCaretaker = caretaker;  
       });
     }
+  }
+
+  checkIsLogged() {
+    if (localStorage.getItem('accessToken') != null) {
+      this.isLogged = true;
+    }
+    this.authService.loginNotiService
+      .subscribe(message => {
+        if (message == "Login success") {
+          this.isLogged=true;
+        } else {
+          this.isLogged=false;
+        }
+      });
   }
 
   openMakeBid() {
