@@ -603,3 +603,27 @@ INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
     2, 'parthia@gmail.com', '2020-09-27',
     'Does this work for dogs also?'
 );
+
+
+
+-- test get available ft caretakers
+INSERT into fulltimeleave (email, leave_date) values ('cassie@gmail.com', '2022-01-01');
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'fido',
+'2020-01-01', '2022-01-05', '2022-01-010',
+80, 110,
+true, true, '1', '1', 5
+);
+
+-- test get available pt caretakers
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-01');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-02');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-03');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-04');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-05');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-06');
+INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-07');
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-02', '2022-01-05', '2022-01-010',
+80, 110,
+true, true, '1', '1', 5
+);

@@ -20,6 +20,14 @@ var getDaysArray = function(start, end) {
     return arr;
 };
 
+// dateString is YYYY-mm-dd
+var incDate = function(dateString, numDays) {
+    dt = new Date(dateString)
+    dt.setDate(dt.getDate() + 1)
+    dts = `${dt.getFullYear()}-${dt.getMonth()+1}-${dt.getDate()}`;
+    return dts
+};
+
 // Give a specified caretaker leave on the interval [start_date, end_date]
 // todo: check for overlaps with existing leave dates
 caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
@@ -34,7 +42,6 @@ caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
         var leave_date;
         for (var i = 0; i < arr.length; i++) {
             leave_date = `${arr[i].getFullYear()}-${arr[i].getMonth()+1}-${arr[i].getDate()}`;
-            "INSERT INTO FullTimeLeave(email, leave_date) VALUES ()"
             const msql = await pool.query(
                 "INSERT INTO FullTimeLeave(email, leave_date) VALUES ($1, $2)",
                 [email, leave_date]
@@ -102,25 +109,36 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
 caretakerRouter.get('/ft/na/all', async(req, res) => {
     try {
         const msql = await pool.query(
-            "select email, leave_date as na_start_date, 1 as na_num_days from fulltimeleave \
+            "select email, leave_date as start_date, leave_date as end_date from fulltimeleave \
             UNION \
-            select caretaker_email as email, bid_date as na_start_date, number_of_days as na_num_days from bidsfor where is_confirmed = true;"
+            select \
+                caretaker_email as email, \
+                start_date, \
+                end_date \
+            from bidsfor where is_confirmed = true;"
         );
         res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
+// test
+
 
 // view a specified fulltime caretakers non-availability
 caretakerRouter.get('/ft/na/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select leave_date as date, 1 as num_days from \
-            fulltimeleave where email=$1 \
+            "select email, leave_date as start_date, leave_date as end_date from fulltimeleave where email = $1 \
             UNION \
-            select bid_date as date, number_of_days as num_days from bidsfor where caretaker_email = $1 and is_confirmed = true;",
+            select \
+                caretaker_email as email, \
+                start_date, \
+                end_date \
+            from bidsfor where \
+                caretaker_email = $1 and \
+                is_confirmed = true;",
             [email]
             );
         res.json(sql.rows); 
@@ -131,52 +149,31 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 
 // view all full time caretakers available for a specified date range
 // accounts for their leave and their confirmed bids
+// range is specified as start_date, end_date inclusive
 caretakerRouter.get('/ft/unavail/range', async(req, res) => {
     try {
-        var startdate = req.body.startdate;
-        var numdays = req.body.numdays;
+        var { start_date, end_date } = req.body;
+        end_date = incDate(end_date);
         // var startdate = '2020-10-11';
         // var numdays = 5;
         const msql = await pool.query(
             "select C1.email from caretakers C1 \
             where C1.is_fulltime = True  \
             and not exists ( \
-            (select leave_date as date, 1 as num_days \
+            (select leave_date as na_date \
             from fulltimeleave \
             where email=C1.email and \
-            $1::date <= leave_date and \
-            leave_date <= $1::date + interval '1' day * ($2 - 1)) \
+            (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date)) \
             UNION \
-            (select bid_date as date, number_of_days as num_days \
+            (select start_date as na_date \
             from bidsfor \
             where caretaker_email = C1.email and is_confirmed = true \
-            and NOT ( \
-            bid_date::date + interval '1' day * (number_of_days - 1) < $1::date \
-            OR $1::date + interval '1' day * ($2 - 1) < bid_date::date \
-            )) \
-            );",
-            [startdate, numdays]
+            and \
+            (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
+            ));",
+            [start_date, end_date]
         );
         res.json(msql.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
-
-// get the availability of all part time caretaker
-// i.e. their available dates - dates where they have confirmed bids
-caretakerRouter.get('/pt/avail/all', async(req, res) => {
-    try {
-        const sql = await pool.query(
-            "select email, work_date as date, 1 as num_days from parttimeavail P1 \
-            where \
-            NOT EXISTS \
-            (SELECT bid_date AS date, number_of_days AS num_days FROM bidsfor \
-            WHERE caretaker_email = email \
-            AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
-            );"
-            );
-        res.json(sql.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -188,13 +185,13 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail P1 \
-            where P1.email = $1 \
-            and \
-            NOT EXISTS \
-            (SELECT bid_date AS start, number_of_days AS num_days FROM bidsfor \
-            WHERE caretaker_email = $1 \
-            AND bid_date <= P1.work_date AND date(P1.work_date) - date(bid_date) <= (number_of_days - 1) \
+            "select * from parttimeavail \
+            where email = $1 and \
+            not exists ( \
+            select 1 from bidsfor where \
+                is_confirmed = true and \
+                caretaker_email = $1 and \
+                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
             );",
             [email]
             );
