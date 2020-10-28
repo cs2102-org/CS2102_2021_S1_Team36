@@ -51,16 +51,30 @@ bidsRouter.get('/for/:email', async(req, res) => {
 // add a bid
 bidsRouter.post('/add', async(req, res) => {
     try {
-        const { owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price,
-                amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating } = req.body;
+        const { owner_email, caretaker_email, pet_name, submission_time, start_date, end_date,
+                amount_bidded, payment_type, transfer_type } = req.body;
+
+        const petSpeciesSql = await pool.query(
+            "select species from pets where email = $1 and pet_name = $2;",
+            [owner_email, pet_name]
+        );
+        var species = petSpeciesSql.rows[0]["species"];
+
+        const priceSql = await pool.query(
+            "select daily_price from Takecareprice where email = $1 and species = $2",
+            [caretaker_email, species]
+        );
+        var price = priceSql.rows[0]["daily_price"];
+        console.log(price);
+
         const msql = await pool.query(
             "INSERT INTO BidsFor(owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price, \
-            amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating) \
+            amount_bidded, payment_type, transfer_type) \
             VALUES \
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);",
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);",
             [owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price,
-             amount_bidded, is_confirmed, is_paid, payment_type, transfer_type, rating]
-            );
+             amount_bidded, payment_type, transfer_type]
+        );
         res.json(true); 
     } catch (err) {
         console.error(err);

@@ -130,12 +130,12 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select email, leave_date as start_date, leave_date as end_date from fulltimeleave where email = $1 \
+            "select email, leave_date as start, leave_date as end from fulltimeleave where email = $1 \
             UNION \
             select \
                 caretaker_email as email, \
-                start_date, \
-                end_date \
+                start_date as start, \
+                end_date as end \
             from bidsfor where \
                 caretaker_email = $1 and \
                 is_confirmed = true;",
@@ -185,7 +185,7 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const sql = await pool.query(
-            "select * from parttimeavail \
+            "select email, to_char(work_date, 'YYYY-mm-dd') from parttimeavail \
             where email = $1 and \
             not exists ( \
             select 1 from bidsfor where \
@@ -272,6 +272,14 @@ caretakerRouter.get('/active', async(req, res) => {
         console.error(err);
     }
 });
+
+// filter endpoint
+// filter by:
+// Caretaker name: find all caretakers whose name has a specified substring
+// Date of availability (Range): find all caretakers available for a superset of the specified interval
+// pet type: find all caretakers who can take care of a specified pet type
+// filter by price range (min, max)
+// filter by min rating
 
 
 
