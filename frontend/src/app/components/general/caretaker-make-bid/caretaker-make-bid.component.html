@@ -24,8 +24,8 @@
             <p><label>Choose which pet: </label>
             <select type="text" formControlName="pet_name">
                 <option></option>
-                <option *ngFor="let pet of pets | keyvalue">
-                    {{ pet.key }}
+                <option value={{pet.key}} *ngFor="let pet of pets | keyvalue">
+                    {{ pet.key }}({{ pet.value }})
                 </option>
             </select></p>
 
@@ -40,8 +40,8 @@
             <p><label>Payment Type: </label>
             <select type="text" formControlName="payment_type">
                 <option></option>
-                <option>Cash</option>
-                <option>Credit Card</option>
+                <option value=1>Cash</option>
+                <option value=2>Credit Card</option>
             </select></p>
 
             <p>Current Min Price: ${{currentMinPrice}}</p>
@@ -54,6 +54,7 @@
 
             <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
         </form>
+         <p *ngIf="bidSuccess">Bid Successful!</p>
     </div>
     <ng-template #elseBlock>
         <h2>Please Login to bid</h2>

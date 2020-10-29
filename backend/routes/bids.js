@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
+const { verifyJwt } = require('../auth/index')
 
 const bidsRouter = express.Router();
 
@@ -49,10 +50,15 @@ bidsRouter.get('/for/:email', async(req, res) => {
 });
 
 // add a bid
-bidsRouter.post('/add', async(req, res) => {
+bidsRouter.post('/add', verifyJwt, async(req, res) => {
     try {
-        const { owner_email, caretaker_email, pet_name, submission_time, start_date, end_date,
+        const owner_email = res.locals.user.email;
+        console.log(owner_email);
+
+        const { caretaker_email, pet_name, submission_time, start_date, end_date,
                 amount_bidded, payment_type, transfer_type } = req.body;
+
+        console.log(pet_name);
 
         const petSpeciesSql = await pool.query(
             "select species from pets where email = $1 and pet_name = $2;",

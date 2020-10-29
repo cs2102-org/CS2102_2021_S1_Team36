@@ -5,6 +5,7 @@ import { CalendarOptions, FullCalendarComponent, isDateSpansEqual, sliceEventSto
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
@@ -35,6 +36,7 @@ export class CaretakerMakeBidComponent implements OnInit {
     selectAllow: this.selectAllowable.bind(this)
   };
 
+  bidSuccess = false;
   isLogged = false;
   pets;
   dates;
@@ -58,7 +60,8 @@ export class CaretakerMakeBidComponent implements OnInit {
   constructor(private caretakerService: CaretakerService, 
     private route: ActivatedRoute,
     private petOwnerService: PetownerService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private bidService: BidService) { }
 
   ngOnInit(): void {
     let aDate = new Date();
@@ -177,7 +180,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   getPetOwnerPets() {
     this.petOwnerService.getPetOwnerPetsWithCaretaker(this.caretaker.email).subscribe((pets) => {
       this.pets = pets.reduce((accumulator, currentValue) => {
-        accumulator[currentValue.pet_name + '(' + currentValue.species + ')'] = currentValue.species;
+        accumulator[currentValue.pet_name] = currentValue.species;
         return accumulator;
       }, {});
     });
@@ -194,9 +197,15 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   onSubmit(bidForm) {
+    this.bidSuccess=false;
     bidForm.controls['submission_time'].setValue(new Date());
     bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
-    console.log(bidForm.value);
+    this.bidService.postBid(bidForm.value).subscribe(status => {
+      if (status) {
+        this.bidSuccess=true;
+        this.bidForm.reset();
+      }
+    });
   }
 
   selectBidDate(selectionInfo) {
