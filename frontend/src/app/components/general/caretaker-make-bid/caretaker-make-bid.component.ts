@@ -69,6 +69,13 @@ export class CaretakerMakeBidComponent implements OnInit {
     this.placeholderDate = aDate.toISOString().slice(0,10);
     this.findCaretaker();
     this.petNameFormChangeSubscribe();
+    this.formResets();
+  }
+
+  formResets() {
+    this.bidForm.valueChanges.subscribe(val => {
+      this.bidSuccess = false;
+    });
   }
 
   petNameFormChangeSubscribe() {
@@ -197,13 +204,12 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   onSubmit(bidForm) {
-    this.bidSuccess=false;
     bidForm.controls['submission_time'].setValue(new Date());
     bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
     this.bidService.postBid(bidForm.value).subscribe(status => {
       if (status) {
-        this.bidSuccess=true;
         this.bidForm.reset();
+        this.bidSuccess=true;
       }
     });
   }

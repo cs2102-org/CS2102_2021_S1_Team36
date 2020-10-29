@@ -53,12 +53,10 @@ bidsRouter.get('/for/:email', async(req, res) => {
 bidsRouter.post('/add', verifyJwt, async(req, res) => {
     try {
         const owner_email = res.locals.user.email;
-        console.log(owner_email);
 
         const { caretaker_email, pet_name, submission_time, start_date, end_date,
                 amount_bidded, payment_type, transfer_type } = req.body;
 
-        console.log(pet_name);
 
         const petSpeciesSql = await pool.query(
             "select species from pets where email = $1 and pet_name = $2;",
@@ -71,7 +69,6 @@ bidsRouter.post('/add', verifyJwt, async(req, res) => {
             [caretaker_email, species]
         );
         var price = priceSql.rows[0]["daily_price"];
-        console.log(price);
 
         const msql = await pool.query(
             "INSERT INTO BidsFor(owner_email, caretaker_email, pet_name, submission_time, start_date, end_date, price, \
