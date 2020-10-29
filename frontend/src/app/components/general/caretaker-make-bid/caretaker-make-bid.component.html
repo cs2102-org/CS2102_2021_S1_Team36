@@ -20,9 +20,9 @@
     <div *ngIf="isLogged; else elseBlock">
         <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
             <p>Choose the dates by clicking and dragging on the calendar</p>
-            <p>You have chosen: {{bidForm.get('dateFrom').value}} - {{bidForm.get('dateTo').value}}</p>
+            <p>You have chosen: {{bidForm.get('start_date').value}} - {{bidForm.get('end_date').value}}</p>
             <p><label>Choose which pet: </label>
-            <select type="text" formControlName="petName">
+            <select type="text" formControlName="pet_name">
                 <option></option>
                 <option *ngFor="let pet of pets | keyvalue">
                     {{ pet.key }}
@@ -30,15 +30,15 @@
             </select></p>
 
             <p><label>Transfer Type: </label>
-            <select type="text" formControlName="transferType">
+            <select type="number" formControlName="transfer_type">
                 <option></option>
-                <option>I deliver</option>
-                <option>Caretaker pick up</option>
-                <option>Transfer through physical building of PCS</option>
+                <option value=1>I deliver</option>
+                <option value=2>Caretaker pick up</option>
+                <option value=3>Transfer through physical building of PCS</option>
             </select></p>
 
             <p><label>Payment Type: </label>
-            <select type="text" formControlName="paymentType">
+            <select type="text" formControlName="payment_type">
                 <option></option>
                 <option>Cash</option>
                 <option>Credit Card</option>
@@ -47,8 +47,8 @@
             <p>Current Min Price: ${{currentMinPrice}}</p>
 
             <p><label>Bid Price: </label>
-            <input type="number" formControlName="bidPrice"></p>
-            <p *ngIf="bidForm.get('bidPrice').touched && bidForm.get('bidPrice').invalid">
+            <input type="number" formControlName="amount_bidded"></p>
+            <p *ngIf="bidForm.get('amount_bidded').touched && bidForm.get('amount_bidded').invalid">
                 Bid Price cannot be less than {{ currentMinPrice }}. 
             </p>
 

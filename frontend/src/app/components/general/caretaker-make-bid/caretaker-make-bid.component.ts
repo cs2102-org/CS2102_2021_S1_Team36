@@ -45,14 +45,14 @@ export class CaretakerMakeBidComponent implements OnInit {
   numberOfBidDays: number = 0;
 
   bidForm = new FormGroup({
-    dateFrom: new FormControl('', Validators.required),
-    dateTo: new FormControl('', Validators.required),
-    petName: new FormControl('', Validators.required),
-    submissionTime: new FormControl(''),
-    caretakerEmail: new FormControl(''),
-    paymentType: new FormControl('', Validators.required),
-    transferType: new FormControl('', Validators.required),
-    bidPrice: new FormControl('', [Validators.required, (control: AbstractControl) => Validators.min(this.currentMinPrice)(control)]),
+    start_date: new FormControl('', Validators.required),
+    end_date: new FormControl('', Validators.required),
+    pet_name: new FormControl('', Validators.required),
+    submission_time: new FormControl(''),
+    caretaker_email: new FormControl(''),
+    payment_type: new FormControl('', Validators.required),
+    transfer_type: new FormControl('', Validators.required),
+    amount_bidded: new FormControl('', [Validators.required, (control: AbstractControl) => Validators.min(this.currentMinPrice)(control)]),
   });
 
   constructor(private caretakerService: CaretakerService, 
@@ -69,7 +69,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   petNameFormChangeSubscribe() {
-    this.bidForm.get("petName").valueChanges.subscribe(selectedValue  => {
+    this.bidForm.get("pet_name").valueChanges.subscribe(selectedValue  => {
       const price = this.pets[selectedValue];
       for (let pet of this.takesCare) {
         if (pet.species == price) {
@@ -194,8 +194,8 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   onSubmit(bidForm) {
-    bidForm.controls['submissionTime'].setValue(new Date());
-    bidForm.controls['caretakerEmail'].setValue(this.caretaker.email);
+    bidForm.controls['submission_time'].setValue(new Date());
+    bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
     console.log(bidForm.value);
   }
 
@@ -204,9 +204,9 @@ export class CaretakerMakeBidComponent implements OnInit {
     const endDate = selectionInfo.end;
     this.numberOfBidDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24); 
     startDate.setDate(startDate.getDate() + 1);
-    this.bidForm.controls['dateFrom'].setValue(startDate.toISOString().slice(0,10));
-    this.bidForm.controls['dateTo'].setValue(endDate.toISOString().slice(0,10));
-    const price = this.pets[this.bidForm.get('petName').value];
+    this.bidForm.controls['start_date'].setValue(startDate.toISOString().slice(0,10));
+    this.bidForm.controls['end_date'].setValue(endDate.toISOString().slice(0,10));
+    const price = this.pets[this.bidForm.get('pet_name').value];
       for (let pet of this.takesCare) {
         if (pet.species == price) {
           this.currentMinPrice = parseFloat(pet.daily_price) * this.numberOfBidDays;
