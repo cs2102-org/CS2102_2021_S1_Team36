@@ -202,35 +202,77 @@ caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     }
 });
 
-// get all caretakers (ft and pt) that are avail for the entire given range
-// caretakerRouter.get('/avail/range', async(req, res) => {
-//     try {
-//         var { start_date, end_date } = req.body;
-//         const sql = await pool.query(
-//             "select C1.email from caretakers C1 \
-//             where C1.is_fulltime = True  \
-//             and not exists ( \
-//             (select leave_date as na_date \
-//             from fulltimeleave \
-//             where email=C1.email and \
-//             (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date)) \
-//             UNION \
-//             (select start_date as na_date \
-//             from bidsfor \
-//             where caretaker_email = C1.email and is_confirmed = true \
-//             and \
-//             (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
-//             )); \
-//             UNION \
+// get all pt caretakers who are avail on the whole of given range
+caretakerRouter.get('/pt/availrange', async(req, res) => {
+    try {
+        var { start_date, end_date } = req.body;
+        console.log(start_date, end_date);
+        const sql = await pool.query(
+            "select C1.email from caretakers C1 \
+            where \
+                is_fulltime = false and \
+                not exists ( \
+                    SELECT generate_series($1::date, $2::date, '1 day'::interval)::date as datez \
+                    EXCEPT \
+                    (select work_date as datez from parttimeavail \
+                     where email = C1.email and \
+                     not exists ( \
+                     select 1 from bidsfor where \
+                         is_confirmed = true and \
+                         caretaker_email = C1.email and \
+                         (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')) \
+                    )\
+                )\
+            ;",
+            [start_date, end_date]);
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
-//             ",
-//             [start_date, end_date]
-//             );
-//         res.json(sql.rows); 
-//     } catch (err) {
-//         console.error(err);
-//     }
-// });
+// get all caretakers (ft and pt) that are avail for the entire given range
+caretakerRouter.get('/availrange', async(req, res) => {
+    try {
+        var { start_date, end_date } = req.body;
+        const sql = await pool.query(
+            "select C1.email from caretakers C1 \
+            where C1.is_fulltime = True  \
+            and not exists ( \
+                (select leave_date as na_date \
+                from fulltimeleave \
+                where email=C1.email and \
+                (leave_date, leave_date + interval '1 day') overlaps ($1::date, $2::date + interval '1 day')) \
+                UNION \
+                (select start_date as na_date \
+                from bidsfor \
+                where caretaker_email = C1.email and is_confirmed = true \
+                and \
+                (start_date, end_date + interval '1 day') overlaps ($1::date, $2::date) \
+                )) \
+            UNION \
+            select C1.email from caretakers C1 \
+            where \
+                is_fulltime = false and \
+                not exists ( \
+                    SELECT generate_series($1::date, $2::date, '1 day'::interval)::date as datez \
+                    EXCEPT \
+                    (select work_date as datez from parttimeavail \
+                     where email = C1.email and \
+                     not exists ( \
+                     select 1 from bidsfor where \
+                         is_confirmed = true and \
+                         caretaker_email = C1.email and \
+                         (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')) \
+                    )\
+                )\
+            ;",
+            [start_date, end_date]);
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 // find all caretakers who can look after a specified pet type
 caretakerRouter.get('/type/:type', async(req, res) => {
@@ -328,29 +370,92 @@ caretakerRouter.get('/detailed/:email', async(req, res) => {
 // price: caretaker price for pet_type in range [min, max]
 // rating: caretaker rating >= rating
 
-// caretakerRouter.get('/filter', async(req, res) => {
-//     try {
-//         var { substr, start_date, end_date, pet_type, price, rating } = req.body;
-//         const msql = await pool.query(
-//             "select email from caretakers NATURAL JOIN users where
-//                 (rating >= 2 or 2 is null) and
-//                 (name LIKE '%' || $1 || '%' or $1 is null)
-//             INTERSECT
-//             select email from takecareprice
-//             where
-//                 (species = $4 or $4 is null) and
-//                 (daily_price >= $5 or $5 is null) and 
-//                 (daily_price <= $6 or $6 is null)
-//             INTERSECT
+caretakerRouter.get('/filter', async(req, res) => {
+    try {
+        var { substr, start_date, end_date, pet_type, min, max, rating } = req.body;
+        console.log(substr, start_date, end_date, pet_type, min, max, rating);
+        const msql = await pool.query(
+            "select email from caretakers NATURAL JOIN users where \
+                (rating >= $7 or $7 is null) and \
+                (name LIKE '%' || $1 || '%' or $1 is null) \
+            INTERSECT \
+            select email from takecareprice \
+            where \
+                (species = $4 or $4 is null) and \
+                (daily_price >= $5 or $5 is null) and \
+                (daily_price <= $6 or $6 is null) \
+            INTERSECT \
+            (select C1.email from caretakers C1 \
+            where C1.is_fulltime = True  \
+            and not exists ( \
+                (select leave_date as na_date \
+                from fulltimeleave \
+                where email=C1.email and \
+                (leave_date, leave_date + interval '1 day') overlaps ($2::date, $3::date + interval '1 day')) \
+                UNION \
+                (select start_date as na_date \
+                from bidsfor \
+                where caretaker_email = C1.email and is_confirmed = true \
+                and \
+                (start_date, end_date + interval '1 day') overlaps ($2::date, $3::date + interval '1 day') \
+                )) \
+            UNION \
+            select C1.email from caretakers C1 \
+            where \
+                is_fulltime = false and \
+                not exists ( \
+                    SELECT generate_series($2::date, $3::date, '1 day'::interval)::date as datez \
+                    EXCEPT \
+                    (select work_date as datez from parttimeavail \
+                     where email = C1.email and \
+                     not exists ( \
+                     select 1 from bidsfor where \
+                         is_confirmed = true and \
+                         caretaker_email = C1.email and \
+                         (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')) \
+                     \
+                )) \
+            );",
+            [substr, start_date, end_date, pet_type, min, max, rating]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
-//             [substr, start_date, end_date, pet_type, min, max, rating]
-//         );
-//         res.json(msql.rows); 
-//     } catch (err) {
-//         console.error(err);
-//     }
-// });
 
+
+// find recommended caretakers
+// return email, name rating, is_fulltime
+caretakerRouter.get('/rec/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+
+        const mkView = await pool.query(
+            "CREATE OR REPLACE VIEW potentialCaretakers AS \
+                (select DISTINCT caretaker_email as email from bidsfor where is_confirmed = True and owner_email in \
+                    (select DISTINCT owner_email from bidsfor where is_confirmed = True and caretaker_email in \
+                        (select caretaker_email from bidsfor where owner_email = '" + email + "' and is_confirmed = True))) \
+                EXCEPT \
+                (select caretaker_email as email from bidsfor where owner_email = '" + email + "' and is_confirmed = True);"
+        );
+
+        var selectCaretakers = "select email, name, rating, is_fulltime from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
+            where exists ( \
+	            (select species from takecareprice T1 where T1.email = PC.email) \
+	            INTERSECT \
+	            (select species from pets P1 where P1.email = $1) \
+            );"
+        const msql = await pool.query(
+            selectCaretakers,
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 
 module.exports = {
