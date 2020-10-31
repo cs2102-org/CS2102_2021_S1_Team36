@@ -7,6 +7,7 @@ import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -19,6 +20,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   selectedCaretaker;
   placeholderDate: String;
   typeOfList = "";
+  petTypes;
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -49,7 +51,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   isLogged: boolean = false;
 
   constructor(private caretakerService: CaretakerService, private router: Router,
-    private authService: AuthService) { }
+    private authService: AuthService, private petOwnerService: PetownerService) { }
 
   ngOnInit(): void {
     let aDate = new Date();
@@ -57,6 +59,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     this.placeholderDate = aDate.toISOString().slice(0,10);
     this.getActiveCaretakers();
     this.checkIsLogged();
+    this.getListOfPetTypes();
   }
 
   getActiveCaretakers() {
@@ -65,6 +68,12 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
       this.typeOfList = "";
       caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
       this.caretakers = caretakers;
+    });
+  }
+
+  getListOfPetTypes() {
+    this.petOwnerService.getGetListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
     });
   }
 

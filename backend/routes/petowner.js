@@ -61,6 +61,18 @@ petownerRouter.post('/:email/pets', async (req, res) => {
     }
 });
 
+// returns a list of all pet types
+petownerRouter.get('/alltypes', async(req, res) => {
+    try {
+        const msql = await pool.query(
+            "select * from Pettypes;"
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     petownerRouter
 }
