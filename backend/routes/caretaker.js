@@ -375,18 +375,15 @@ caretakerRouter.get('/filter', async(req, res) => {
     try {
         var { substr, start_date, end_date, pet_type, min, max, rating } = req.body;
         console.log(substr, start_date, end_date, pet_type, min, max, rating);
-        const msql = await pool.query(
-            "select email from caretakers NATURAL JOIN users where \
-                (rating >= $7 or $7 is null) and \
-                (name LIKE '%' || $1 || '%' or $1 is null) \
-            INTERSECT \
-            select email from takecareprice \
+        var p1 = "select email, rating, is_fulltime from caretakers NATURAL JOIN users where \
+            (rating >= $7 or $7 is null) and \
+            (name LIKE '%' || $1 || '%' or $1 is null)";
+        var p2 = "select email, rating, is_fulltime from takecareprice NATURAL JOIN Caretakers \
             where \
                 (species = $4 or $4 is null) and \
                 (daily_price >= $5 or $5 is null) and \
-                (daily_price <= $6 or $6 is null) \
-            INTERSECT \
-            (select C1.email from caretakers C1 \
+                (daily_price <= $6 or $6 is null)";
+        var p3 = "(select C1.email, C1.rating, C1.is_fulltime from caretakers C1 \
             where C1.is_fulltime = True  \
             and not exists ( \
                 (select leave_date as na_date \
@@ -401,7 +398,7 @@ caretakerRouter.get('/filter', async(req, res) => {
                 (start_date, end_date + interval '1 day') overlaps ($2::date, $3::date + interval '1 day') \
                 )) \
             UNION \
-            select C1.email from caretakers C1 \
+            select C1.email, C1.rating, C1.is_fulltime from caretakers C1 \
             where \
                 is_fulltime = false and \
                 not exists ( \
@@ -416,7 +413,10 @@ caretakerRouter.get('/filter', async(req, res) => {
                          (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')) \
                      \
                 )) \
-            );",
+            )";
+        var p4 = "select F.email, name, rating, is_fulltime from (" + p1 + " INTERSECT " + p2 + " INTERSECT " + p3 + ") AS F NATURAL JOIN Users";
+        const msql = await pool.query(
+            p4,
             [substr, start_date, end_date, pet_type, min, max, rating]
         );
         res.json(msql.rows); 
@@ -458,6 +458,18 @@ caretakerRouter.get('/rec', verifyJwt, async(req, res) => {
     }
 });
 
+
+// returns a list of all pet types
+caretakerRouter.get('/alltypes', async(req, res) => {
+    try {
+        const msql = await pool.query(
+            "select * from Pettypes;"
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 module.exports = {
     caretakerRouter
