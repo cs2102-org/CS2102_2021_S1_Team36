@@ -253,7 +253,7 @@ language plpgsql
 as
 $$
 BEGIN
-	return getPetLimit(cemail) + 2 >= ALL (select num_jobs from getWorkload(cemail, s, e));
+	return getPetLimit(cemail) > ALL (select num_jobs from getWorkload(cemail, s, e));
 END;
 $$;
 
