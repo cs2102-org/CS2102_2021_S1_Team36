@@ -130,8 +130,8 @@ BEGIN
 END;
 $$;
 
-drop trigger if exists on_bid_confirmed on BidsFor;
-CREATE TRIGGER on_bid_confirmed
+drop trigger if exists trigger_invalidate_bids on BidsFor;
+CREATE TRIGGER trigger_invalidate_bids
     AFTER UPDATE OF is_confirmed ON BidsFor
     FOR EACH ROW
     EXECUTE PROCEDURE invalidate_bids();
@@ -160,12 +160,37 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS on_rating_added on BidsFor;
-CREATE TRIGGER on_rating_added 
+DROP TRIGGER IF EXISTS trigger_update_rating on BidsFor;
+CREATE TRIGGER trigger_update_rating
     AFTER UPDATE OF rating ON BidsFor
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating();
-	
+
+
+-- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
+CREATE OR REPLACE FUNCTION block_taking_leave()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+		select 1 from bidsFor
+		where
+			caretaker_email = NEW.email and
+			((start_date, end_date + interval '1 day') overlaps (NEW.leave_date, NEW.leave_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'You have a job on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_taking_leave on FullTimeLeave;
+CREATE TRIGGER trigger_block_taking_leave
+    BEFORE INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_taking_leave();
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
