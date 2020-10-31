@@ -182,6 +182,11 @@ INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaohong@gmail.com',
 INSERT INTO Users(name, email, description, password) VALUES ('xiaozong', 'xiaozong@gmail.com', 'xiaozong is a part time caretaker of pcs', 'pwxiaozong');
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaozong@gmail.com', false, 2);
 
+INSERT INTO Users(name, email, description, password) VALUES ('jane', 'jane@gmail.com', 'jane is an admin of pcs', 'pwjane');
+INSERT INTO PcsAdmins(email) VALUES ('jane@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('janey', 'janey@gmail.com', 'janey is an admin of pcs', 'pwjaney');
+INSERT INTO PcsAdmins(email) VALUES ('janey@gmail.com');
+
 INSERT INTO PetTypes(species) VALUES ('Dog');
 INSERT INTO PetTypes(species) VALUES ('Cat');
 INSERT INTO PetTypes(species) VALUES ('Hamster');
