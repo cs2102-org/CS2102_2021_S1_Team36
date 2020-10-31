@@ -112,6 +112,7 @@ CREATE TABLE Comments (
     PRIMARY KEY (post_id, email, date_time)
 );
 
+
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
 INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a petowner of pcs', 'pwpeter');
@@ -627,3 +628,47 @@ INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
 80, 110,
 true, true, '1', '1', 5
 );
+
+--TRIGGERS
+
+--users covering constraint
+CREATE OR REPLACE FUNCTION check_user_covering() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    uncovered_user VARCHAR(30);
+BEGIN 
+    SELECT email INTO uncovered_user
+    FROM Users u
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM PetOwners p
+        WHERE p.email = u.email
+    )
+    AND
+    NOT EXISTS (
+        SELECT 1
+        FROM CareTakers c
+        WHERE c.email = u.email
+    )
+    AND 
+    NOT EXISTS (
+        SELECT 1
+        FROM PcsAdmins pcs
+        WHERE pcs.email = u.email
+    );
+    
+    IF uncovered_user IS NOT NULL THEN 
+        RAISE exception 'user % must belong to one user type', uncovered_user;
+    END IF;
+    RETURN NULL;
+
+END;
+$$ LANGUAGE plpgsql;
+
+-- calling the trigger
+DROP TRIGGER IF EXISTS user_cover_trigger ON Users;
+CREATE CONSTRAINT TRIGGER user_cover_trigger
+    AFTER INSERT ON Users
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_user_covering();
