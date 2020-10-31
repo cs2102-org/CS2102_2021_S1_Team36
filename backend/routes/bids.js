@@ -45,7 +45,7 @@ bidsRouter.get('/by/:email/pending', async (req, res) => {
             from bidsfor    \
             where owner_email = $1 \
               and is_confirmed is null \
-              and start_date >= now() \
+              and start_date >= now()::date \
             order by start_date ASC, end_date ASC;",
             [email]
         );
@@ -78,7 +78,16 @@ bidsRouter.get('/by/:email/rejected', async (req, res) => {
 // gets done bids for a specific petowner
 bidsRouter.get('/by/:email/done', async (req, res) => {
     try {
-
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * \
+            from bidsfor    \
+            where owner_email = $1  \
+              and is_confirmed is true \
+            order by start_date DESC, end_date DESC;",
+            [email]
+        );
+        res.json(msql.rows);
     } catch (err) {
         console.error(err);
     }
