@@ -10,6 +10,7 @@ import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-
 import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'petowner/bids', component: PetOwnerBidsComponent },
   { path: 'caretaker/bids', component: CaretakerBidsComponent },
   { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
+  { path: 'caretaker/profile', component: CaretakerProfileComponent },
   { path: 'forum', component: ForumComponent },
   { path: 'caretaker/bid/:caretaker', component: CaretakerMakeBidComponent },
   { path: 'petowner/summary', component: PetOwnerSummaryComponent }
