@@ -453,6 +453,31 @@ caretakerRouter.get('/alltypes', async(req, res) => {
     }
 });
 
+// returns a list of caretakers that :email has previously transacted with
+caretakerRouter.get('/txnbefore/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "SELECT email, name, rating, \
+                CASE \
+                    WHEN is_fulltime THEN 'Full Time' \
+                    ELSE 'Part Time' \
+                END \
+                as type FROM \
+                (select DISTINCT caretaker_email as email from bidsFor \
+                where \
+                    owner_email = $1 and \
+                    is_confirmed = True \
+                ) AS TB \
+                NATURAL JOIN Users NATURAL JOIN Caretakers",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     caretakerRouter
 }
