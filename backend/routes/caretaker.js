@@ -353,7 +353,7 @@ caretakerRouter.get('/detailed/:email', async(req, res) => {
         const { email } = req.params;
         const msql = await pool.query(
             "SELECT email, description, rating, name, \
-            CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END\
+            CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type \
             FROM Users NATURAL JOIN Caretakers WHERE email = $1;",
             [email]
         );
