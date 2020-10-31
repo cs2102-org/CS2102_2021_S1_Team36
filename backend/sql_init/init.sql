@@ -256,7 +256,19 @@ BEGIN
 END;
 $$;
 
--- return true if caretaker is available on the given interval
+-- return true if caretaker has capacity to take on 1 more pet on the given interval
+drop function if exists hasSpareCapacity;
+CREATE OR REPLACE FUNCTION hasSpareCapacity(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return getPetLimit(cemail) > ALL (select num_jobs from getWorkload(cemail, s, e));
+END;
+$$;
+
+-- return true if caretaker is available (not on leave if fulltime, and is on work if parttime) on the given interval
 drop function if exists isAvail;
 CREATE OR REPLACE FUNCTION isAvail(cemail varchar, s date, e date)
 RETURNS boolean
@@ -264,7 +276,30 @@ language plpgsql
 as
 $$
 BEGIN
-	return getPetLimit(cemail) > ALL (select num_jobs from getWorkload(cemail, s, e));
+	IF (select is_fulltime from caretakers where email = cemail) THEN
+		return not exists (
+			select * from FullTimeLeave
+			where
+				email = cemail and
+				clash(s, e, leave_date)
+		);
+	ELSE
+		return not exists (
+			SELECT generate_series(s::date, e::date, '1 day'::interval)::date as datez
+			EXCEPT (select work_date as datez from parttimeavail where email = email)
+		);
+	END IF;
+END;
+$$;
+
+drop function if exists canWork;
+CREATE OR REPLACE FUNCTION canWork(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return isAvail(cemail, s, e) AND hasSpareCapacity(cemail, s, e);
 END;
 $$;
 
