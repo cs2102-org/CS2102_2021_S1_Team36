@@ -13,4 +13,8 @@ export class BidService {
   public postBid(bidDetails): Observable<any> {
     return this.http.post(baseurl + '/api/bids/add', bidDetails, getHttpOptionsWithAuth());
   }
+
+  public getBids(): Observable<any> {
+    return this.http.get(baseurl + '/api/bids/by', getHttpOptionsWithAuth());
+  }
 }

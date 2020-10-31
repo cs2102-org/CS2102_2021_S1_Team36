@@ -1,40 +1,72 @@
-<div id="#content">
-    <div class="column-left">
-        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit(filterForm.value)">
+<div class="column-left">
+    <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
 
-            <div class="text-bar">
-              <p><label>Search:</label></p>
-              <p> <input type="text" formControlName="search"></p>
-            </div>
-
-            <div class="text-bar">
-              <p><label>Date:</label></p>
-              <p><input type="text" formControlName="date"></p>
-            </div>
-
-            <div class="text-bar">
-              <p><label>Type of Pet:</label></p>
-              <p><input type="text" formControlName="petType"></p>
-            </div>
-
-            <div class="text-bar">
-              <p><label>Price:</label></p>
-              <p><input type="text" formControlName="price"></p>
-            </div>
-
-            <div class="text-bar">
-              <p><label>Minimum Rating:</label></p>
-              <p><input type="text" formControlName="minRating"></p>
-            </div>
-
-            <button class="button" type="submit">Search</button>
-          </form>
+    <div class="text-bar">
+      <p><label>Search For Caretaker:</label></p>
+      <p> <input type="text" formControlName="substr"></p>
     </div>
-    <div class="column-right">
-        <h2>List of Bids (Pet Owner)</h2>
-        <button>Show All</button>
-        <button>Pending</button>
-        <button>Rejected</button>
-        <button>Done</button>
+
+    <div class="text-bar" style="float:left; margin-right:10px;">
+      <p><label>Date From:</label></p>
+      <p><input type="date" formControlName="start_date"></p>
     </div>
+
+    <div class="text-bar">
+      <p><label>Date To:</label></p>
+      <p><input type="date" formControlName="end_date"></p>
+    </div>
+
+    <div class="text-bar">
+      <p><label>Type of Pet:</label></p>
+      <p><input type="text" formControlName="pet_type"></p>
+    </div>
+
+    <div class="text-bar" style="float:left; margin-right:5px;">
+      <p><label>Price From:</label></p>
+      <p><input style="margin-right:10px" type="number" formControlName="min"></p>
+    </div>
+
+    <div class="text-bar">
+      <p><label>Price To:</label></p>
+      <p><input style="margin-right:10px" type="number" formControlName="max"></p>
+    </div>
+
+    <button class="button" type="submit">Search</button>
+  </form>
+</div>
+<div >
+    <h2>My Bids (Pet Owner)</h2>
+    <button>Show All</button>
+    <button>Pending</button>
+    <button>Rejected</button>
+    <button>Done</button>
+
+    <table>
+      <tr> 
+        <th>Caretaker Name</th>
+        <th>Pet Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Payment Type</th>
+        <th>Transfer Type</th>
+        <th>Submission Time</th>
+        <th>Amount Bidded</th>
+        <th>Confirmed?</th>
+        <th>Paid?</th>
+        <th>Rating</th>
+      </tr>
+      <tr *ngFor="let bid of bids" (click)="openCaretaker(bid)">
+        <td>{{bid.name}}</td>
+        <td>{{bid.pet_name}}</td>
+        <td>{{bid.start_date}}</td>
+        <td>{{bid.end_date}}</td>
+        <td>{{bid.payment_type}}</td>
+        <td>{{bid.transfer_type}}</td>
+        <td>{{bid.submission_time}}</td>
+        <td>${{bid.amount_bidded}}</td>
+        <td>{{bid.is_confirmed}}</td>
+        <td>{{bid.is_paid}}</td>
+        <td>{{bid.rating}}</td>
+      </tr>
+    </table>
 </div>

@@ -1,5 +1,5 @@
 .column-left {
-  width: 25%;
+  width: 32%;
   float: left;
   word-wrap: break-word;
   height: 95vh;
@@ -10,11 +10,6 @@
   width: 65%;
   float: right;
   word-wrap: break-word;
-}
-
-#content {
-  width: 50%;
-  max-width: 20;
 }
 
 .form {

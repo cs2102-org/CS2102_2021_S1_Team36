@@ -22,13 +22,17 @@ bidsRouter.get('/all', async(req, res) => {
 });
 
 // get all bids by a specified petowner
-bidsRouter.get('/by/:email', async(req, res) => {
+bidsRouter.get('/by', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const msql = await pool.query(
-            "select * from bidsfor where owner_email = $1;",
+            "SELECT amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end_date, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start_date, 	to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+                FROM Bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
+            WHERE owner_email = $1 \
+            ORDER BY \
+            submission_time desc;",
             [email]
-            );
+        );
         res.json(msql.rows); 
     } catch (err) {
         console.error(err);
