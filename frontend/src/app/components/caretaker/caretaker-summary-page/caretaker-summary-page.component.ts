@@ -27,7 +27,17 @@ export class CaretakerSummaryPageComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
     this.calendarComponent.getApi().render();
   }
 
+  getLeave() {
+    
+  }
+
+  getBids() {
+
+  }
 }

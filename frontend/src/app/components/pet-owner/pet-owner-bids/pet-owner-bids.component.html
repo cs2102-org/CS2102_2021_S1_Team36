@@ -17,8 +17,13 @@
     </div>
 
     <div class="text-bar">
-      <p><label>Type of Pet:</label></p>
-      <p><input type="text" formControlName="pet_type"></p>
+      <p><label>Type of Pet: </label>
+      <select type="text" formControlName="pet_type">
+          <option></option>
+          <option *ngFor="let type of petTypes">
+              {{ type }}
+          </option>
+      </select></p>
     </div>
 
     <div class="text-bar">

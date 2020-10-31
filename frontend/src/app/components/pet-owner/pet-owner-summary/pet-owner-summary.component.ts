@@ -16,7 +16,6 @@ export class PetOwnerSummaryComponent implements OnInit {
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
-    height: 450,
     events: [],
     eventBackgroundColor: 'lightblue',
     eventTextColor: 'black',

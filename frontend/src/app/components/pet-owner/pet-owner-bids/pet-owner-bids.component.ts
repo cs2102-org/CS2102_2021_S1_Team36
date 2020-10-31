@@ -6,6 +6,7 @@ import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { SubmitRatingComponent } from '../submit-rating/submit-rating.component';
+import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
 @Component({
   selector: 'app-pet-owner-bids',
@@ -25,16 +26,25 @@ export class PetOwnerBidsComponent implements OnInit {
   });
 
   currentDate = new Date();
+  petTypes: any;
 
-  constructor(private bidService: BidService, private router: Router, private dialog: MatDialog) { }
+  constructor(private bidService: BidService, private router: Router, private dialog: MatDialog,
+    private petOwnerService: PetownerService) { }
 
   ngOnInit(): void {
     this.showAllBids();
+    this.getListOfPetTypes();
   }
 
   showAllBids() {
     this.bidService.getBids().subscribe((bids) => {
       this.bids = bids;
+    });
+  }
+
+  getListOfPetTypes() {
+    this.petOwnerService.getGetListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
     });
   }
 

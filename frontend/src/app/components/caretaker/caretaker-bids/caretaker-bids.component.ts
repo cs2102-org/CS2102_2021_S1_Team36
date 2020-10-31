@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { BidService } from 'src/app/services/bid/bid.service';
 
 @Component({
   selector: 'app-caretaker-bids',
@@ -8,16 +9,25 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 export class CaretakerBidsComponent implements OnInit {
   filterForm = new FormGroup({
-    search: new FormControl(''),
-    date: new FormControl(''),
-    petType: new FormControl(''),
-    price: new FormControl(''),
-    minRating: new FormControl('')
+    substr: new FormControl(''),
+    start_date: new FormControl(''),
+    end_date: new FormControl(''),
+    pet_type: new FormControl(''),
+    min: new FormControl(''),
+    max: new FormControl(''),
   });
+  bids: any;
 
-  constructor() { }
+  constructor(private bidService: BidService) { }
 
   ngOnInit(): void {
+    this.showAllBids();
+  }
+
+  showAllBids() {
+    this.bidService.getBids().subscribe((bids) => {
+      this.bids = bids;
+    });
   }
   
   onSubmit(searchParam) {
