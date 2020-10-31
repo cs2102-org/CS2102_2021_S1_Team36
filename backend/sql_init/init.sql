@@ -32,7 +32,7 @@ CREATE TABLE Users (
 CREATE TABLE Caretakers (
     email VARCHAR(30) PRIMARY KEY REFERENCES Users(email) ON DELETE CASCADE,
     is_fulltime BOOLEAN NOT NULL,
-    rating INTEGER,
+    rating DECIMAL(10, 2),
     CHECK (0 <= rating AND rating <= 5)
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE BidsFor (
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) DEFAULT 3 CHECK (rating >= 0 AND rating <= 5), --can add text for the review
+    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
@@ -112,6 +112,8 @@ CREATE TABLE Comments (
     PRIMARY KEY (post_id, email, date_time)
 );
 
+-- when a bid has its is_confirmed set to True, this trigger will find all clashing bids and set is_confirmed to False
+-- bid B clashes with bid A if B have same caretaker_email as A and bid B's (start_date, end_date) overlaps with that of A
 CREATE OR REPLACE FUNCTION invalidate_bids()
 RETURNS trigger
 language plpgsql
@@ -133,6 +135,36 @@ CREATE TRIGGER on_bid_confirmed
     AFTER UPDATE OF is_confirmed ON BidsFor
     FOR EACH ROW
     EXECUTE PROCEDURE invalidate_bids();
+
+
+-- when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
+CREATE OR REPLACE FUNCTION update_rating()
+RETURNS trigger
+language plpgsql
+as
+$$
+DECLARE
+	r DECIMAL(10, 2);
+BEGIN
+	select AVG(rating) into r from bidsfor
+	where
+		caretaker_email = NEW.caretaker_email and
+		rating is not null;
+		
+	update Caretakers CT set
+		rating = r
+	where
+		CT.email = NEW.caretaker_email;
+		
+	return new;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_rating_added on BidsFor;
+CREATE TRIGGER on_rating_added 
+    AFTER UPDATE OF rating ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_rating();
 	
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
@@ -715,21 +747,21 @@ INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 1
 INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'carl@gmail.com', 'millie',
 '2022-01-01', '2023-01-05', '2023-01-10',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-01', '2023-01-01', '2023-01-05',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-02', '2023-01-10', '2023-01-15',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-03', '2023-01-5', '2023-01-20',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 
