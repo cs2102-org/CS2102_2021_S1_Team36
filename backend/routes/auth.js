@@ -32,17 +32,8 @@ authRouter.post("/login", async (req, res) => {
     // const validPass = await bcrypt.compare(password, passwordStored);
     // if (validPass) {
       return jwt.sign(rows[0], 'secretkey', (err, token) => {
-        const returnJson = { token };
-        if (user.pemail != null) {
-          returnJson['is_petowner'] = true;
-        } else if (user.cemail != null) {
-          returnJson['is_caretaker'] = true;
-          if (user.is_fulltime) {
-            returnJson['is_fulltime'] = true;
-          }
-        } if (user.aemail != null) {
-          returnJson['is_admin'] = true;
-        } 
+        const { pemail, cemail, aemail, is_fulltime } = rows[0];
+        const returnJson = Object.assign({}, { token }, { pemail, cemail, aemail, is_fulltime });
         return res.status(200).json(returnJson);
       });
     // }
