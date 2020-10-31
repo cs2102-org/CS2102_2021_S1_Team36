@@ -430,7 +430,9 @@ caretakerRouter.get('/rec/:email', async(req, res) => {
                 (select caretaker_email as email from bidsfor where owner_email = '" + email + "' and is_confirmed = True);"
         );
 
-        var selectCaretakers = "select email, name, rating, is_fulltime from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
+        var selectCaretakers = "select email, name, rating, \
+            case when is_fulltime then 'Full Time' else 'Part Time' End \
+            as type from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
             where exists ( \
 	            (select species from takecareprice T1 where T1.email = PC.email) \
 	            INTERSECT \
