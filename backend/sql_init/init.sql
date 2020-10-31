@@ -192,6 +192,71 @@ CREATE TRIGGER trigger_block_taking_leave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
 
+
+-- ============================== helper functions =============================================================
+
+-- return true if interval [s1, e1] overlaps with [s2, e2]
+CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, s2 date, e2 date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return ((s1, e1 + interval '1 day') overlaps (s2, e2 + interval '1 day'));
+END;
+$$;
+
+-- return the max number of pets this caretaker can take care of
+CREATE OR REPLACE FUNCTION getPetLimit(cemail varchar)
+RETURNS int
+language plpgsql
+as
+$$
+BEGIN
+	IF (NOT EXISTS (select 1 from caretakers where email = cemail)) THEN
+		return 0;
+	ELSIF (select is_fulltime from caretakers where email = cemail) THEN
+		return 5;
+	ELSIF (select rating from caretakers where email = cemail) >= 4 THEN
+		return 5;
+	ELSE
+		return 2;
+	END IF;
+END;
+$$;
+
+-- return the workload of this caretaker on the interval
+-- workload is a table of pairs (work_date, num_jobs)
+drop function if exists getWorkload;
+CREATE OR REPLACE FUNCTION getWorkload(cemail varchar, s date, e date)
+RETURNS table (work_date date, num_jobs int)
+language plpgsql
+as
+$$
+BEGIN
+	return query select D.work_date, (
+		select COUNT(*)::int from bidsFor
+		where
+			caretaker_email = cemail and 
+			is_confirmed = True and
+			clash(start_date, end_date, D.work_date, D.work_date)
+	) as num_jobs
+	from (select generate_series(s, e, '1 day'::interval)::date as work_date) as D;
+END;
+$$;
+
+-- return true if caretaker is available on the given interval
+drop function if exists isAvail;
+CREATE OR REPLACE FUNCTION isAvail(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return getPetLimit(cemail) + 2 >= ALL (select num_jobs from getWorkload(cemail, s, e));
+END;
+$$;
+
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
 INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a petowner of pcs', 'pwpeter');
@@ -704,6 +769,16 @@ INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022
 INSERT into parttimeavail (email, work_date) values ('xiaoming@gmail.com', '2022-01-07');
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
 '2020-01-02', '2022-01-05', '2022-01-07',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-03', '2022-01-06', '2022-01-08',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-04', '2022-01-07', '2022-01-09',
 80, 110,
 true, true, '1', '1', 5
 );
