@@ -34,6 +34,43 @@ bidsRouter.get('/by/:email', async(req, res) => {
     }
 });
 
+// gets pending and upcoming bids for a specific petowner
+// upcoming means now() <= start date of job
+bidsRouter.get('/by/:email/pending', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * \
+            from bidsfor    \
+            where owner_email = $1 \
+              and is_confirmed is null \
+              and start_date >= now()::date;",
+            [email]
+        );
+        res.json(msql.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// gets rejected bids for a specific petowner
+bidsRouter.get('/by/:email/rejected', async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// gets done bids for a specific petowner
+bidsRouter.get('/by/:email/done', async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // get all bids for a specified caretaker
 bidsRouter.get('/for/:email', async(req, res) => {
     try {

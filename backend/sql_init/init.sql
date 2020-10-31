@@ -707,8 +707,8 @@ INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'canneth@gmail.com', 'charlie',
 true, true, '1', '1', 5
 );
 
-Delete from Takecareprice where email = 'canneth@gmail.com' and species = 'Dog'
-INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaohong@gmail.com', 'Turtle')
+Delete from Takecareprice where email = 'canneth@gmail.com' and species = 'Dog';
+INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaohong@gmail.com', 'Turtle');
 
 -- test bidsFor trigger
 -- if the first bid is updated to is_confirmed = True, it will set is_confirmed = False for the 2nd and 3rd bids
