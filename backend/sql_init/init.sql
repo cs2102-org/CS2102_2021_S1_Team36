@@ -79,7 +79,7 @@ CREATE TABLE BidsFor (
     end_date DATE,
     price DECIMAL(10,2),
     amount_bidded DECIMAL(10,2),
-    is_confirmed BOOLEAN DEFAULT False,
+    is_confirmed BOOLEAN DEFAULT NULL,
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
