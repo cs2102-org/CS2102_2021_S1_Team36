@@ -44,20 +44,20 @@ export class PetOwnerSummaryComponent implements OnInit {
   getEventsOnCalendar() {
     this.bidService.getBids().subscribe(bids => {
       let id = 1;
-      const bidsUpdated = bids.map(function(bid) {
-        bid.id = id++;
+      const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
+      const copyBids =JSON.parse(JSON.stringify(bidsUpdated));
+      this.bids = copyBids.reduce((accumulator, currentValue) => {
+        accumulator[currentValue.id] = currentValue;
+        return accumulator;
+      }, {});
+      this.calendarOptions.events = bidsUpdated.map(function(bid) {
         let aDate = new Date(bid.end);
         aDate.setDate(aDate.getDate() + 1);
         bid.end = aDate.toISOString().slice(0,10);
         
         bid.title = `${bid.pet_name} taken care by ${bid.name}`;
         return bid;
-      });
-      this.calendarOptions.events = bidsUpdated;
-      this.bids = bidsUpdated.reduce((accumulator, currentValue) => {
-        accumulator[currentValue.id] = currentValue;
-        return accumulator;
-      }, {});
+      });      
     })
   }
 }
