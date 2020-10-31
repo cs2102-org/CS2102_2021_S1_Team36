@@ -6,9 +6,9 @@ const { json } = require('express');
 
 const saltRounds = 10;
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.get("/", async (req, res) => {
+authRouter.get("/", async (req, res) => {
   const { rows } = await pool.query(
     "SELECT * FROM Users;"
   );
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
 });
 
 // User login
-router.post("/login", async (req, res) => {
+authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const { rows } = await pool.query(
     "SELECT * FROM Users WHERE email=$1;"
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
 });
 
 // User signup
-router.post("/signup", async (req, res) => {
+authRouter.post("/signup", async (req, res) => {
   const { name, email, password, desc } = req.body;
   const hash = await bcrypt.hash(password, saltRounds);
   try {
@@ -50,4 +50,6 @@ router.post("/signup", async (req, res) => {
   return res.status(200).json({ message: "Success" });
 });
 
-module.exports = router;
+module.exports = {
+  authRouter
+};
