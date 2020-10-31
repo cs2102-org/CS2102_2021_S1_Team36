@@ -18,6 +18,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
 
   selectedCaretaker;
   placeholderDate: String;
+  typeOfList = "";
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -35,16 +36,15 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   };
 
   filterForm = new FormGroup({
-    search: new FormControl(''),
-    dateFrom: new FormControl(''),
-    dateTo: new FormControl(''),
-    petType: new FormControl(''),
-    priceFrom: new FormControl(''),
-    priceTo: new FormControl(''),
-    minRating: new FormControl('')
+    substr: new FormControl(''),
+    start_date: new FormControl(''),
+    end_date: new FormControl(''),
+    pet_type: new FormControl(''),
+    min: new FormControl(''),
+    max: new FormControl(''),
+    rating: new FormControl('')
   });
 
-  caretakersSubscription: Subscription;
   caretakers: any[] = [];
   isLogged: boolean = false;
 
@@ -60,16 +60,46 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   }
 
   getActiveCaretakers() {
-    this.caretakersSubscription = this.caretakerService.getActiveCaretakers().subscribe((caretakers) => {
+    this.caretakerService.getActiveCaretakers().subscribe((caretakers) => {
+      let id = 1;
+      this.typeOfList = "";
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
+  }
+
+  showRecommendedCaretakers() {
+    this.caretakerService.getRecommendedCaretakers().subscribe((caretakers) => {
+      console.log(caretakers);
+      this.typeOfList = "Recommended";
       let id = 1;
       caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
       this.caretakers = caretakers;
     });
   }
 
-  onSubmit(searchParam) {
-    console.log('SENT');
-    console.log(searchParam);
+  onSubmit() {
+    this.checkFormControl("start_date");
+    this.checkFormControl("end_date");
+    this.checkFormControl("rating");
+    this.checkFormControl("pet_type");
+    this.checkFormControl("min");
+    this.checkFormControl("max");
+    this.checkFormControl("substr");
+    console.log(this.filterForm.value);
+    this.caretakerService.getFilteredActiveCaretakers(this.filterForm.value).subscribe((caretakers) => {
+      console.log(caretakers);
+      let id = 1;
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
+  }
+
+  checkFormControl(name) {
+    console.log(name);
+    if (this.filterForm.get(name).value === "") {
+      this.filterForm.controls[name].setValue(null);
+    }
   }
 
   select(caretaker){

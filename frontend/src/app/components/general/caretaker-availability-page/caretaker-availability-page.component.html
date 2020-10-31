@@ -1,49 +1,50 @@
 <div class="content">
     <div class="column-left">
-        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit(filterForm.value)">
+        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
 
             <div class="text-bar">
               <p><label>Search For Caretaker:</label></p>
-              <p> <input type="text" formControlName="search"></p>
+              <p> <input type="text" formControlName="substr"></p>
             </div>
 
             <div class="text-bar" style="float:left; margin-right:10px;">
               <p><label>Date From:</label></p>
-              <p><input type="date" formControlName="dateFrom"></p>
+              <p><input type="date" formControlName="start_date"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Date To:</label></p>
-              <p><input type="date" formControlName="dateTo"></p>
+              <p><input type="date" formControlName="end_date"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Type of Pet:</label></p>
-              <p><input type="text" formControlName="petType"></p>
+              <p><input type="text" formControlName="pet_type"></p>
             </div>
 
             <div class="text-bar" style="float:left; margin-right:5px;">
               <p><label>Price From:</label></p>
-              <p><input style="margin-right:10px" type="text" formControlName="priceFrom"></p>
+              <p><input style="margin-right:10px" type="number" formControlName="min"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Price To:</label></p>
-              <p><input style="margin-right:10px" type="text" formControlName="priceTo"></p>
+              <p><input style="margin-right:10px" type="number" formControlName="max"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Minimum Rating:</label></p>
-              <p><input type="text" formControlName="minRating"></p>
+              <p><input type="number" formControlName="rating"></p>
             </div>
 
             <button class="button" type="submit">Search</button>
           </form>
     </div>
     <div class="column-center">
+      <h2 *ngIf="typeOfList != ''">{{typeOfList}}</h2>
       <h2>List of Caretakers</h2>
-      <button>Show All</button>
-      <button *ngIf="isLogged">Recommended</button>
+      <button (click)="getActiveCaretakers()">Show All</button>
+      <button *ngIf="isLogged" (click)="showRecommendedCaretakers()">Recommended</button>
       <button *ngIf="isLogged">Previously Transacted</button>
 
       <ul class="caretakers">

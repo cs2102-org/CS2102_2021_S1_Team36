@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
+const { verifyJwt } = require('../auth/index')
 
 const bodyParser = require('body-parser')
 
@@ -428,9 +429,9 @@ caretakerRouter.get('/filter', async(req, res) => {
 
 // find recommended caretakers
 // return email, name rating, is_fulltime
-caretakerRouter.get('/rec/:email', async(req, res) => {
+caretakerRouter.get('/rec', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
 
         const mkView = await pool.query(
             "CREATE OR REPLACE VIEW potentialCaretakers AS \
