@@ -371,7 +371,7 @@ caretakerRouter.get('/detailed/:email', async(req, res) => {
 // price: caretaker price for pet_type in range [min, max]
 // rating: caretaker rating >= rating
 
-caretakerRouter.get('/filter', async(req, res) => {
+caretakerRouter.post('/filter', async(req, res) => {
     try {
         var { substr, start_date, end_date, pet_type, min, max, rating } = req.body;
         console.log(substr, start_date, end_date, pet_type, min, max, rating);
@@ -414,7 +414,7 @@ caretakerRouter.get('/filter', async(req, res) => {
                      \
                 )) \
             )";
-        var p4 = "select F.email, name, rating, is_fulltime as type from (" + p1 + " INTERSECT " + p2 + " INTERSECT " + p3 + ") AS F NATURAL JOIN Users";
+        var p4 = "select F.email, name, rating, case when is_fulltime then 'Full Time' else 'Part Time' end as type from (" + p1 + " INTERSECT " + p2 + " INTERSECT " + p3 + ") AS F NATURAL JOIN Users order by rating desc";
         const msql = await pool.query(
             p4,
             [substr, start_date, end_date, pet_type, min, max, rating]

@@ -169,16 +169,17 @@ bidsRouter.get('/earnings/range', async(req, res) => {
 
 // Add rating to a Bidsfor entry
 // rating must be 0 <= rating <= 5
-bidsRouter.post('/rate', async (req, res) => {
+bidsRouter.put('/rate', verifyJwt, async (req, res) => {
     try {
-        const { rating, owner_email, caretaker_email, pet_name, submission_time } = req.body;
-        // console.log(req.body);
+        const owner_email = res.locals.user.email;
+        const { rating, caretaker_email, pet_name, submission_time } = req.body;
         const sql = await pool.query(
             "UPDATE bidsfor SET rating = $1 \
-            WHERE owner_email=$2 AND caretaker_email=$3 AND pet_name=$4 AND submission_time=$5;",
+            WHERE owner_email=$2 AND caretaker_email=$3 AND pet_name=$4 AND to_char(submission_time, 'HH24:MI:SS')=$5;",
             [rating, owner_email, caretaker_email, pet_name, submission_time]
         );
-        res.status(200).send(`Updated bidsfor with: ${owner_email}, ${caretaker_email}, ${pet_name}, ${submission_time} with rating ${rating}`);
+        console.log(sql);
+        res.status(200).send({message: `Updated bidsfor with: ${owner_email}, ${caretaker_email}, ${pet_name}, ${submission_time} with rating ${rating}`});
     } catch (err) {
         console.error(err);
     }

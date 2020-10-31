@@ -24,6 +24,8 @@ export class PetOwnerBidsComponent implements OnInit {
     max: new FormControl(''),
   });
 
+  currentDate = new Date();
+
   constructor(private bidService: BidService, private router: Router, private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -32,10 +34,14 @@ export class PetOwnerBidsComponent implements OnInit {
 
   showAllBids() {
     this.bidService.getBids().subscribe((bids) => {
-      console.log(bids);
       this.bids = bids;
     });
   }
+
+  checkPastDate(date) {
+    return new Date(date) <= this.currentDate;
+  }
+
 
   openCaretaker(bid) {
     const encrypted =  Base64.stringify(Utf8.parse(bid.caretaker_email));
@@ -46,9 +52,14 @@ export class PetOwnerBidsComponent implements OnInit {
   }
 
   openSubmitRating(bid) {
-    this.dialog.open(SubmitRatingComponent, { data: {
-    dataKey: bid
-  }});
+    const dialogRef = this.dialog.open(SubmitRatingComponent, { data: {
+      dataKey: bid
+    }});
+    dialogRef.afterClosed().subscribe(result => {
+      if(result.data === 'Submit Success'){
+        this.ngOnInit();
+      }
+    });
   }
 
   onSubmit() {

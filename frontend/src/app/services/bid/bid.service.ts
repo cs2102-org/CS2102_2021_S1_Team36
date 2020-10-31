@@ -17,4 +17,8 @@ export class BidService {
   public getBids(): Observable<any> {
     return this.http.get(baseurl + '/api/bids/by', getHttpOptionsWithAuth());
   }
+
+  public putBidRating(bidDetails): Observable<any> {
+    return this.http.put(baseurl + '/api/bids/rate', bidDetails, getHttpOptionsWithAuth());
+  }
 }

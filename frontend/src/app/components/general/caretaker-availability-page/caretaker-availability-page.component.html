@@ -38,11 +38,11 @@
             </div>
 
             <div class="text-bar">
-              <p><label>Minimum Rating:</label></p>
-              <p><input type="number" formControlName="rating"></p>
+              <p><label>Minimum Rating: </label>
+              <input type="number" min="0" max="5" step="1" formControlName="rating"></p>
             </div>
 
-            <button class="button" type="submit">Search</button>
+            <button class="button" type="submit" [disabled] = "!filterForm.valid">Search</button>
           </form>
     </div>
     <div class="column-center">

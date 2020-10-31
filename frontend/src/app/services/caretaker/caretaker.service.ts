@@ -16,7 +16,7 @@ export class CaretakerService {
   }
 
   public getFilteredActiveCaretakers(details): Observable<any> {
-    return this.http.get(baseurl + '/api/caretaker/filter/', httpOptions);
+    return this.http.post(baseurl + '/api/caretaker/filter/', details, httpOptions);
   }
 
   public getRecommendedCaretakers(): Observable<any> {
