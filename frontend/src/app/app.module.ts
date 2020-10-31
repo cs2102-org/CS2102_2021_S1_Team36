@@ -24,6 +24,8 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
+import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -44,7 +46,9 @@ FullCalendarModule.registerPlugins([
     CaretakerBidsComponent,
     StatsComponent,
     ForumComponent,
-    CaretakerMakeBidComponent
+    CaretakerMakeBidComponent,
+    PetOwnerSummaryComponent,
+    SubmitRatingComponent
   ],
   imports: [
     BrowserModule,
