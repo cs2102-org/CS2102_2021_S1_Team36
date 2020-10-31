@@ -196,6 +196,17 @@ CREATE TRIGGER trigger_block_taking_leave
 -- ============================== helper functions =============================================================
 
 -- return true if interval [s1, e1] overlaps with [s2, e2]
+CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, d date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return ((s1, e1 + interval '1 day') overlaps (d, d + interval '1 day'));
+END;
+$$;
+
+-- return true if interval [s1, e1] overlaps with [s2, e2]
 CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, s2 date, e2 date)
 RETURNS boolean
 language plpgsql
