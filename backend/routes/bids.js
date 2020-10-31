@@ -36,6 +36,7 @@ bidsRouter.get('/by/:email', async(req, res) => {
 
 // gets pending and upcoming bids for a specific petowner
 // upcoming means now() <= start date of job
+// order by earliest starting job first
 bidsRouter.get('/by/:email/pending', async (req, res) => {
     try {
         const { email } = req.params;
@@ -44,7 +45,8 @@ bidsRouter.get('/by/:email/pending', async (req, res) => {
             from bidsfor    \
             where owner_email = $1 \
               and is_confirmed is null \
-              and start_date >= now()::date;",
+              and start_date >= now() \
+            order by start_date ASC, end_date ASC;",
             [email]
         );
         res.json(msql.rows);
@@ -54,9 +56,20 @@ bidsRouter.get('/by/:email/pending', async (req, res) => {
 });
 
 // gets rejected bids for a specific petowner
+// is_confirmed = false regardless of time, like a record of all rejected bids
+// reverse chronological order (recent start date first)
 bidsRouter.get('/by/:email/rejected', async (req, res) => {
     try {
-
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * \
+            from bidsfor    \
+            where owner_email = $1  \
+              and is_confirmed is false \
+            order by start_date DESC, end_date DESC;",
+            [email]
+        );
+        res.json(msql.rows);
     } catch (err) {
         console.error(err);
     }
