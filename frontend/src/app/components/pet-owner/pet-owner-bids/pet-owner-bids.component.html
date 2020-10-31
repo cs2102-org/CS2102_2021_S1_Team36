@@ -6,7 +6,7 @@
       <p> <input type="text" formControlName="substr"></p>
     </div>
 
-    <div class="text-bar" style="float:left; margin-right:10px;">
+    <div class="text-bar" >
       <p><label>Date From:</label></p>
       <p><input type="date" formControlName="start_date"></p>
     </div>
@@ -21,7 +21,7 @@
       <p><input type="text" formControlName="pet_type"></p>
     </div>
 
-    <div class="text-bar" style="float:left; margin-right:5px;">
+    <div class="text-bar">
       <p><label>Price From:</label></p>
       <p><input style="margin-right:10px" type="number" formControlName="min"></p>
     </div>
@@ -54,8 +54,10 @@
         <th>Confirmed?</th>
         <th>Paid?</th>
         <th>Rating</th>
+        <th></th>
+        <th></th>
       </tr>
-      <tr *ngFor="let bid of bids" (click)="openCaretaker(bid)">
+      <tr *ngFor="let bid of bids">
         <td>{{bid.name}}</td>
         <td>{{bid.pet_name}}</td>
         <td>{{bid.start_date}}</td>
@@ -67,6 +69,8 @@
         <td>{{bid.is_confirmed}}</td>
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
+        <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
+        <td><button>Add Rating</button><td>
       </tr>
     </table>
 </div>
