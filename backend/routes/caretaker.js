@@ -414,7 +414,7 @@ caretakerRouter.get('/filter', async(req, res) => {
                      \
                 )) \
             )";
-        var p4 = "select F.email, name, rating, is_fulltime from (" + p1 + " INTERSECT " + p2 + " INTERSECT " + p3 + ") AS F NATURAL JOIN Users";
+        var p4 = "select F.email, name, rating, is_fulltime as type from (" + p1 + " INTERSECT " + p2 + " INTERSECT " + p3 + ") AS F NATURAL JOIN Users";
         const msql = await pool.query(
             p4,
             [substr, start_date, end_date, pet_type, min, max, rating]

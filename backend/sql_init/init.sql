@@ -79,7 +79,7 @@ CREATE TABLE BidsFor (
     end_date DATE,
     price DECIMAL(10,2),
     amount_bidded DECIMAL(10,2),
-    is_confirmed BOOLEAN DEFAULT False,
+    is_confirmed BOOLEAN DEFAULT NULL,
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
@@ -111,6 +111,29 @@ CREATE TABLE Comments (
     cont TEXT,
     PRIMARY KEY (post_id, email, date_time)
 );
+
+CREATE OR REPLACE FUNCTION invalidate_bids()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	update bidsfor BF set
+		is_confirmed = false
+	where
+		BF.caretaker_email = NEW.caretaker_email and
+		BF.is_confirmed isnull and
+		((BF.start_date, BF.end_date + interval '1 day') overlaps (NEW.start_date, NEW.end_date + interval '1 day'));
+	return new;
+END;
+$$;
+
+drop trigger if exists on_bid_confirmed on BidsFor;
+CREATE TRIGGER on_bid_confirmed
+    AFTER UPDATE OF is_confirmed ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE invalidate_bids();
+	
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
@@ -687,5 +710,26 @@ true, true, '1', '1', 5
 Delete from Takecareprice where email = 'canneth@gmail.com' and species = 'Dog'
 INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 100, 'xiaohong@gmail.com', 'Turtle')
 
-
+-- test bidsFor trigger
+-- if the first bid is updated to is_confirmed = True, it will set is_confirmed = False for the 2nd and 3rd bids
+INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'carl@gmail.com', 'millie',
+'2022-01-01', '2023-01-05', '2023-01-10',
+80, 110,
+null, null, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
+'2020-01-01', '2023-01-01', '2023-01-05',
+80, 110,
+null, null, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
+'2020-01-02', '2023-01-10', '2023-01-15',
+80, 110,
+null, null, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
+'2020-01-03', '2023-01-5', '2023-01-20',
+80, 110,
+null, null, '1', '1', 5
+);
 
