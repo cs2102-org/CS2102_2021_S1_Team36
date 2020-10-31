@@ -26,7 +26,7 @@ bidsRouter.get('/by', verifyJwt, async(req, res) => {
     try {
         const email = res.locals.user.email;
         const msql = await pool.query(
-            "SELECT amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end_date, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start_date, 	to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            "SELECT amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, 	to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
                 FROM Bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             WHERE owner_email = $1 \
             ORDER BY \

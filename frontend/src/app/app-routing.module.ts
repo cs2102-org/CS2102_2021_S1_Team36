@@ -16,6 +16,7 @@ const routes: Routes = [
   { path: 'caretaker-availabilities', component: CaretakerAvailabilityPageComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'petowner/bids', component: PetOwnerBidsComponent },
+  { path: 'petowner/summary', component: PetOwnerSummaryComponent },
   { path: 'caretaker/bids', component: CaretakerBidsComponent },
   { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
   { path: 'forum', component: ForumComponent },

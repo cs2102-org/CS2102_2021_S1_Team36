@@ -60,8 +60,8 @@
       <tr *ngFor="let bid of bids">
         <td>{{bid.name}}</td>
         <td>{{bid.pet_name}}</td>
-        <td>{{bid.start_date}}</td>
-        <td>{{bid.end_date}}</td>
+        <td>{{bid.start}}</td>
+        <td>{{bid.end}}</td>
         <td>{{bid.payment_type}}</td>
         <td>{{bid.transfer_type}}</td>
         <td>{{bid.submission_time}}</td>
@@ -70,7 +70,7 @@
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
         <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end_date)">Add Rating</button><td>
+        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end_date) && bid.rating != null">Add Rating</button><td>
       </tr>
     </table>
 </div>

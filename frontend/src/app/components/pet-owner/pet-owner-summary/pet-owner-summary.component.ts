@@ -1,4 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
+import { cpuUsage } from 'process';
+import { BidService } from 'src/app/services/bid/bid.service';
+import { BidDialogComponent } from '../../general/bid-dialog/bid-dialog.component';
 
 @Component({
   selector: 'app-pet-owner-summary',
@@ -7,9 +12,52 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PetOwnerSummaryComponent implements OnInit {
 
-  constructor() { }
+  @ViewChild('calendar') calendarComponent: FullCalendarComponent;
+
+  calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    height: 450,
+    events: [],
+    eventBackgroundColor: 'lightblue',
+    eventTextColor: 'black',
+    eventClick: this.openBidDialog.bind(this),
+  };
+
+  bids;
+
+  constructor(private bidService: BidService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.getEventsOnCalendar();
   }
 
+  ngAfterViewInit(): void {
+    this.calendarComponent.getApi().render();
+  }
+  
+  openBidDialog(selectionInfo) {
+    this.dialog.open(BidDialogComponent, { data: {
+      dataKey: this.bids[selectionInfo.event.id]
+    }});
+  }
+
+  getEventsOnCalendar() {
+    this.bidService.getBids().subscribe(bids => {
+      let id = 1;
+      const bidsUpdated = bids.map(function(bid) {
+        bid.id = id++;
+        let aDate = new Date(bid.end);
+        aDate.setDate(aDate.getDate() + 1);
+        bid.end = aDate.toISOString().slice(0,10);
+        
+        bid.title = `${bid.pet_name} taken care by ${bid.name}`;
+        return bid;
+      });
+      this.calendarOptions.events = bidsUpdated;
+      this.bids = bidsUpdated.reduce((accumulator, currentValue) => {
+        accumulator[currentValue.id] = currentValue;
+        return accumulator;
+      }, {});
+    })
+  }
 }

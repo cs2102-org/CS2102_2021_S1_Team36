@@ -26,6 +26,7 @@ import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
+import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -48,7 +49,8 @@ FullCalendarModule.registerPlugins([
     ForumComponent,
     CaretakerMakeBidComponent,
     PetOwnerSummaryComponent,
-    SubmitRatingComponent
+    SubmitRatingComponent,
+    BidDialogComponent
   ],
   imports: [
     BrowserModule,
