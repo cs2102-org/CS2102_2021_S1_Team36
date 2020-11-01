@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
+import { BidDialogComponent } from '../../general/bid-dialog/bid-dialog.component';
 
 @Component({
   selector: 'app-caretaker-summary-page',
@@ -20,7 +22,8 @@ export class CaretakerSummaryPageComponent implements OnInit {
     selectable: true,
     unselectAuto: false,
     select: this.selectDate.bind(this),
-    datesSet: this.viewRenderer.bind(this)
+    datesSet: this.viewRenderer.bind(this),
+    eventClick: this.openBidDialog.bind(this),
   };
 
   form = new FormGroup({
@@ -35,11 +38,16 @@ export class CaretakerSummaryPageComponent implements OnInit {
   numOfWorkDaysInThatMonth = 0;
   earningsInThatMonth;
 
-  constructor(private caretakerService: CaretakerService, private bidService: BidService) { }
+  constructor(private caretakerService: CaretakerService, private bidService: BidService
+    , private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getDates();
     this.checkFullTime();
+  }
+
+  ngAfterViewInit(): void {
+    this.calendarComponent.getApi().render();
   }
 
   viewRenderer(dateInfo) {
@@ -50,12 +58,14 @@ export class CaretakerSummaryPageComponent implements OnInit {
     this.getEarningsForMonth();
   }
 
-  ngAfterViewInit(): void {
-    this.calendarComponent.getApi().render();
-  }
-
   reduceEarnings(total, add) {
     return total + Number(add.amount);
+  }
+
+  openBidDialog(selectionInfo) {
+    this.dialog.open(BidDialogComponent, { data: {
+      dataKey: this.bids[selectionInfo.event.id]
+    }});
   }
 
   getEarningsForMonth() {
