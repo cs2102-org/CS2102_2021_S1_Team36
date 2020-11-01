@@ -29,6 +29,13 @@ CREATE TABLE Users (
     password VARCHAR(60) NOT NULL
 );
 
+CREATE TABLE CaretakerApplication (
+    email VARCHAR(30) REFERENCES Users(email) PRIMARY KEY ON DELETE CASCADE,
+    is_fulltime BOOLEAN NOT NULL,
+    cares_for TEXT NOT NULL,
+    is_accepted BOOLEAN
+); 
+
 CREATE TABLE Caretakers (
     email VARCHAR(30) PRIMARY KEY REFERENCES Users(email) ON DELETE CASCADE,
     is_fulltime BOOLEAN NOT NULL,
