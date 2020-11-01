@@ -117,7 +117,7 @@ bidsRouter.post('/for', verifyJwt, async(req, res) => {
                 is_confirmed = false;
             }
             const msql = await pool.query(
-                "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+                "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
                 from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
                 where caretaker_email = $1 and is_confirmed = $2",
                 [email, is_confirmed]
@@ -125,7 +125,7 @@ bidsRouter.post('/for', verifyJwt, async(req, res) => {
             res.json(msql.rows);
         } else {
             const msql = await pool.query(
-                "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+                "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
                 from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
                 where caretaker_email = $1;",
                 [email]
@@ -199,10 +199,10 @@ bidsRouter.post('/add', verifyJwt, async(req, res) => {
     "status" : true
 }
 */
-bidsRouter.put('/status', async(req, res) => {
+bidsRouter.put('/status', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
-        var { owner_email, caretaker_email, pet_name, submission_time, status } = req.body;
+        const caretaker_email = res.locals.user.email;
+        var { owner_email, pet_name, submission_time, status } = req.body;
         
         const msql = await pool.query(
             "UPDATE bidsfor SET \
@@ -211,10 +211,10 @@ bidsRouter.put('/status', async(req, res) => {
                 owner_email = $1 and \
                 caretaker_email = $2 and \
                 pet_name = $3 and \
-                submission_time = $4::timestamp;",
+                to_char(submission_time, 'HH24:MI:SS')= $4;",
             [owner_email, caretaker_email, pet_name, submission_time, status]
             );
-        res.json(msql.rows); 
+        res.json(true); 
     } catch (err) {
         console.error(err);
     }

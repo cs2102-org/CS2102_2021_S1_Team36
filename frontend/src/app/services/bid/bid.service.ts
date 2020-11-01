@@ -49,4 +49,12 @@ export class BidService {
   public getRejectedBidsCaretaker(): Observable<any> {
     return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "rejected"}, getHttpOptionsWithAuth());
   }
+
+  public postAcceptBid(details): Observable<any> {
+    return this.http.put(baseurl + '/api/bids/status', details, getHttpOptionsWithAuth());
+  }
+
+  public postRejectBid(details): Observable<any> {
+    return this.http.put(baseurl + '/api/bids/status', details, getHttpOptionsWithAuth());
+  }
 }

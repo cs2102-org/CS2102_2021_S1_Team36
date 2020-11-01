@@ -35,7 +35,7 @@
   </form>
 </div>
 <div class="column-right">
-    <h2>List of Bids (CareTaker)</h2>
+    <h2>{{ showType }} Bids (CareTaker)</h2>
     <button (click)="showAllBids()">Show All</button>
     <button (click)="showPendingBids()">Pending</button>
     <button (click)="showRejectedBids()">Rejected</button>
@@ -43,7 +43,7 @@
 
     <table>
       <tr> 
-        <th>Caretaker Name</th>
+        <th>Pet Owner Name</th>
         <th>Pet Name</th>
         <th>Start Date</th>
         <th>End Date</th>
@@ -69,7 +69,8 @@
         <td>{{bid.is_confirmed}}</td>
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
-    
+        <button (click)="acceptBid(bid)">Accept Bid</button>
+        <button (click)="rejectBid(bid)">Rejected Bid</button>
       </tr>
     </table>
 </div>
