@@ -75,7 +75,7 @@
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
         <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end_date) && bid.rating != null">Add Rating</button><td>
+        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed">Add Rating</button><td>
       </tr>
     </table>
 </div>
