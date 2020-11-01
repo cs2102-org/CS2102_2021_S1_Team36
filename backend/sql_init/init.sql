@@ -32,7 +32,7 @@ CREATE TABLE Users (
 CREATE TABLE Caretakers (
     email VARCHAR(30) PRIMARY KEY REFERENCES Users(email) ON DELETE CASCADE,
     is_fulltime BOOLEAN NOT NULL,
-    rating INTEGER,
+    rating DECIMAL(10, 2),
     CHECK (0 <= rating AND rating <= 5)
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE BidsFor (
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) DEFAULT 3 CHECK (rating >= 0 AND rating <= 5), --can add text for the review
+    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
@@ -112,28 +112,117 @@ CREATE TABLE Comments (
     PRIMARY KEY (post_id, email, date_time)
 );
 
-CREATE OR REPLACE FUNCTION invalidate_bids()
-RETURNS trigger
+-- ============================================ HELPER FUNCTIONS =============================================================
+
+-- return true if interval [s1, e1] overlaps with [s2, e2]
+CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, d date)
+RETURNS boolean
 language plpgsql
 as
 $$
 BEGIN
-	update bidsfor BF set
-		is_confirmed = false
-	where
-		BF.caretaker_email = NEW.caretaker_email and
-		BF.is_confirmed isnull and
-		((BF.start_date, BF.end_date + interval '1 day') overlaps (NEW.start_date, NEW.end_date + interval '1 day'));
-	return new;
+	return ((s1, e1 + interval '1 day') overlaps (d, d + interval '1 day'));
 END;
 $$;
 
-drop trigger if exists on_bid_confirmed on BidsFor;
-CREATE TRIGGER on_bid_confirmed
-    AFTER UPDATE OF is_confirmed ON BidsFor
-    FOR EACH ROW
-    EXECUTE PROCEDURE invalidate_bids();
-	
+-- return true if interval [s1, e1] overlaps with [s2, e2]
+CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, s2 date, e2 date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return ((s1, e1 + interval '1 day') overlaps (s2, e2 + interval '1 day'));
+END;
+$$;
+
+-- return the max number of pets this caretaker can take care of
+CREATE OR REPLACE FUNCTION getPetLimit(cemail varchar)
+RETURNS int
+language plpgsql
+as
+$$
+BEGIN
+	IF (NOT EXISTS (select 1 from caretakers where email = cemail)) THEN
+		return 0;
+	ELSIF (select is_fulltime from caretakers where email = cemail) THEN
+		return 5;
+	ELSIF (select rating from caretakers where email = cemail) >= 4 THEN
+		return 5;
+	ELSE
+		return 2;
+	END IF;
+END;
+$$;
+
+-- return the workload of this caretaker on the interval
+-- workload is a table of pairs (work_date, num_jobs)
+drop function if exists getWorkload;
+CREATE OR REPLACE FUNCTION getWorkload(cemail varchar, s date, e date)
+RETURNS table (work_date date, num_jobs int)
+language plpgsql
+as
+$$
+BEGIN
+	return query select D.work_date, (
+		select COUNT(*)::int from bidsFor
+		where
+			caretaker_email = cemail and 
+			is_confirmed = True and
+			clash(start_date, end_date, D.work_date, D.work_date)
+	) as num_jobs
+	from (select generate_series(s, e, '1 day'::interval)::date as work_date) as D;
+END;
+$$;
+
+-- return true if caretaker has capacity to take on 1 more pet on the given interval
+drop function if exists hasSpareCapacity;
+CREATE OR REPLACE FUNCTION hasSpareCapacity(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return getPetLimit(cemail) > ALL (select num_jobs from getWorkload(cemail, s, e));
+END;
+$$;
+
+-- return true if caretaker is available (not on leave if fulltime, and is on work if parttime) on the given interval
+drop function if exists isAvail;
+CREATE OR REPLACE FUNCTION isAvail(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	IF (select is_fulltime from caretakers where email = cemail) THEN
+		return not exists (
+			select * from FullTimeLeave
+			where
+				email = cemail and
+				clash(s, e, leave_date)
+		);
+	ELSE
+		return not exists (
+			SELECT generate_series(s::date, e::date, '1 day'::interval)::date as datez
+			EXCEPT (select work_date as datez from parttimeavail where email = email)
+		);
+	END IF;
+END;
+$$;
+
+drop function if exists canWork;
+CREATE OR REPLACE FUNCTION canWork(cemail varchar, s date, e date)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return isAvail(cemail, s, e) AND hasSpareCapacity(cemail, s, e);
+END;
+$$;
+
+--=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
@@ -655,6 +744,16 @@ INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
 80, 110,
 true, true, '1', '1', 5
 );
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-03', '2022-01-06', '2022-01-08',
+80, 110,
+true, true, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('panter@gmail.com', 'xiaoming@gmail.com', 'fido',
+'2020-01-04', '2022-01-07', '2022-01-09',
+80, 110,
+true, true, '1', '1', 5
+);
 
 
 -- test recommends
@@ -720,25 +819,27 @@ INSERT INTO Takecareprice(base_price, daily_price, email, species) VALUES (80, 1
 INSERT INTO BidsFor VALUES ('pistachio@gmail.com', 'carl@gmail.com', 'millie',
 '2022-01-01', '2023-01-05', '2023-01-10',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-01', '2023-01-01', '2023-01-05',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-02', '2023-01-10', '2023-01-15',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 '2020-01-03', '2023-01-5', '2023-01-20',
 80, 110,
-null, null, '1', '1', 5
+null, null, '1', '1', null
 );
 
---TRIGGERS
+
+--================================================ TRIGGERS ===================================================================
+-- You might want to comment out the triggers so it is easier to put in data to test
 
 --users covering constraint
 CREATE OR REPLACE FUNCTION check_user_covering() RETURNS TRIGGER
@@ -834,3 +935,85 @@ DROP TRIGGER IF EXISTS pcs_caretaker_overlap_trigger ON PcsAdmins;
 CREATE TRIGGER pcs_caretaker_overlap_trigger
     AFTER INSERT ON PcsAdmins
     EXECUTE PROCEDURE check_admin_caretaker_overlap();
+
+-- Trigger: when a bid has its is_confirmed set to True, this trigger will find all clashing bids and set is_confirmed to False
+-- bid B clashes with bid A if B have same caretaker_email as A and bid B's (start_date, end_date) overlaps with that of A
+CREATE OR REPLACE FUNCTION invalidate_bids()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	update bidsfor BF set
+		is_confirmed = false
+	where
+		BF.caretaker_email = NEW.caretaker_email and
+		BF.is_confirmed isnull and
+		NOT canWork(NEW.caretakter_email, BF.start_date, BF.end_date);
+	return new;
+END;
+$$;
+
+drop trigger if exists trigger_invalidate_bids on BidsFor;
+CREATE TRIGGER trigger_invalidate_bids
+    AFTER UPDATE OF is_confirmed ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE invalidate_bids();
+
+
+-- Trigger: when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
+CREATE OR REPLACE FUNCTION update_rating()
+RETURNS trigger
+language plpgsql
+as
+$$
+DECLARE
+	r DECIMAL(10, 2);
+BEGIN
+	select AVG(rating) into r from bidsfor
+	where
+		caretaker_email = NEW.caretaker_email and
+		rating is not null;
+		
+	update Caretakers CT set
+		rating = r
+	where
+		CT.email = NEW.caretaker_email;
+		
+	return new;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_update_rating on BidsFor;
+CREATE TRIGGER trigger_update_rating
+    AFTER UPDATE OF rating ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_rating();
+
+
+-- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
+CREATE OR REPLACE FUNCTION block_taking_leave()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+		select 1 from bidsFor
+		where
+			caretaker_email = NEW.email and
+			((start_date, end_date + interval '1 day') overlaps (NEW.leave_date, NEW.leave_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'You have a job on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_taking_leave on FullTimeLeave;
+CREATE TRIGGER trigger_block_taking_leave
+    BEFORE INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_taking_leave();
+
+-- =============================================== END TRIGGERS ====================================================

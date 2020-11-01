@@ -99,14 +99,24 @@ bidsRouter.get('/by/done', verifyJwt, async (req, res) => {
 });
 
 // get all bids for a specified caretaker
+// put is_confirmed in the req body to filter by that
 bidsRouter.get('/for/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const msql = await pool.query(
-            "select * from bidsfor where caretaker_email = $1;",
-            [email]
-            );
-        res.json(msql.rows); 
+        const { is_confirmed } = req.body;
+        if ( !is_confirmed ) { // return all bids
+            const msql = await pool.query(
+                "select * from bidsfor where caretaker_email = $1;",
+                [email]
+                );
+            res.json(msql.rows); 
+        } else { // return all bids that are confirmed
+            const msql = await pool.query(
+                "select * from bidsfor where caretaker_email = $1 and is_confirmed = $2",
+                [email, is_confirmed]
+                );
+            res.json(msql.rows); 
+        }
     } catch (err) {
         console.error(err);
     }
