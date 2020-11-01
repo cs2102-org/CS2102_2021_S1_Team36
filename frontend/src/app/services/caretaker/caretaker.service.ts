@@ -38,4 +38,8 @@ export class CaretakerService {
   public getCareTakerDetails(email): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/detailed/' + email, httpOptions);
   }
+
+  public getAllCaretakers(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/all', getHttpOptionsWithAuth());
+  }
 }

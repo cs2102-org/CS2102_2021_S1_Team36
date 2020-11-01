@@ -69,7 +69,7 @@ caretakerRouter.post('/new', async(req, res) => {
 caretakerRouter.get('/all', async(req, res) => {
     try {
         const cts = await pool.query(
-            "SELECT * FROM Caretakers;",
+            "SELECT name, email, is_fulltime, rating FROM Caretakers NATURAL JOIN Users;",
         );
         res.json(cts.rows); 
     } catch (err) {
