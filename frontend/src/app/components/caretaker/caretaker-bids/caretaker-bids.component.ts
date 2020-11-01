@@ -25,7 +25,29 @@ export class CaretakerBidsComponent implements OnInit {
   }
 
   showAllBids() {
-    this.bidService.getBids().subscribe((bids) => {
+    this.bidService.getBidsCaretaker().subscribe((bids) => {
+      console.log(bids);
+      this.bids = bids;
+    });
+  }
+
+  showPendingBids() {
+    this.bidService.getPendingBidsCaretaker().subscribe((bids) => {
+      console.log(bids);
+      this.bids = bids;
+    });
+  }
+
+  showDoneBids() {
+    this.bidService.getDoneBidsCaretaker().subscribe((bids) => {
+      console.log(bids);
+      this.bids = bids;
+    });
+  }
+
+  showRejectedBids() {
+    this.bidService.getRejectedBidsCaretaker().subscribe((bids) => {
+      console.log(bids);
       this.bids = bids;
     });
   }

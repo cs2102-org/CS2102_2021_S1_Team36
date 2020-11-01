@@ -949,7 +949,7 @@ BEGIN
 	where
 		BF.caretaker_email = NEW.caretaker_email and
 		BF.is_confirmed isnull and
-		NOT canWork(NEW.caretakter_email, BF.start_date, BF.end_date);
+		NOT canWork(NEW.caretaker_email, BF.start_date, BF.end_date);
 	return new;
 END;
 $$;

@@ -33,4 +33,20 @@ export class BidService {
   public getRejectedBids(): Observable<any> {
     return this.http.get(baseurl + '/api/bids/by/rejected', getHttpOptionsWithAuth());
   }
+
+  public getBidsCaretaker(): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/for', '', getHttpOptionsWithAuth());
+  }
+
+  public getPendingBidsCaretaker(): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "pending"}, getHttpOptionsWithAuth());
+  }
+
+  public getDoneBidsCaretaker(): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "done"}, getHttpOptionsWithAuth());
+  }
+
+  public getRejectedBidsCaretaker(): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "rejected"}, getHttpOptionsWithAuth());
+  }
 }

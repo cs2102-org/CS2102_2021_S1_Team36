@@ -36,10 +36,10 @@
 </div>
 <div class="column-right">
     <h2>List of Bids (CareTaker)</h2>
-    <button>Show All</button>
-    <button>Pending</button>
-    <button>Rejected</button>
-    <button>Done</button>
+    <button (click)="showAllBids()">Show All</button>
+    <button (click)="showPendingBids()">Pending</button>
+    <button (click)="showRejectedBids()">Rejected</button>
+    <button (click)="showDoneBids()">Done</button>
 
     <table>
       <tr> 
