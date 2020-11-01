@@ -19,24 +19,31 @@ export class CaretakerSummaryPageComponent implements OnInit {
     events: [],
     selectable: true,
     unselectAuto: false,
-    select: this.selectLeaveDate.bind(this)
+    select: this.selectDate.bind(this)
   };
 
-  leaveForm = new FormGroup({
+  form = new FormGroup({
     start_date: new FormControl('', Validators.required),
     end_date: new FormControl('', Validators.required)
   });
+
   bids: any;
+  caretakerType: string;
 
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService) { }
 
   ngOnInit(): void {
     this.getDates();
+    this.checkFullTime();
   }
 
   ngAfterViewInit(): void {
     this.calendarComponent.getApi().render();
+  }
+
+  checkFullTime() {
+    this.caretakerType = localStorage.hasOwnProperty('is_fulltime') ? "Full Time" : "Part Time";
   }
 
   getDates() {
@@ -65,16 +72,16 @@ export class CaretakerSummaryPageComponent implements OnInit {
     });
   }
 
-  selectLeaveDate(selectionInfo) {
+  selectDate(selectionInfo) {
     const startDate = selectionInfo.start;
     const endDate = selectionInfo.end;
     startDate.setDate(startDate.getDate() + 1);
-    this.leaveForm.controls['start_date'].setValue(startDate.toISOString().slice(0,10));
-    this.leaveForm.controls['end_date'].setValue(endDate.toISOString().slice(0,10));
+    this.form.controls['start_date'].setValue(startDate.toISOString().slice(0,10));
+    this.form.controls['end_date'].setValue(endDate.toISOString().slice(0,10));
   }
 
-  onSubmit() {
-    this.caretakerService.postNewLeave(this.leaveForm.value).subscribe(msg => {
+  onLeaveSubmit() {
+    this.caretakerService.postNewLeave(this.form.value).subscribe(msg => {
       if (msg) {
         console.log("success");
       }
