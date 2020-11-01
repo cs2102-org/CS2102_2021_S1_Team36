@@ -28,6 +28,8 @@ import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summa
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
 import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
+import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
+import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -52,7 +54,9 @@ FullCalendarModule.registerPlugins([
     PetOwnerSummaryComponent,
     SubmitRatingComponent,
     BidDialogComponent,
-    ManageUsersComponent
+    ManageUsersComponent,
+    FormNewCaretakerComponent,
+    FormNewAdminComponent
   ],
   imports: [
     BrowserModule,

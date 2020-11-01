@@ -42,4 +42,8 @@ export class CaretakerService {
   public getAllCaretakers(): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/all', getHttpOptionsWithAuth());
   }
+
+  public postNewLeave(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/ft/leave/new/range', details, getHttpOptionsWithAuth());
+  }
 }

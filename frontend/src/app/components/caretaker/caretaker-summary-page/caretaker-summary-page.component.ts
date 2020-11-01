@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 
 @Component({
   selector: 'app-caretaker-summary-page',
@@ -21,12 +22,12 @@ export class CaretakerSummaryPageComponent implements OnInit {
   };
 
   leaveForm = new FormGroup({
-    start_date: new FormControl(''),
-    end_date: new FormControl('')
+    start_date: new FormControl('', Validators.required),
+    end_date: new FormControl('', Validators.required)
   });
 
 
-  constructor() { }
+  constructor(private caretakerService: CaretakerService) { }
 
   ngOnInit(): void {
   }
@@ -49,5 +50,13 @@ export class CaretakerSummaryPageComponent implements OnInit {
     startDate.setDate(startDate.getDate() + 1);
     this.leaveForm.controls['start_date'].setValue(startDate.toISOString().slice(0,10));
     this.leaveForm.controls['end_date'].setValue(endDate.toISOString().slice(0,10));
+  }
+
+  onSubmit() {
+    this.caretakerService.postNewLeave(this.leaveForm.value).subscribe(msg => {
+      if (msg) {
+        console.log("success");
+      }
+    });
   }
 }

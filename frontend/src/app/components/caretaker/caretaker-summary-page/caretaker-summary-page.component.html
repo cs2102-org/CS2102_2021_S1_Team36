@@ -2,4 +2,6 @@
     <full-calendar #calendar [options]="calendarOptions" style="width: 700px; margin: auto; margin-top: 5%;"></full-calendar>
 </div>
 
+<h2>Apply For Leave</h2>
 <p>You have chosen: {{leaveForm.get('start_date').value}} - {{leaveForm.get('end_date').value}}</p>
+<button (click)="onSubmit()">Submit</button>
