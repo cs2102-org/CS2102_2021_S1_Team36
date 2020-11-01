@@ -15,6 +15,7 @@ import { PetownerService } from 'src/app/services/petowner/petowner.service';
 })
 export class PetOwnerBidsComponent implements OnInit {
   bids;
+  showType = "";
 
   filterForm = new FormGroup({
     substr: new FormControl(''),
@@ -37,6 +38,7 @@ export class PetOwnerBidsComponent implements OnInit {
   }
 
   showAllBids() {
+    this.showType = "";
     this.bidService.getBids().subscribe((bids) => {
       this.bids = bids;
     });
@@ -74,5 +76,26 @@ export class PetOwnerBidsComponent implements OnInit {
 
   onSubmit() {
     console.log('SENT');
+  }
+
+  showPendingBids() {
+    this.showType = "Pending";
+    this.bidService.getPendingBids().subscribe((bids) => {
+      this.bids = bids;
+    });
+  }
+
+  showRejectedBids() {
+    this.showType = "Rejected";
+    this.bidService.getRejectedBids().subscribe((bids) => {
+      this.bids = bids;
+    });
+  }
+
+  showDoneBids() {
+    this.showType = "Done";
+    this.bidService.getDoneBids().subscribe((bids) => {
+      this.bids = bids;
+    });
   }
 }

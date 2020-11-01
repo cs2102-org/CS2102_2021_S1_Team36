@@ -40,11 +40,11 @@
   </form>
 </div>
 <div >
-    <h2>My Bids (Pet Owner)</h2>
-    <button>Show All</button>
-    <button>Pending</button>
-    <button>Rejected</button>
-    <button>Done</button>
+    <h2>My {{ showType }} Bids (Pet Owner)</h2>
+    <button (click)="showAllBids()">Show All</button>
+    <button (click)="showPendingBids()">Pending</button>
+    <button (click)="showRejectedBids()">Rejected</button>
+    <button (click)="showDoneBids()">Done</button>
 
     <table>
       <tr> 

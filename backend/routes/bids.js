@@ -42,12 +42,12 @@ bidsRouter.get('/by', verifyJwt, async(req, res) => {
 // gets pending and upcoming bids for a specific petowner
 // upcoming means now() <= start date of job
 // order by earliest starting job first
-bidsRouter.get('/by/:email/pending', async (req, res) => {
+bidsRouter.get('/by/pending', verifyJwt, async (req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const msql = await pool.query(
-            "select * \
-            from bidsfor    \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email  \
             where owner_email = $1 \
               and is_confirmed is null \
               and start_date >= now()::date \
@@ -63,12 +63,12 @@ bidsRouter.get('/by/:email/pending', async (req, res) => {
 // gets rejected bids for a specific petowner
 // is_confirmed = false regardless of time, like a record of all rejected bids
 // reverse chronological order (recent start date first)
-bidsRouter.get('/by/:email/rejected', async (req, res) => {
+bidsRouter.get('/by/rejected', verifyJwt, async (req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const msql = await pool.query(
-            "select * \
-            from bidsfor    \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             where owner_email = $1  \
               and is_confirmed is false \
             order by start_date DESC, end_date DESC;",
@@ -81,12 +81,12 @@ bidsRouter.get('/by/:email/rejected', async (req, res) => {
 });
 
 // gets done bids for a specific petowner
-bidsRouter.get('/by/:email/done', async (req, res) => {
+bidsRouter.get('/by/done', verifyJwt, async (req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const msql = await pool.query(
-            "select * \
-            from bidsfor    \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             where owner_email = $1  \
               and is_confirmed is true \
             order by start_date DESC, end_date DESC;",

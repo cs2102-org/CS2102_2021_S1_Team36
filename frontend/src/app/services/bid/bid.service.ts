@@ -21,4 +21,16 @@ export class BidService {
   public putBidRating(bidDetails): Observable<any> {
     return this.http.put(baseurl + '/api/bids/rate', bidDetails, getHttpOptionsWithAuth());
   }
+
+  public getPendingBids(): Observable<any> {
+    return this.http.get(baseurl + '/api/bids/by/pending', getHttpOptionsWithAuth());
+  }
+
+  public getDoneBids(): Observable<any> {
+    return this.http.get(baseurl + '/api/bids/by/done', getHttpOptionsWithAuth());
+  }
+
+  public getRejectedBids(): Observable<any> {
+    return this.http.get(baseurl + '/api/bids/by/rejected', getHttpOptionsWithAuth());
+  }
 }
