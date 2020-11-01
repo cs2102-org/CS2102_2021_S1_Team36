@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 
 @Component({
@@ -25,23 +26,43 @@ export class CaretakerSummaryPageComponent implements OnInit {
     start_date: new FormControl('', Validators.required),
     end_date: new FormControl('', Validators.required)
   });
+  bids: any;
 
 
-  constructor(private caretakerService: CaretakerService) { }
+  constructor(private caretakerService: CaretakerService, private bidService: BidService) { }
 
   ngOnInit(): void {
+    this.getDates();
   }
 
   ngAfterViewInit(): void {
     this.calendarComponent.getApi().render();
   }
 
-  getLeave() {
-    
-  }
+  getDates() {
+    this.caretakerService.getLeaveDates().subscribe(leaves => {
+      leaves = leaves.map(leave => {leave.title="leave"; return leave;}); 
 
-  getBids() {
+      this.bidService.getBidsCaretaker().subscribe((bids) => {
+        let id = 1;
+        const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
+        const copyBids =JSON.parse(JSON.stringify(bidsUpdated));
+        this.bids = copyBids.reduce((accumulator, currentValue) => {
+          accumulator[currentValue.id] = currentValue;
+          return accumulator;
+        }, {});
 
+        const bidsMid = bidsUpdated.map(function(bid) {
+          let aDate = new Date(bid.end);
+          aDate.setDate(aDate.getDate() + 1);
+          bid.end = aDate.toISOString().slice(0,10);
+          
+          bid.title = `Take care of ${bid.name}'s ${bid.pet_name}`;
+          return bid;
+        });    
+        this.calendarOptions.events = bidsMid.concat(leaves);
+      });
+    });
   }
 
   selectLeaveDate(selectionInfo) {

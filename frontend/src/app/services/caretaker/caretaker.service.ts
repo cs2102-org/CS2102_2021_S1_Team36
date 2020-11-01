@@ -50,4 +50,8 @@ export class CaretakerService {
   public postNewLeave(details): Observable<any> {
     return this.http.post(baseurl + '/api/caretaker/ft/leave/new/range', details, getHttpOptionsWithAuth());
   }
+
+  public getLeaveDates(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/ft/leave', getHttpOptionsWithAuth());
+  }
 }

@@ -114,20 +114,20 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave/:email', async(req, res) => {
+caretakerRouter.get('/ft/leave', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const { start_date, end_date } = req.body;
         console.log(start_date, end_date);
         if ( !start_date || !end_date ) {
             const msql = await pool.query(
-                "SELECT * FROM FullTimeLeave WHERE email = $1 AND clash(NOW()::date, (NOW() + interval '2 year')::date, leave_date)",
+                "SELECT to_char(leave_date, 'YYYY-MM-dd') as date FROM FullTimeLeave WHERE email = $1",
                 [email]
             );
             res.json(msql.rows);
         } else {
             const msql = await pool.query(
-                "SELECT * FROM FullTimeLeave WHERE email = $1 AND clash($2, $3, leave_date)",
+                "SELECT to_char(leave_date, 'YYYY-MM-dd') as date FROM FullTimeLeave WHERE email = $1 AND clash($2, $3, leave_date)",
                 [email, start_date, end_date]
             );
             res.json(msql.rows);
