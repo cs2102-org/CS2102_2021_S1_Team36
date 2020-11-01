@@ -112,88 +112,7 @@ CREATE TABLE Comments (
     PRIMARY KEY (post_id, email, date_time)
 );
 
--- when a bid has its is_confirmed set to True, this trigger will find all clashing bids and set is_confirmed to False
--- bid B clashes with bid A if B have same caretaker_email as A and bid B's (start_date, end_date) overlaps with that of A
-CREATE OR REPLACE FUNCTION invalidate_bids()
-RETURNS trigger
-language plpgsql
-as
-$$
-BEGIN
-	update bidsfor BF set
-		is_confirmed = false
-	where
-		BF.caretaker_email = NEW.caretaker_email and
-		BF.is_confirmed isnull and
-		((BF.start_date, BF.end_date + interval '1 day') overlaps (NEW.start_date, NEW.end_date + interval '1 day'));
-	return new;
-END;
-$$;
-
-drop trigger if exists trigger_invalidate_bids on BidsFor;
-CREATE TRIGGER trigger_invalidate_bids
-    AFTER UPDATE OF is_confirmed ON BidsFor
-    FOR EACH ROW
-    EXECUTE PROCEDURE invalidate_bids();
-
-
--- when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
-CREATE OR REPLACE FUNCTION update_rating()
-RETURNS trigger
-language plpgsql
-as
-$$
-DECLARE
-	r DECIMAL(10, 2);
-BEGIN
-	select AVG(rating) into r from bidsfor
-	where
-		caretaker_email = NEW.caretaker_email and
-		rating is not null;
-		
-	update Caretakers CT set
-		rating = r
-	where
-		CT.email = NEW.caretaker_email;
-		
-	return new;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS trigger_update_rating on BidsFor;
-CREATE TRIGGER trigger_update_rating
-    AFTER UPDATE OF rating ON BidsFor
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_rating();
-
-
--- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
-CREATE OR REPLACE FUNCTION block_taking_leave()
-RETURNS trigger
-language plpgsql
-as
-$$
-BEGIN
-	IF EXISTS (
-		select 1 from bidsFor
-		where
-			caretaker_email = NEW.email and
-			((start_date, end_date + interval '1 day') overlaps (NEW.leave_date, NEW.leave_date + interval '1 day'))
-	) THEN
-		RAISE EXCEPTION 'You have a job on this date';
-	END IF;
-	RETURN NEW;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS trigger_block_taking_leave on FullTimeLeave;
-CREATE TRIGGER trigger_block_taking_leave
-    BEFORE INSERT ON FullTimeLeave
-    FOR EACH ROW
-    EXECUTE PROCEDURE block_taking_leave();
-
-
--- ============================== helper functions =============================================================
+-- ============================================ HELPER FUNCTIONS =============================================================
 
 -- return true if interval [s1, e1] overlaps with [s2, e2]
 CREATE OR REPLACE FUNCTION clash(s1 date, e1 date, d date)
@@ -303,6 +222,8 @@ BEGIN
 END;
 $$;
 
+--=================================================== END HELPER ============================================================
+
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
 INSERT INTO PetOwners(email) VALUES ('panter@gmail.com');
 INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a petowner of pcs', 'pwpeter');
@@ -371,6 +292,11 @@ INSERT INTO Users(name, email, description, password) VALUES ('xiaohong', 'xiaoh
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaohong@gmail.com', false, 2);
 INSERT INTO Users(name, email, description, password) VALUES ('xiaozong', 'xiaozong@gmail.com', 'xiaozong is a part time caretaker of pcs', 'pwxiaozong');
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaozong@gmail.com', false, 2);
+
+INSERT INTO Users(name, email, description, password) VALUES ('jane', 'jane@gmail.com', 'jane is an admin of pcs', 'pwjane');
+INSERT INTO PcsAdmins(email) VALUES ('jane@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('janey', 'janey@gmail.com', 'janey is an admin of pcs', 'pwjaney');
+INSERT INTO PcsAdmins(email) VALUES ('janey@gmail.com');
 
 INSERT INTO PetTypes(species) VALUES ('Dog');
 INSERT INTO PetTypes(species) VALUES ('Cat');
@@ -911,3 +837,183 @@ INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 null, null, '1', '1', null
 );
 
+
+--================================================ TRIGGERS ===================================================================
+-- You might want to comment out the triggers so it is easier to put in data to test
+
+--users covering constraint
+CREATE OR REPLACE FUNCTION check_user_covering() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    uncovered_user VARCHAR(30);
+BEGIN 
+    SELECT email INTO uncovered_user
+    FROM Users u
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM PetOwners p
+        WHERE p.email = u.email
+    )
+    AND
+    NOT EXISTS (
+        SELECT 1
+        FROM CareTakers c
+        WHERE c.email = u.email
+    )
+    AND 
+    NOT EXISTS (
+        SELECT 1
+        FROM PcsAdmins pcs
+        WHERE pcs.email = u.email
+    );
+    
+    IF uncovered_user IS NOT NULL THEN 
+        RAISE exception 'user % must belong to one user type', uncovered_user;
+    END IF;
+    RETURN NULL;
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS user_cover_trigger ON Users;
+CREATE CONSTRAINT TRIGGER user_cover_trigger
+    AFTER INSERT ON Users
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_user_covering();
+
+-- admin + petowner overlap constraint
+CREATE OR REPLACE FUNCTION check_admin_petowner_overlap() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    overlap_user VARCHAR(30);
+BEGIN
+    SELECT pcs.email into overlap_user
+    FROM PcsAdmins pcs, PetOwners p
+    WHERE pcs.email = p.email;
+
+    IF overlap_user IS NOT NULL THEN
+        RAISE exception '% should not be both PCS Admin and Pet Owner', overlap_user;
+    END IF;
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS petowner_overlap_trigger ON PetOwners;
+CREATE TRIGGER petowner_overlap_trigger
+    AFTER INSERT ON PetOwners
+    EXECUTE PROCEDURE check_admin_petowner_overlap();
+
+DROP TRIGGER IF EXISTS pcs_petowner_overlap_trigger ON PcsAdmins;
+CREATE TRIGGER pcs_petowner_overlap_trigger
+    AFTER INSERT ON PcsAdmins
+    EXECUTE PROCEDURE check_admin_petowner_overlap();
+
+-- admin + caretaker overlap constraint
+CREATE OR REPLACE FUNCTION check_admin_caretaker_overlap() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    overlap_user VARCHAR(30);
+BEGIN
+    SELECT pcs.email into overlap_user
+    FROM PcsAdmins pcs, CareTakers c
+    WHERE pcs.email = c.email;
+
+    IF overlap_user IS NOT NULL THEN
+        RAISE exception '% should not be both PCS Admin and CareTaker', overlap_user;
+    END IF;
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS caretaker_overlap_trigger ON CareTakers;
+CREATE TRIGGER caretaker_overlap_trigger
+    AFTER INSERT ON CareTakers
+    EXECUTE PROCEDURE check_admin_caretaker_overlap();
+
+DROP TRIGGER IF EXISTS pcs_caretaker_overlap_trigger ON PcsAdmins;
+CREATE TRIGGER pcs_caretaker_overlap_trigger
+    AFTER INSERT ON PcsAdmins
+    EXECUTE PROCEDURE check_admin_caretaker_overlap();
+
+-- Trigger: when a bid has its is_confirmed set to True, this trigger will find all clashing bids and set is_confirmed to False
+-- bid B clashes with bid A if B have same caretaker_email as A and bid B's (start_date, end_date) overlaps with that of A
+CREATE OR REPLACE FUNCTION invalidate_bids()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	update bidsfor BF set
+		is_confirmed = false
+	where
+		BF.caretaker_email = NEW.caretaker_email and
+		BF.is_confirmed isnull and
+		((BF.start_date, BF.end_date + interval '1 day') overlaps (NEW.start_date, NEW.end_date + interval '1 day'));
+	return new;
+END;
+$$;
+
+drop trigger if exists trigger_invalidate_bids on BidsFor;
+CREATE TRIGGER trigger_invalidate_bids
+    AFTER UPDATE OF is_confirmed ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE invalidate_bids();
+
+
+-- Trigger: when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
+CREATE OR REPLACE FUNCTION update_rating()
+RETURNS trigger
+language plpgsql
+as
+$$
+DECLARE
+	r DECIMAL(10, 2);
+BEGIN
+	select AVG(rating) into r from bidsfor
+	where
+		caretaker_email = NEW.caretaker_email and
+		rating is not null;
+		
+	update Caretakers CT set
+		rating = r
+	where
+		CT.email = NEW.caretaker_email;
+		
+	return new;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_update_rating on BidsFor;
+CREATE TRIGGER trigger_update_rating
+    AFTER UPDATE OF rating ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_rating();
+
+
+-- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
+CREATE OR REPLACE FUNCTION block_taking_leave()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+		select 1 from bidsFor
+		where
+			caretaker_email = NEW.email and
+			((start_date, end_date + interval '1 day') overlaps (NEW.leave_date, NEW.leave_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'You have a job on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_taking_leave on FullTimeLeave;
+CREATE TRIGGER trigger_block_taking_leave
+    BEFORE INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_taking_leave();
+
+-- =============================================== END TRIGGERS ====================================================
