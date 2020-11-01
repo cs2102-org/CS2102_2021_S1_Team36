@@ -26,11 +26,11 @@ export class ManageUsersComponent implements OnInit {
 
   openNewCaretakerForm() {
     const ref = this.dialog.open(FormNewCaretakerComponent);
-    // ref.disableClose = true;
+    ref.disableClose = true;
   }
 
   openNewAdminForm() {
     const ref = this.dialog.open(FormNewAdminComponent);
-    // ref.disableClose = true;
+    ref.disableClose = true;
   }
 }
