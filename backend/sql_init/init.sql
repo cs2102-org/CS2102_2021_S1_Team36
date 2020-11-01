@@ -953,12 +953,12 @@ BEGIN
 	return new;
 END;
 $$;
-
-drop trigger if exists trigger_invalidate_bids on BidsFor;
-CREATE TRIGGER trigger_invalidate_bids
-    AFTER UPDATE OF is_confirmed ON BidsFor
-    FOR EACH ROW
-    EXECUTE PROCEDURE invalidate_bids();
+-- TODO: Fix this trigger!
+-- drop trigger if exists trigger_invalidate_bids on BidsFor;
+-- CREATE TRIGGER trigger_invalidate_bids
+--     AFTER UPDATE OF is_confirmed ON BidsFor
+--     FOR EACH ROW
+--     EXECUTE PROCEDURE invalidate_bids();
 
 
 -- Trigger: when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
