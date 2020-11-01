@@ -22,20 +22,31 @@ bidsRouter.get('/all', async(req, res) => {
 
 // get all bids by a specified petowner
 // put is_confirmed in the req body to filter by that
+// if is_confirmed is one of "pending" / "confirmed" / "rejected", then filter by is_confirmed
+// otherwise, return all bids
 bidsRouter.get('/by/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const { is_confirmed } = req.body;
-        if ( !is_confirmed ) { // return all bids
-            const msql = await pool.query(
-                "select * from bidsfor where owner_email = $1;",
-                [email]
-                );
-            res.json(msql.rows); 
-        } else { // return all bids that are confirmed
+        var { is_confirmed } = req.body;
+
+        if (is_confirmed == "pending" || is_confirmed == "confirmed" || is_confirmed == "rejected") { // return results that are filtered by is_confirmed
+            if (is_confirmed == "pending") {
+                is_confirmed = null;
+            } else if (is_confirmed == "confirmed") {
+                is_confirmed = true;
+            }
+            else if (is_confirmed == "rejected") {
+                is_confirmed = false;
+            }
             const msql = await pool.query(
                 "select * from bidsfor where owner_email = $1 and is_confirmed = $2",
                 [email, is_confirmed]
+            );
+            res.json(msql.rows);
+        } else {
+            const msql = await pool.query(
+                "select * from bidsfor where owner_email = $1;",
+                [email]
                 );
             res.json(msql.rows); 
         }
@@ -46,20 +57,31 @@ bidsRouter.get('/by/:email', async(req, res) => {
 
 // get all bids for a specified caretaker
 // put is_confirmed in the req body to filter by that
+// if is_confirmed is one of "pending" / "confirmed" / "rejected", then filter by is_confirmed
+// otherwise, return all bids
 bidsRouter.get('/for/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const { is_confirmed } = req.body;
-        if ( !is_confirmed ) { // return all bids
-            const msql = await pool.query(
-                "select * from bidsfor where caretaker_email = $1;",
-                [email]
-                );
-            res.json(msql.rows); 
-        } else { // return all bids that are confirmed
+        var { is_confirmed } = req.body;
+
+        if (is_confirmed == "pending" || is_confirmed == "confirmed" || is_confirmed == "rejected") { // return results that are filtered by is_confirmed
+            if (is_confirmed == "pending") {
+                is_confirmed = null;
+            } else if (is_confirmed == "confirmed") {
+                is_confirmed = true;
+            }
+            else if (is_confirmed == "rejected") {
+                is_confirmed = false;
+            }
             const msql = await pool.query(
                 "select * from bidsfor where caretaker_email = $1 and is_confirmed = $2",
                 [email, is_confirmed]
+            );
+            res.json(msql.rows);
+        } else {
+            const msql = await pool.query(
+                "select * from bidsfor where caretaker_email = $1;",
+                [email]
                 );
             res.json(msql.rows); 
         }
@@ -115,6 +137,39 @@ bidsRouter.post('/add', async(req, res) => {
     "transfer_type" : "2",
     "rating" : null,
 */
+
+// use to set the status of a specified bid
+// put "status" : True OR "status : False" in json body to accept / reject the bid
+// requires primary key of bidsfor in req body
+/* example
+{
+    "owner_email" : "parthus@gmail.com",
+	"caretaker_email" : "carl@gmail.com",
+	"pet_name" : "hugo",
+    "submission_time" : "2020-01-03",
+    "status" : true
+}
+*/
+bidsRouter.put('/status', async(req, res) => {
+    try {
+        const { email } = req.params;
+        var { owner_email, caretaker_email, pet_name, submission_time, status } = req.body;
+        
+        const msql = await pool.query(
+            "UPDATE bidsfor SET \
+                is_confirmed = $5 \
+            where \
+                owner_email = $1 and \
+                caretaker_email = $2 and \
+                pet_name = $3 and \
+                submission_time = $4::timestamp;",
+            [owner_email, caretaker_email, pet_name, submission_time, status]
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
