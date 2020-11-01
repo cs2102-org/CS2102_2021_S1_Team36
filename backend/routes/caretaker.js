@@ -79,7 +79,7 @@ caretakerRouter.get('/ft/leave/all', async(req, res) => {
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave/:email', async(req, res) => {
+caretakerRouter.post('/ft/leave/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const { start_date, end_date } = req.body;
@@ -105,7 +105,7 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
 // get the availability of a specified part time caretaker
 // assumes specified caretaker is actually part time
 // if start_date and end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/pt/avail/:email', async(req, res) => {
+caretakerRouter.post('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const { start_date, end_date } = req.body;
@@ -219,7 +219,7 @@ caretakerRouter.get('/all', async(req, res) => {
 // price: caretaker price for pet_type in range [min, max]
 // rating: caretaker rating >= rating
 // is_fulltime: true or false to filter for fulltime or parttime caretakers
-caretakerRouter.get('/filter', async(req, res) => {
+caretakerRouter.post('/filter', async(req, res) => {
     try {
         var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
         console.log(substr, start_date, end_date, pet_type, min, max, rating);

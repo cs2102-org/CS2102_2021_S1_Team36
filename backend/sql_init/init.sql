@@ -87,6 +87,8 @@ CREATE TABLE BidsFor (
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+-- todo: check that price <= amount_bidded
+-- check that start_date >= end_date
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
