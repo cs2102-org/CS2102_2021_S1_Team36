@@ -27,6 +27,7 @@ import { CaretakerMakeBidComponent } from './components/general/caretaker-make-b
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
 import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
+import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -50,7 +51,8 @@ FullCalendarModule.registerPlugins([
     CaretakerMakeBidComponent,
     PetOwnerSummaryComponent,
     SubmitRatingComponent,
-    BidDialogComponent
+    BidDialogComponent,
+    ManageUsersComponent
   ],
   imports: [
     BrowserModule,

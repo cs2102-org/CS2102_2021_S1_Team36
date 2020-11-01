@@ -10,6 +10,7 @@ import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-
 import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -21,7 +22,8 @@ const routes: Routes = [
   { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
   { path: 'forum', component: ForumComponent },
   { path: 'caretaker/bid/:caretaker', component: CaretakerMakeBidComponent },
-  { path: 'petowner/summary', component: PetOwnerSummaryComponent }
+  { path: 'petowner/summary', component: PetOwnerSummaryComponent },
+  { path: 'admin/manage', component: ManageUsersComponent }
 ];
 
 @NgModule({
