@@ -57,4 +57,8 @@ export class BidService {
   public postRejectBid(details): Observable<any> {
     return this.http.put(baseurl + '/api/bids/status', details, getHttpOptionsWithAuth());
   }
+
+    public getCaretakerEarnings(details): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/hist/range/', details, getHttpOptionsWithAuth());
+  }
 }

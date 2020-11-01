@@ -19,7 +19,8 @@ export class CaretakerSummaryPageComponent implements OnInit {
     events: [],
     selectable: true,
     unselectAuto: false,
-    select: this.selectDate.bind(this)
+    select: this.selectDate.bind(this),
+    datesSet: this.viewRenderer.bind(this)
   };
 
   form = new FormGroup({
@@ -29,7 +30,10 @@ export class CaretakerSummaryPageComponent implements OnInit {
 
   bids: any;
   caretakerType: string;
-
+  currentStart;
+  currentEnd;
+  numOfWorkDaysInThatMonth = 0;
+  earningsInThatMonth;
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService) { }
 
@@ -38,8 +42,28 @@ export class CaretakerSummaryPageComponent implements OnInit {
     this.checkFullTime();
   }
 
+  viewRenderer(dateInfo) {
+    let aDate = new Date(dateInfo.start);
+    aDate.setDate(aDate.getDate() + 1);
+    this.currentStart = aDate.toISOString().slice(0,10);
+    this.currentEnd = dateInfo.end.toISOString().slice(0,10);
+    this.getEarningsForMonth();
+  }
+
   ngAfterViewInit(): void {
     this.calendarComponent.getApi().render();
+  }
+
+  reduceEarnings(total, add) {
+    return total + Number(add.amount);
+  }
+
+  getEarningsForMonth() {
+    const details = {start_date: this.currentStart, end_date: this.currentEnd};
+    this.bidService.getCaretakerEarnings(details).subscribe(detail => {
+      this.numOfWorkDaysInThatMonth = detail.length;
+      this.earningsInThatMonth = detail.reduce(this.reduceEarnings, 0);
+    });
   }
 
   checkFullTime() {

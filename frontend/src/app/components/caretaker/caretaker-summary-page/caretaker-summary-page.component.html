@@ -2,6 +2,9 @@
     <full-calendar #calendar [options]="calendarOptions" style="width: 700px; margin: auto; margin-top: 5%;"></full-calendar>
 </div>
 
+<h3>Earnings: ${{earningsInThatMonth}}</h3>
+<h3>Days Worked: {{numOfWorkDaysInThatMonth}} Days</h3>
+
 <div *ngIf="caretakerType === 'Full Time'">
     <h2>Apply For Leave</h2>
     <p>You have chosen: {{form.get('start_date').value}} - {{form.get('end_date').value}}</p>

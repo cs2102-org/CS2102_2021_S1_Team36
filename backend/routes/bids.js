@@ -241,9 +241,9 @@ bidsRouter.get('/hist/:email', async(req, res) => {
 // for a given range,
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
-bidsRouter.get('/hist/range/:email', async(req, res) => {
+bidsRouter.post('/hist/range', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         var { start_date, end_date } = req.body;
         // startdate = '2020-01-01';
         // enddate = '2021-03-01';
