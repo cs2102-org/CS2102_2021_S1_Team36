@@ -949,16 +949,16 @@ BEGIN
 	where
 		BF.caretaker_email = NEW.caretaker_email and
 		BF.is_confirmed isnull and
-		((BF.start_date, BF.end_date + interval '1 day') overlaps (NEW.start_date, NEW.end_date + interval '1 day'));
+		NOT canWork(NEW.caretakter_email, BF.start_date, BF.end_date);
 	return new;
 END;
 $$;
--- TODO: Fix this trigger!
--- drop trigger if exists trigger_invalidate_bids on BidsFor;
--- CREATE TRIGGER trigger_invalidate_bids
---     AFTER UPDATE OF is_confirmed ON BidsFor
---     FOR EACH ROW
---     EXECUTE PROCEDURE invalidate_bids();
+
+drop trigger if exists trigger_invalidate_bids on BidsFor;
+CREATE TRIGGER trigger_invalidate_bids
+    AFTER UPDATE OF is_confirmed ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE invalidate_bids();
 
 
 -- Trigger: when a bidsFor has rating updated, this function will compute the caretakers new rating and update Caretakers table
