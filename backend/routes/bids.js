@@ -24,7 +24,7 @@ bidsRouter.get('/all', async(req, res) => {
 // put is_confirmed in the req body to filter by that
 // if is_confirmed is one of "pending" / "confirmed" / "rejected", then filter by is_confirmed
 // otherwise, return all bids
-bidsRouter.get('/by/:email', async(req, res) => {
+bidsRouter.post('/by/:email', async(req, res) => {
     try {
         const { email } = req.params;
         var { is_confirmed } = req.body;
@@ -59,7 +59,7 @@ bidsRouter.get('/by/:email', async(req, res) => {
 // put is_confirmed in the req body to filter by that
 // if is_confirmed is one of "pending" / "confirmed" / "rejected", then filter by is_confirmed
 // otherwise, return all bids
-bidsRouter.get('/for/:email', async(req, res) => {
+bidsRouter.post('/for/:email', async(req, res) => {
     try {
         const { email } = req.params;
         var { is_confirmed } = req.body;
@@ -192,7 +192,7 @@ bidsRouter.get('/hist/:email', async(req, res) => {
 // for a given range,
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
-bidsRouter.get('/hist/range/:email', async(req, res) => {
+bidsRouter.post('/hist/range/:email', async(req, res) => {
     try {
         const { email } = req.params;
         var { start_date, end_date } = req.body;
@@ -216,7 +216,7 @@ bidsRouter.get('/hist/range/:email', async(req, res) => {
 // find the number of days worked and total earnings for each caretaker over a specified range
 // returns table (caretaker_email, days_worked, total_earnings)
 // only caretakers with nonzero work days appear in the result
-bidsRouter.get('/earnings/range', async(req, res) => {
+bidsRouter.post('/earnings/range', async(req, res) => {
     try {
         var { start_date, end_date } = req.body;
         const msql = await pool.query(
