@@ -23,6 +23,10 @@ export class CaretakerService {
     return this.http.get(baseurl + '/api/caretaker/rec/', getHttpOptionsWithAuth());
   }
 
+  public getTransactedCaretakers(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/txnbefore', getHttpOptionsWithAuth());
+  }
+
   public getAvailPartTimeCareTaker(email): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/pt/avail/' + email, httpOptions);
   }

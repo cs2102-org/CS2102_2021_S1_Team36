@@ -50,7 +50,7 @@
       <h2>List of Caretakers</h2>
       <button (click)="getActiveCaretakers()">Show All</button>
       <button *ngIf="isLogged" (click)="showRecommendedCaretakers()">Recommended</button>
-      <button *ngIf="isLogged">Previously Transacted</button>
+      <button *ngIf="isLogged" (click)="showTransactedCaretakers()">Previously Transacted</button>
 
       <ul class="caretakers">
         <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">
