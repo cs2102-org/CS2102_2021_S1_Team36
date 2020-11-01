@@ -31,9 +31,9 @@ var incDate = function(dateString, numDays) {
 
 // Give a specified caretaker leave on the interval [start_date, end_date]
 // todo: check for overlaps with existing leave dates
-caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
+caretakerRouter.post('/ft/leave/new/range', verifyJwt, async(req, res) => {
     try {
-        const {email} = req.params;
+        const email = res.locals.user.email;
         var {start_date, end_date} = req.body;
         start_date = new Date(start_date);
         end_date = new Date(end_date);
@@ -55,10 +55,9 @@ caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
 });
 
 // insert new caretaker
-caretakerRouter.post('/new', async(req, res) => {
+caretakerRouter.post('/new', verifyJwt, async(req, res) => {
     try {
-        const {email, full_time, rating} = req.body;
-        console.log(email);
+        const { email, full_time } = req.body;
         res.json(true); 
     } catch (err) {
         console.error(err);

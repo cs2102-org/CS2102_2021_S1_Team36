@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
@@ -13,16 +14,17 @@ export class CaretakerSummaryPageComponent implements OnInit {
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
-    dateClick: this.handleDateClick.bind(this), // bind is important!
-    events: [
-      { title: 'event 1', date: '2019-04-01' },
-      { title: 'event 2', date: '2019-04-02' }
-    ]
+    events: [],
+    selectable: true,
+    unselectAuto: false,
+    select: this.selectLeaveDate.bind(this)
   };
 
-  handleDateClick(arg) {
-    alert('date click! ' + arg.dateStr)
-  }
+  leaveForm = new FormGroup({
+    start_date: new FormControl(''),
+    end_date: new FormControl('')
+  });
+
 
   constructor() { }
 
@@ -39,5 +41,13 @@ export class CaretakerSummaryPageComponent implements OnInit {
 
   getBids() {
 
+  }
+
+  selectLeaveDate(selectionInfo) {
+    const startDate = selectionInfo.start;
+    const endDate = selectionInfo.end;
+    startDate.setDate(startDate.getDate() + 1);
+    this.leaveForm.controls['start_date'].setValue(startDate.toISOString().slice(0,10));
+    this.leaveForm.controls['end_date'].setValue(endDate.toISOString().slice(0,10));
   }
 }
