@@ -36,32 +36,40 @@ export class CaretakerBidsComponent implements OnInit {
   showAllBids() {
     this.showType = "";
     this.bidService.getBidsCaretaker().subscribe((bids) => {
-      console.log(bids);
-      this.bids = bids;
+      this.bids = bids.map(this.changeTransferType)
+        .map(this.changePaymentType)
+        .map(this.changeConfirmation)
+        .map(this.changePaid);
     });
   }
 
   showPendingBids() {
     this.showType = "Pending";
     this.bidService.getPendingBidsCaretaker().subscribe((bids) => {
-      console.log(bids);
-      this.bids = bids;
+      this.bids = bids.map(this.changeTransferType)
+        .map(this.changePaymentType)
+        .map(this.changeConfirmation)
+        .map(this.changePaid);
     });
   }
 
   showDoneBids() {
     this.showType = "Done";
     this.bidService.getDoneBidsCaretaker().subscribe((bids) => {
-      console.log(bids);
-      this.bids = bids;
+      this.bids = bids.map(this.changeTransferType)
+        .map(this.changePaymentType)
+        .map(this.changeConfirmation)
+        .map(this.changePaid);
     });
   }
 
   showRejectedBids() {
     this.showType = "Rejected";
     this.bidService.getRejectedBidsCaretaker().subscribe((bids) => {
-      console.log(bids);
-      this.bids = bids;
+      this.bids = bids.map(this.changeTransferType)
+        .map(this.changePaymentType)
+        .map(this.changeConfirmation)
+        .map(this.changePaid);
     });
   }
 
@@ -105,5 +113,43 @@ export class CaretakerBidsComponent implements OnInit {
   onSubmit(searchParam) {
     console.log('SENT');
     console.log(searchParam);
+  }
+
+  changeTransferType(bid) {
+    if (bid.transfer_type == 1) {
+      bid.transfer = "Pet Owner deliver";
+    } else if (bid.transfer_type == 2) {
+      bid.transfer = "Caretaker pick up";
+    } else {
+      bid.transfer= "Transfer by PCS Building";
+    }
+    return bid;
+  }
+
+  changePaymentType(bid) {
+    if (bid.payment_type == 1) {
+      bid.payment_type = "Cash";
+    } else {
+      bid.payment_type= "Credit Card";
+    }
+    return bid;
+  }
+
+  changePaid(bid) {
+    if (bid.is_paid) {
+      bid.is_paid = "Paid";
+    } else {
+      bid.is_paid = "Not Paid";
+    }
+    return bid;
+  }
+
+  changeConfirmation(bid) {
+    if (bid.is_confirmed) {
+      bid.is_confirmed  = "Confirmed";
+    } else {
+      bid.is_confirmed = "Not Confirmed";
+    }
+    return bid;
   }
 }

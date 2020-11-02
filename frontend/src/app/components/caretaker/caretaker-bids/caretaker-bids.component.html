@@ -63,14 +63,16 @@
         <td>{{bid.start}}</td>
         <td>{{bid.end}}</td>
         <td>{{bid.payment_type}}</td>
-        <td>{{bid.transfer_type}}</td>
+        <td>{{bid.transfer}}</td>
         <td>{{bid.submission_time}}</td>
         <td>${{bid.amount_bidded}}</td>
         <td>{{bid.is_confirmed}}</td>
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
-        <button (click)="acceptBid(bid)">Accept Bid</button>
-        <button (click)="rejectBid(bid)">Rejected Bid</button>
+        <div *ngIf="bid.is_confirmed !== 'Confirmed' && bid.is_confirmed !== 'Not Confirmed'">
+          <button (click)="acceptBid(bid)">Accept Bid</button>
+          <button (click)="rejectBid(bid)">Rejected Bid</button>
+        </div>
       </tr>
     </table>
 </div>
