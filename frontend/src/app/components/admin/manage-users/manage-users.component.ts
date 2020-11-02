@@ -20,6 +20,7 @@ export class ManageUsersComponent implements OnInit {
   showType = "Admins";
   things;
   msg = '';
+  searchValue: string;
 
   constructor(private caretakerService: CaretakerService, private dialog: MatDialog,
     private pcsAdminService: PcsadminService,

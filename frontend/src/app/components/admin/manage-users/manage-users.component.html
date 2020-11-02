@@ -7,7 +7,8 @@
 <h3>{{showType}}</h3>
 <p>{{msg}}</p>
 <div *ngIf="showType==='Caretakers'">
-<button (click)="openNewCaretakerForm()">Add New Caretaker</button>
+<button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
+<input type="text" [(ngModel)]="searchValue"/>
 <table>
     <tr>
         <th>Caretaker Name</th>
@@ -18,7 +19,7 @@
         <th></th>
         <th></th>
     </tr>
-    <tr *ngFor="let caretaker of things">
+    <tr *ngFor="let caretaker of things | searchfilter: searchValue">
         <td>{{caretaker.name}}</td>
         <td>{{caretaker.email}}</td>
         <td>{{caretaker.is_fulltime}}</td>
@@ -31,7 +32,8 @@
 </div>
 
 <div *ngIf="showType==='Admins'">
-<button (click)="openNewAdminForm()">Add New Admin</button>
+<button (click)="openNewAdminForm()">Add New Admin</button><br>
+<input type="text" [(ngModel)]="searchValue"/>
 <table>
     <tr>
         <th>Admin Name</th>
@@ -39,7 +41,7 @@
         <th>Description</th>
         <th></th>
     </tr>
-    <tr *ngFor="let admin of things">
+    <tr *ngFor="let admin of things | searchfilter: searchValue">
         <td>{{admin.name}}</td>
         <td>{{admin.email}}</td>
         <td>{{admin.description}}</td>
@@ -65,6 +67,8 @@
 </div>
 
 <div *ngIf="showType==='Pet Owners'">
+<br>
+<input type="text" [(ngModel)]="searchValue"/>
 <table>
     <tr>
         <th>Pet Owner Name</th>
@@ -72,7 +76,7 @@
         <th>Description</th>
         <th></th>
     </tr>
-    <tr *ngFor="let po of things">
+    <tr *ngFor="let po of things | searchfilter: searchValue">
         <td>{{po.name}}</td>
         <td>{{po.email}}</td>
         <td>{{po.description}}</td>

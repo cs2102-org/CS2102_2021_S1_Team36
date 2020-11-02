@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MenuHeaderComponent } from './components/general/menu-header/menu-header.component';
 import { LoginComponent } from './components/general/login/login.component';
@@ -33,6 +33,7 @@ import { FormNewAdminComponent } from './components/admin/form-new-admin/form-ne
 import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
+import { SearchfilterPipe } from './searchfilter.pipe';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -63,6 +64,7 @@ FullCalendarModule.registerPlugins([
     FormNewPetTypeComponent,
     DeleteLeaveAvailComponent,
     DetailedPetComponent,
+    SearchfilterPipe,
   ],
   imports: [
     BrowserModule,
@@ -74,6 +76,7 @@ FullCalendarModule.registerPlugins([
     MatIconModule,
     FullCalendarModule,
     HttpClientModule,
+    FormsModule,
     // MatDatepickerModule,
     // MatFormFieldModule,
   ],
