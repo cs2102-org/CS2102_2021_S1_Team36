@@ -6,6 +6,9 @@ import { PetownerService } from 'src/app/services/petowner/petowner.service';
 import { FormNewAdminComponent } from '../form-new-admin/form-new-admin.component';
 import { FormNewCaretakerComponent } from '../form-new-caretaker/form-new-caretaker.component';
 import { FormNewPetTypeComponent } from '../form-new-pet-type/form-new-pet-type.component';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-users',
@@ -18,7 +21,8 @@ export class ManageUsersComponent implements OnInit {
 
   constructor(private caretakerService: CaretakerService, private dialog: MatDialog,
     private pcsAdminService: PcsadminService,
-    private petOwnerService: PetownerService) { }
+    private petOwnerService: PetownerService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.getAllAdmins();
@@ -50,6 +54,14 @@ export class ManageUsersComponent implements OnInit {
       this.showType = "Pet Owners";
       this.things = po;
     });
+  }
+
+  openMakeBid(selectedCaretaker) {
+    const encrypted =  Base64.stringify(Utf8.parse(selectedCaretaker.email));
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/caretaker/bid/' + encrypted])
+    );
+    window.open(url);
   }
 
 

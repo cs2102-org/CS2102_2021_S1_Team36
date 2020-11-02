@@ -14,7 +14,18 @@ export class BidDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
-    this.bid = this.data.dataKey;
+    this.bid = this.changeTransferType(this.data.dataKey);
+  }
+
+  changeTransferType(bid) {
+    if (bid.transfer_type == 1) {
+      bid.transfer = "Pet Owner deliver";
+    } else if (bid.transfer_type == 2) {
+      bid.transfer = "Caretaker pick up";
+    } else {
+      bid.transfer= "Transfer through the physical building of PCS";
+    }
+    return bid;
   }
 
 }

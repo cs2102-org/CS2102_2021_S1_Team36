@@ -14,12 +14,14 @@
         <th>Full Time</th>
         <th>Rating</th>
         <th></th>
+        <th></th>
     </tr>
     <tr *ngFor="let caretaker of things">
         <td>{{caretaker.name}}</td>
         <td>{{caretaker.email}}</td>
         <td>{{caretaker.is_fulltime}}</td>
         <td>{{caretaker.rating}}</td>
+        <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
         <th><button>Delete</button></th>
     </tr>
 </table>
@@ -46,7 +48,7 @@
 <table>
     <tr>
         <th>Pet Type</th>
-        <th>Number</th>
+        <th>Quantity</th>
         <th></th>
     </tr>
     <tr *ngFor="let pt of things">
