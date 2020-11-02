@@ -80,6 +80,12 @@ export class CaretakerBidsComponent implements OnInit {
     this.bidForm.controls['status'].setValue(status);
   }
 
+  setBidPaid(bid) {
+    this.bidForm.controls['owner_email'].setValue(bid.owner_email);
+    this.bidForm.controls['submission_time'].setValue(bid.submission_time);
+    this.bidForm.controls['pet_name'].setValue(bid.pet_name);
+  }
+
   reloadAfterChangeBid(){
     if (this.showType === "")  {
       this.showAllBids();
@@ -151,5 +157,12 @@ export class CaretakerBidsComponent implements OnInit {
       bid.is_confirmed = "Not Confirmed";
     }
     return bid;
+  }
+
+  postPaid(bid) {
+    this.setBidPaid(bid);
+    this.bidService.postPaidBid(this.bidForm.value).subscribe(msg => {
+      this.reloadAfterChangeBid();
+    });
   }
 }

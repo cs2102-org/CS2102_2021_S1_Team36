@@ -211,8 +211,30 @@ bidsRouter.put('/status', verifyJwt, async(req, res) => {
                 owner_email = $1 and \
                 caretaker_email = $2 and \
                 pet_name = $3 and \
-                to_char(submission_time, 'HH24:MI:SS')= $4;",
+                to_char(submission_time, 'YYYY-MM-dd HH24:MI:SS')= $4;",
             [owner_email, caretaker_email, pet_name, submission_time, status]
+            );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// set bid as paid
+bidsRouter.put('/paid', verifyJwt, async(req, res) => {
+    try {
+        const caretaker_email = res.locals.user.email;
+        var { owner_email, pet_name, submission_time } = req.body;
+        
+        const msql = await pool.query(
+            "UPDATE bidsfor SET \
+                is_paid = true \
+            where \
+                owner_email = $1 and \
+                caretaker_email = $2 and \
+                pet_name = $3 and \
+                to_char(submission_time, 'YYYY-MM-dd HH24:MI:SS')= $4;",
+            [owner_email, caretaker_email, pet_name, submission_time]
             );
         res.json(true); 
     } catch (err) {
