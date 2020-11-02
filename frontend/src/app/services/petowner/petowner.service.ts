@@ -25,4 +25,8 @@ export class PetownerService {
   public getAllPetOwners(): Observable<any> {
     return this.http.get(baseurl + '/api/petowner/petowners', httpOptions);
   }
+
+  public getPetDetails(details): Observable<any> {
+    return this.http.post(baseurl + '/api/petowner/pet/detailed', details, httpOptions);
+  }
 }

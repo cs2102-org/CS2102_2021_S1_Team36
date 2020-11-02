@@ -9,7 +9,7 @@ const petownerRouter = express.Router();
 to test the endpoints here, use http://localhost:5000/api/petowner/ in front of the urls
 */
 
-// get the pets of a specified user
+// get all pet owners
 petownerRouter.get('/petowners', async(req, res) => {
     try {
         const pets = await pool.query(
@@ -84,6 +84,22 @@ petownerRouter.get('/alltypes', async(req, res) => {
         console.error(err);
     }
 });
+
+// get specified pet details
+petownerRouter.post('/pet/detailed', async(req, res) => {
+    try {
+        const pet_name = req.body.pet_name;
+        const owner = req.body.owner_email;
+        const msql = await pool.query(
+            "select species, special_requirements, description from pets where pet_name=$1 and email=$2;",
+            [pet_name, owner]
+            );
+        res.json(msql.rows[0]); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 module.exports = {
     petownerRouter

@@ -63,9 +63,12 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   openBidDialog(selectionInfo) {
-    this.dialog.open(BidDialogComponent, { data: {
-      dataKey: this.bids[selectionInfo.event.id]
-    }});
+    if (selectionInfo.event.title != "leave") {
+      this.dialog.open(BidDialogComponent, { data: {
+        dataKey: this.bids[selectionInfo.event.id],
+        type: "Pet Owner: "
+      }});
+    }
   }
 
   getEarningsForMonth() {
