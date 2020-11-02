@@ -42,9 +42,8 @@
 
 .content {
   background-color: #1e77aa;
-  overflow:auto;
-  height: 94vh;
-  width: 100vh;
+  height: 95vh;
+  width: 100%;
 }
 
 th, td  {
