@@ -68,14 +68,14 @@
         <td>{{bid.start}}</td>
         <td>{{bid.end}}</td>
         <td>{{bid.payment_type}}</td>
-        <td>{{bid.transfer_type}}</td>
+        <td>{{bid.transfer}}</td>
         <td>{{bid.submission_time}}</td>
         <td>${{bid.amount_bidded}}</td>
         <td>{{bid.is_confirmed}}</td>
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
         <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed">Add Rating</button><td>
+        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button><td>
       </tr>
     </table>
 </div>
