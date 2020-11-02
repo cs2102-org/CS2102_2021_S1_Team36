@@ -53,7 +53,7 @@ export class ManageUsersComponent implements OnInit {
    getAllPetOwners() {
     this.petOwnerService.getAllPetOwners().subscribe(po => {
       this.showType = "Pet Owners";
-      this.things = po;
+      this.things = po.map(po => {po.show = false; return po;});
     });
   }
 
@@ -103,5 +103,18 @@ export class ManageUsersComponent implements OnInit {
       this.msg = "Account successfully deleted";
       this.refreshAfterChange();
     });
+  }
+
+  showHide(po) {
+    if (!po.show) {
+      this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
+        console.log(pets);
+        po.pets = pets;
+        po.show = true;
+      });
+    } else {
+      po.pets = [];
+      po.show = false;
+    }
   }
 }
