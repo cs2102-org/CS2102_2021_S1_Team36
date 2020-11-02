@@ -69,7 +69,7 @@
         <td>{{bid.is_confirmed}}</td>
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
-        <div *ngIf="bid.is_confirmed !== 'Confirmed' && bid.is_confirmed !== 'Rejected'">
+        <div *ngIf="bid.is_confirmed === 'Not Confirmed'">
           <button (click)="acceptBid(bid)">Accept Bid</button>
           <button (click)="rejectBid(bid)">Rejected Bid</button>
         </div>

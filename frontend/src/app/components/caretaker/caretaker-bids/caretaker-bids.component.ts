@@ -151,10 +151,12 @@ export class CaretakerBidsComponent implements OnInit {
   }
 
   changeConfirmation(bid) {
-    if (bid.is_confirmed) {
+    if (bid.is_confirmed == null) {
+       bid.is_confirmed = "Not Confirmed";
+    } else if (bid.is_confirmed) {
       bid.is_confirmed  = "Confirmed";
     } else {
-      bid.is_confirmed = "Not Confirmed";
+      bid.is_confirmed = "Rejected"
     }
     return bid;
   }
