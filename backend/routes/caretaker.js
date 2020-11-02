@@ -79,6 +79,39 @@ caretakerRouter.post('/pt/avail/new/range', verifyJwt, async(req, res) => {
     }
 });
 
+//delete full time leave
+caretakerRouter.delete('/ft/leave/:date', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const leave_date = req.params.date;
+        const msql = await pool.query(
+            "DELETE FROM FullTimeLeave \
+            WHERE email = $1 and leave_date = $2",
+            [email, leave_date]
+        );
+        
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+//delete part time avail
+caretakerRouter.delete('/pt/avail/:date', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const work_date = req.params.date;
+        const msql = await pool.query(
+            "DELETE FROM PartTimeAvail \
+            WHERE email = $1 and work_date = $2",
+            [email, work_date]
+        );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // insert new caretaker
 caretakerRouter.post('/new', verifyJwt, async(req, res) => {
     try {

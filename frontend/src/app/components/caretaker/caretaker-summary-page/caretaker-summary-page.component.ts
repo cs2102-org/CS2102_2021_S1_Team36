@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import { BidDialogComponent } from '../../general/bid-dialog/bid-dialog.component';
+import { DeleteLeaveAvailComponent } from '../delete-leave-avail/delete-leave-avail.component';
 
 @Component({
   selector: 'app-caretaker-summary-page',
@@ -70,6 +71,17 @@ export class CaretakerSummaryPageComponent implements OnInit {
         dataKey: this.bids[selectionInfo.event.id],
         type: "Pet Owner: "
       }});
+    } else {
+      const ref = this.dialog.open(DeleteLeaveAvailComponent, { data: {
+          dataKey: selectionInfo.event.start,
+          type: selectionInfo.event.title
+        }
+      });
+      ref.afterClosed().subscribe(msg => {
+        if (msg) {
+          this.getDates();
+        }
+      })
     }
   }
 
@@ -147,4 +159,5 @@ export class CaretakerSummaryPageComponent implements OnInit {
       }
     });
   }
+
 }
