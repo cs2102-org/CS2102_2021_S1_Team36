@@ -18,7 +18,11 @@ export class PetownerService {
     return this.http.get(baseurl + '/api/petowner/pets/' + email, getHttpOptionsWithAuth());
   }
 
-  public getGetListOfPetTypes(): Observable<any> {
+  public getListOfPetTypes(): Observable<any> {
     return this.http.get(baseurl + '/api/petowner/alltypes', httpOptions);
+  }
+
+  public getAllPetOwners(): Observable<any> {
+    return this.http.get(baseurl + '/api/petowner/petowners', httpOptions);
   }
 }

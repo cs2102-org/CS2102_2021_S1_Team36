@@ -73,7 +73,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   }
 
   getListOfPetTypes() {
-    this.petOwnerService.getGetListOfPetTypes().subscribe(petTypes => {
+    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
       this.petTypes = petTypes.map(elem => elem.species);
     });
   }

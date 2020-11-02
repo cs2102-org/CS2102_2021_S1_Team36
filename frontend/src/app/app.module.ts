@@ -30,6 +30,7 @@ import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.c
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
 import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
+import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -56,7 +57,8 @@ FullCalendarModule.registerPlugins([
     BidDialogComponent,
     ManageUsersComponent,
     FormNewCaretakerComponent,
-    FormNewAdminComponent
+    FormNewAdminComponent,
+    FormNewPetTypeComponent,
   ],
   imports: [
     BrowserModule,

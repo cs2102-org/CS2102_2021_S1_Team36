@@ -13,6 +13,13 @@ pcsRouter.post('/pet-types', async (req, res) => {
     return res.status(200).json(result.rows);
 });
 
+pcsRouter.get('/admins', async (req, res) => {
+    const result = await pool.query(
+        'select email, name from Users natural join pcsadmins;',
+    );
+    return res.status(200).json(result.rows);
+});
+
 module.exports = {
     pcsRouter
 }

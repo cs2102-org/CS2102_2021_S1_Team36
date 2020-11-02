@@ -10,6 +10,18 @@ to test the endpoints here, use http://localhost:5000/api/petowner/ in front of 
 */
 
 // get the pets of a specified user
+petownerRouter.get('/petowners', async(req, res) => {
+    try {
+        const pets = await pool.query(
+            "SELECT email, name FROM Users natural join Petowners",
+        );
+        res.json(pets.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get the pets of a specified user
 petownerRouter.get('/pets', verifyJwt, async(req, res) => {
     try {
         const user = res.locals.user;

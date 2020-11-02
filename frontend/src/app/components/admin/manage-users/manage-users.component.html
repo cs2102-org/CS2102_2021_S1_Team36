@@ -1,17 +1,71 @@
-<button (click)="openNewCaretakerForm()">Add New Caretaker</button>
-<button (click)="openNewAdminForm()">Add New Admin</button>
+<button (click)="getAllAdmins()">Admin</button>
+<button (click)="getAllCaretakers()">Caretakers</button>
+<button (click)="getAllPetOwners()">PetOwners</button>
+<button (click)="getAllPetTypes()">PetTypes</button>
 
+
+<h3>{{showType}}</h3>
+<div *ngIf="showType==='Caretakers'">
+<button (click)="openNewCaretakerForm()">Add New Caretaker</button>
 <table>
     <tr>
         <th>Caretaker Name</th>
         <th>Email</th>
         <th>Full Time</th>
         <th>Rating</th>
+        <th></th>
     </tr>
-    <tr *ngFor="let caretaker of caretakers">
+    <tr *ngFor="let caretaker of things">
         <td>{{caretaker.name}}</td>
         <td>{{caretaker.email}}</td>
         <td>{{caretaker.is_fulltime}}</td>
         <td>{{caretaker.rating}}</td>
+        <th><button>Delete</button></th>
     </tr>
 </table>
+</div>
+
+<div *ngIf="showType==='Admins'">
+<button (click)="openNewAdminForm()">Add New Admin</button>
+<table>
+    <tr>
+        <th>Admin Name</th>
+        <th>Email</th>
+        <th></th>
+    </tr>
+    <tr *ngFor="let admin of things">
+        <td>{{admin.name}}</td>
+        <td>{{admin.email}}</td>
+        <th><button>Delete</button></th>
+    </tr>
+</table>
+</div>
+
+<div *ngIf="showType==='Pet Types'">
+<button (click)="openNewTypeForm()">Add New PetType</button>
+<table>
+    <tr>
+        <th>Pet Type</th>
+        <th></th>
+    </tr>
+    <tr *ngFor="let pt of things">
+        <td>{{pt.species}}</td>
+        <th><button>Delete</button></th>
+    </tr>
+</table>
+</div>
+
+<div *ngIf="showType==='Pet Owners'">
+<table>
+    <tr>
+        <th>Pet Owner Name</th>
+        <th>Email</th>
+        <th></th>
+    </tr>
+    <tr *ngFor="let po of things">
+        <td>{{po.name}}</td>
+        <td>{{po.email}}</td>
+        <th><button>Delete</button></th>
+    </tr>
+</table>
+</div>
