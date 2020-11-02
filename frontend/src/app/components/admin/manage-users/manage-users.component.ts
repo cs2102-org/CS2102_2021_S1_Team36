@@ -90,7 +90,12 @@ export class ManageUsersComponent implements OnInit {
 
   openNewTypeForm() {
     const ref = this.dialog.open(FormNewPetTypeComponent);
-    // ref.disableClose = true;
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(result => {
+      if (result) {
+       this.refreshAfterChange();
+      }
+    });
   }
 
   deleteUser(email) {

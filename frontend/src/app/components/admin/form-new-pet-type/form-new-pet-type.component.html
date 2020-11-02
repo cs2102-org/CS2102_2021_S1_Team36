@@ -1,10 +1,10 @@
 <button class="close" mat-button [mat-dialog-close]="true">X</button>
-<form class="form" [formGroup]="typeForm" (ngSubmit)="onSubmitType()">
+<form class="form" [formGroup]="typeForm" (ngSubmit)="onSubmitType(typeForm.value)">
     <h3>Create New Pet Type</h3>
     <p>Please specify the details</p>
     <p>
         <label>Pet Type: </label>
-        <input type="text" formControlName="pet_type">
+        <input type="text" formControlName="species">
     </p>
     <button>Submit</button>
 </form>

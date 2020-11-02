@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { PcsadminService } from 'src/app/services/pcsadmin/pcsadmin.service';
 
 @Component({
   selector: 'app-form-new-pet-type',
@@ -9,13 +10,17 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class FormNewPetTypeComponent implements OnInit {
  typeForm = new FormGroup({
-    pet_type: new FormControl('', Validators.required)
+    species: new FormControl('', Validators.required)
   });
 
-  constructor(private dialogRef: MatDialogRef<FormNewPetTypeComponent>) { }
+  constructor(private dialogRef: MatDialogRef<FormNewPetTypeComponent>, private pcsAdminService: PcsadminService) { }
 
   ngOnInit(): void {
   }
   
-  onSubmitType(){}
+  onSubmitType(details) {
+    this.pcsAdminService.postNewPetType(details).subscribe(msg => {
+      this.dialogRef.close(true);
+    })
+  }
 }

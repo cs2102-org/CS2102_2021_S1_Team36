@@ -21,4 +21,8 @@ export class PcsadminService {
   public deleteUser(details): Observable<any> {
     return this.http.delete(baseurl + '/api/pcs-admins/user/' + details, httpOptions);
   }
+
+  public postNewPetType(type): Observable<any> {
+    return this.http.post(baseurl + '/api/pcs-admins/pet-types', type, httpOptions);
+  }
 }
