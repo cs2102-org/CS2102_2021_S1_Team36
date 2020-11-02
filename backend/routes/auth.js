@@ -19,7 +19,7 @@ authRouter.get("/", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const { rows } = await pool.query(
-    "SELECT password, is_fulltime, U.email AS uemail, P.email AS pemail, C.email AS cemail, A.email AS aemail \
+    "SELECT U.email, password, is_fulltime, U.email AS uemail, P.email AS pemail, C.email AS cemail, A.email AS aemail \
       FROM ((Users U LEFT JOIN PetOwners P ON U.email=P.email) \
         LEFT JOIN Caretakers C ON U.email=C.email) \
           LEFT JOIN PCSAdmins A on U.email=A.email \
