@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 export class ManageUsersComponent implements OnInit {
   showType = "Admins";
   things;
+  msg = '';
 
   constructor(private caretakerService: CaretakerService, private dialog: MatDialog,
     private pcsAdminService: PcsadminService,
@@ -31,7 +32,7 @@ export class ManageUsersComponent implements OnInit {
   getAllCaretakers() {
     this.caretakerService.getAllCaretakers().subscribe(caretakers => {
       this.showType = "Caretakers";
-      this.things = caretakers;
+      this.things = caretakers.map(c => {c.is_fulltime = c.is_fulltime ? "Full Time" : "Part Time"; return c;});
     });
   }
 
@@ -56,6 +57,18 @@ export class ManageUsersComponent implements OnInit {
     });
   }
 
+  refreshAfterChange() {
+    if (this.showType == "Admins") {
+      this.getAllAdmins();
+    } else if (this.showType = "Pet Types") {
+      this.getAllPetTypes();
+    } else if (this.showType = "Pet Owners") {
+      this.getAllPetOwners;
+    } else {
+      this.getAllCaretakers();
+    }
+  }
+
   openMakeBid(selectedCaretaker) {
     const encrypted =  Base64.stringify(Utf8.parse(selectedCaretaker.email));
     const url = this.router.serializeUrl(
@@ -78,5 +91,12 @@ export class ManageUsersComponent implements OnInit {
   openNewTypeForm() {
     const ref = this.dialog.open(FormNewPetTypeComponent);
     // ref.disableClose = true;
+  }
+
+  deleteUser(email) {
+    this.pcsAdminService.deleteUser(email).subscribe(msg => {
+      this.msg = "Account successfully deleted";
+      this.refreshAfterChange();
+    });
   }
 }

@@ -17,15 +17,15 @@ pcsRouter.post('/pet-types', async (req, res) => {
     }
 });
 
-pcsRouter.delete('/user', async (req, res) => {
+pcsRouter.delete('/user/:email', async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { email } = req.params;
         await pool.query(
             `
             DELETE FROM Users 
-            WHERE name = $1 AND email = $2 
+            WHERE email = $1 
             `,
-            [name, email],
+            [email],
         );
         return res.status(204).send('Account successfully deleted');
     } catch (err) {

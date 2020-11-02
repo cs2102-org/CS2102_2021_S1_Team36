@@ -5,13 +5,14 @@
 
 
 <h3>{{showType}}</h3>
+<p>{{msg}}</p>
 <div *ngIf="showType==='Caretakers'">
 <button (click)="openNewCaretakerForm()">Add New Caretaker</button>
 <table>
     <tr>
         <th>Caretaker Name</th>
         <th>Email</th>
-        <th>Full Time</th>
+        <th>Type</th>
         <th>Rating</th>
         <th></th>
         <th></th>
@@ -22,7 +23,7 @@
         <td>{{caretaker.is_fulltime}}</td>
         <td>{{caretaker.rating}}</td>
         <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
-        <th><button>Delete</button></th>
+        <th><button (click)="deleteUser(caretaker.email)">Delete</button></th>
     </tr>
 </table>
 </div>
@@ -38,12 +39,12 @@
     <tr *ngFor="let admin of things">
         <td>{{admin.name}}</td>
         <td>{{admin.email}}</td>
-        <th><button>Delete</button></th>
+        <th><button (click)="deleteUser(admin.email)">Delete</button></th>
     </tr>
 </table>
 </div>
 
-<div *ngIf="showType==='Pet Types'">
+<div *ngIf="showType ==='Pet Types'">
 <button (click)="openNewTypeForm()">Add New PetType</button>
 <table>
     <tr>
@@ -69,7 +70,7 @@
     <tr *ngFor="let po of things">
         <td>{{po.name}}</td>
         <td>{{po.email}}</td>
-        <th><button>Delete</button></th>
+        <th><button (click)="deleteUser(po.email)">Delete</button></th>
     </tr>
 </table>
 </div>
