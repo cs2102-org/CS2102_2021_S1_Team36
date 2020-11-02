@@ -9,6 +9,7 @@ import { FormNewPetTypeComponent } from '../form-new-pet-type/form-new-pet-type.
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
+import { DetailedPetComponent } from '../detailed-pet/detailed-pet.component';
 
 @Component({
   selector: 'app-manage-users',
@@ -107,8 +108,7 @@ export class ManageUsersComponent implements OnInit {
 
   showHide(po) {
     if (!po.show) {
-      this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
-        console.log(pets);
+      this.pcsAdminService.getPetOwnerPets(po.email).subscribe((pets) => {
         po.pets = pets;
         po.show = true;
       });
@@ -116,5 +116,14 @@ export class ManageUsersComponent implements OnInit {
       po.pets = [];
       po.show = false;
     }
+  }
+
+  showDetailedPet(pet) {
+    console.log(pet);
+    this.dialog.open(DetailedPetComponent, { data : { 
+        owner_email: pet.email,
+        pet_name: pet.pet_name
+      }
+    });
   }
 }

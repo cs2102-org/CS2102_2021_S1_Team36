@@ -86,6 +86,20 @@ pcsRouter.get('/pet-types', async (req, res) => {
     }
 });
 
+// get the pets of a specified user by admin
+pcsRouter.get('/pets/:email', async(req, res) => {
+    try {
+        const email = req.params.email;
+        const pets = await pool.query(
+            "SELECT * FROM Pets WHERE email = $1",
+            [email]
+        );
+        res.json(pets.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     pcsRouter
 }

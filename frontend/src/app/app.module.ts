@@ -32,6 +32,7 @@ import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker
 import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
 import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
+import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -61,6 +62,7 @@ FullCalendarModule.registerPlugins([
     FormNewAdminComponent,
     FormNewPetTypeComponent,
     DeleteLeaveAvailComponent,
+    DetailedPetComponent,
   ],
   imports: [
     BrowserModule,

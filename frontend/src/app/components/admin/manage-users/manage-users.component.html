@@ -84,6 +84,7 @@
             <tr *ngFor="let pet of po.pets">
                 <td>{{pet.pet_name}}</td>
                 <td>{{pet.species}}</td>
+                <td><button (click)="showDetailedPet(pet)">More</button></td>
             </tr>
         </table>
         <td><button (click)="deleteUser(po.email)">Delete</button></td>

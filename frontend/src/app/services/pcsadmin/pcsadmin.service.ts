@@ -25,4 +25,8 @@ export class PcsadminService {
   public postNewPetType(type): Observable<any> {
     return this.http.post(baseurl + '/api/pcs-admins/pet-types', type, httpOptions);
   }
+
+  public getPetOwnerPets(email): Observable<any> {
+    return this.http.get(baseurl + '/api/pcs-admins/pets/' + email, httpOptions);
+  }
 }

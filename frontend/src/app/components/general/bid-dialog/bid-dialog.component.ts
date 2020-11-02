@@ -38,7 +38,7 @@ export class BidDialogComponent implements OnInit {
       console.log(detail);
       this.hide = false;
       this.petDetails = detail;
-    })
+    });
   }
 
 }
