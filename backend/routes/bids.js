@@ -216,6 +216,7 @@ bidsRouter.post('/hist/range/:email', async(req, res) => {
 // find the number of days worked and total earnings for each caretaker over a specified range
 // returns table (caretaker_email, days_worked, total_earnings)
 // only caretakers with nonzero work days appear in the result
+// should it be is_paid instead??
 bidsRouter.post('/earnings/range', async(req, res) => {
     try {
         var { start_date, end_date } = req.body;
