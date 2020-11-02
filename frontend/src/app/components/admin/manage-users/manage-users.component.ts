@@ -33,6 +33,7 @@ export class ManageUsersComponent implements OnInit {
   getAllCaretakers() {
     this.caretakerService.getAllCaretakers().subscribe(caretakers => {
       this.showType = "Caretakers";
+      this.msg = '';
       this.things = caretakers.map(c => {c.is_fulltime = c.is_fulltime ? "Full Time" : "Part Time"; return c;});
     });
   }
@@ -40,6 +41,7 @@ export class ManageUsersComponent implements OnInit {
   getAllAdmins() {
     this.pcsAdminService.getAdminList().subscribe(admins => {
       this.showType = "Admins";
+      this.msg = '';
       this.things = admins;
     });
   }
@@ -47,6 +49,7 @@ export class ManageUsersComponent implements OnInit {
   getAllPetTypes() {
     this.pcsAdminService.getListOfPetTypes().subscribe(petTypes => {
       this.showType = "Pet Types";
+      this.msg = '';
       this.things = petTypes;
     });
   }
@@ -54,6 +57,7 @@ export class ManageUsersComponent implements OnInit {
    getAllPetOwners() {
     this.petOwnerService.getAllPetOwners().subscribe(po => {
       this.showType = "Pet Owners";
+      this.msg = '';
       this.things = po.map(po => {po.show = false; return po;});
     });
   }
@@ -61,9 +65,9 @@ export class ManageUsersComponent implements OnInit {
   refreshAfterChange() {
     if (this.showType == "Admins") {
       this.getAllAdmins();
-    } else if (this.showType = "Pet Types") {
+    } else if (this.showType == "Pet Types") {
       this.getAllPetTypes();
-    } else if (this.showType = "Pet Owners") {
+    } else if (this.showType == "Pet Owners") {
       this.getAllPetOwners;
     } else {
       this.getAllCaretakers();
@@ -101,8 +105,8 @@ export class ManageUsersComponent implements OnInit {
 
   deleteUser(email) {
     this.pcsAdminService.deleteUser(email).subscribe(msg => {
-      this.msg = "Account successfully deleted";
       this.refreshAfterChange();
+      this.msg = "Account successfully deleted";
     });
   }
 
