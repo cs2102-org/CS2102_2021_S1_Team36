@@ -58,7 +58,7 @@ CREATE TABLE PetTypes ( -- enumerates the types of pets there are, like Dog, Cat
 );
 
 CREATE TABLE Pets (
-    email VARCHAR(30) REFERENCES PetOwners(email),
+    email VARCHAR(30) REFERENCES PetOwners(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     special_requirements VARCHAR(255),
     description VARCHAR(255),
@@ -72,7 +72,7 @@ CREATE TABLE PcsAdmins (
 
 CREATE TABLE BidsFor (
     owner_email VARCHAR(30),
-    caretaker_email VARCHAR(30) REFERENCES CareTakers(email),
+    caretaker_email VARCHAR(30) REFERENCES CareTakers(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     submission_time TIMESTAMP,
     start_date DATE,
@@ -105,7 +105,7 @@ CREATE TABLE Posts (
 );
 
 CREATE TABLE Comments (
-	post_id INTEGER REFERENCES Posts(post_id),
+	post_id INTEGER REFERENCES Posts(post_id) ON DELETE CASCADE,
     email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     date_time TIMESTAMP DEFAULT NOW(),
     cont TEXT,
