@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginComponent } from '../login/login.component';
 
@@ -13,7 +14,8 @@ export class MenuHeaderComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,5 +38,6 @@ export class MenuHeaderComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.router.navigateByUrl('caretaker-availabilities');
   }
 }
