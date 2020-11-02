@@ -164,9 +164,9 @@ caretakerRouter.get('/ft/leave', verifyJwt, async(req, res) => {
 
 // get the availability of a specified part time worker
 // i.e. their available dates - dates where they have confirmed bids
-caretakerRouter.get('/pt/avail/:email', async(req, res) => {
+caretakerRouter.get('/pt/avail', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const sql = await pool.query(
             "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
             where email = $1 and \
