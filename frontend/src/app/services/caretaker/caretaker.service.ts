@@ -19,6 +19,14 @@ export class CaretakerService {
     return this.http.post(baseurl + '/api/caretaker/filter/', details, httpOptions);
   }
 
+  public getFilteredRecommendedCaretakers(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/filter/recommended', details, getHttpOptionsWithAuth());
+  }
+
+  public getFilteredTransactedCaretakers(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/filter/transacted', details, getHttpOptionsWithAuth());
+  }
+
   public getRecommendedCaretakers(): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/rec/', getHttpOptionsWithAuth());
   }

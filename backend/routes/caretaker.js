@@ -378,6 +378,125 @@ caretakerRouter.post('/filter', async(req, res) => {
     }
 });
 
+caretakerRouter.post('/filter/recommended', verifyJwt, async(req, res) => {
+    try {
+        var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
+        console.log(substr, start_date, end_date, pet_type, min, max, rating);
+        const email = res.locals.user.email;
+
+        const mkView = await pool.query(
+            "CREATE OR REPLACE VIEW potentialCaretakers AS \
+                (select DISTINCT caretaker_email as email from bidsfor where is_confirmed = True and owner_email in \
+                    (select DISTINCT owner_email from bidsfor where is_confirmed = True and caretaker_email in \
+                        (select caretaker_email from bidsfor where owner_email = '" + email + "' and is_confirmed = True))) \
+                EXCEPT \
+                (select caretaker_email as email from bidsfor where owner_email = '" + email + "' and is_confirmed = True);"
+        );
+
+        var selectCaretakers = "(select email, name, rating, \
+            case when is_fulltime then 'Full Time' else 'Part Time' End \
+            as type from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
+            where exists ( \
+	            (select species from takecareprice T1 where T1.email = PC.email) \
+	            INTERSECT \
+	            (select species from pets P1 where P1.email = $9) \
+            ));"
+
+        var nameRating = "select email, rating, is_fulltime from caretakers NATURAL JOIN Users\
+            where \
+                (rating >= $7 or $7 is null) and \
+                (name LIKE '%' || $1 || '%' or $1 is null)";
+        var speciesPrice = "select email, rating, is_fulltime from takecareprice NATURAL JOIN Caretakers \
+            where \
+                (species = $4 or $4 is null) and \
+                (daily_price >= $5 or $5 is null) and \
+                (daily_price <= $6 or $6 is null)";
+        var canWork = "select email, rating, is_fulltime from caretakers \
+            where \
+                canWork(email, $2, $3) or \
+                $2 is null or \
+                $3 is null";
+        var fullTime = "select email, rating, is_fulltime from caretakers \
+            where \
+                is_fulltime = $8 or \
+                $8 is null";
+        var combine = "(select F.email, US.name, rating, \
+            CASE \
+                WHEN is_fulltime THEN 'Full Time' \
+                ELSE 'Part Time' \
+            END \
+            as type \
+            FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
+            AS F NATURAL JOIN Users US) \
+            INTERSECT " +
+            selectCaretakers;
+        const msql = await pool.query(
+            combine,
+            [substr, start_date, end_date, pet_type, min, max, rating, is_fulltime, email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+caretakerRouter.post('/filter/transacted', verifyJwt, async(req, res) => {
+    try {
+        var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
+        console.log(substr, start_date, end_date, pet_type, min, max, rating);
+        const email = res.locals.user.email;
+
+        var tranx = "(SELECT email, name, rating, \
+                CASE \
+                    WHEN is_fulltime THEN 'Full Time' \
+                    ELSE 'Part Time' \
+                END \
+                as type FROM \
+                (select DISTINCT caretaker_email as email from bidsFor \
+                where \
+                    owner_email = $9 and \
+                    is_confirmed = True \
+                ) AS TB \
+                NATURAL JOIN Users NATURAL JOIN Caretakers)";
+        var nameRating = "select email, rating, is_fulltime from caretakers NATURAL JOIN Users\
+            where \
+                (rating >= $7 or $7 is null) and \
+                (name LIKE '%' || $1 || '%' or $1 is null)";
+        var speciesPrice = "select email, rating, is_fulltime from takecareprice NATURAL JOIN Caretakers \
+            where \
+                (species = $4 or $4 is null) and \
+                (daily_price >= $5 or $5 is null) and \
+                (daily_price <= $6 or $6 is null)";
+        var canWork = "select email, rating, is_fulltime from caretakers \
+            where \
+                canWork(email, $2, $3) or \
+                $2 is null or \
+                $3 is null";
+        var fullTime = "select email, rating, is_fulltime from caretakers \
+            where \
+                is_fulltime = $8 or \
+                $8 is null";
+        var combine = "(select F.email, US.name, rating, \
+            CASE \
+                WHEN is_fulltime THEN 'Full Time' \
+                ELSE 'Part Time' \
+            END \
+            as type \
+            FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
+            AS F NATURAL JOIN Users US) " + 
+            "INTERSECT " + tranx;
+        const msql = await pool.query(
+            combine,
+            [substr, start_date, end_date, pet_type, min, max, rating, is_fulltime, email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
+
 // find recommended caretakers
 // return email, name rating, is_fulltime
 caretakerRouter.get('/rec', verifyJwt, async(req, res) => {

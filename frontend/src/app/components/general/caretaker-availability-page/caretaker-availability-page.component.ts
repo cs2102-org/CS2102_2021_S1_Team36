@@ -106,12 +106,26 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     this.checkFormControl("max");
     this.checkFormControl("substr");
     this.checkFormControl("is_fulltime");
-    console.log(this.filterForm.value);
-    this.caretakerService.getFilteredActiveCaretakers(this.filterForm.value).subscribe((caretakers) => {
-      let id = 1;
-      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
-      this.caretakers = caretakers;
-    });
+
+    if (this.typeOfList === "") {
+      this.caretakerService.getFilteredActiveCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      });
+    } else if (this.typeOfList === "Previously Transacted") {
+      this.caretakerService.getFilteredTransactedCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      }); 
+    } else {
+      this.caretakerService.getFilteredRecommendedCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      }); 
+    }
   }
 
   checkFormControl(name) {
