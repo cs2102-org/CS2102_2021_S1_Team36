@@ -1,6 +1,6 @@
 const express = require('express');
 const pool = require('../db');
-const { jwt } = require('../auth/index');
+const { jwt, verifyJwt } = require('../auth/index');
 const bcrypt = require('bcrypt');
 const { json } = require('express');
 
@@ -53,3 +53,30 @@ authRouter.post("/signup", async (req, res) => {
 module.exports = {
   authRouter
 };
+
+// User profile retrieval. Gets detailed information of specified user [for user profile page]
+authRouter.get('/profile', verifyJwt, async(req, res) => {
+  try {
+      const user = res.locals.user;
+      const email = user.email;
+      const userProfileList = [];
+      const msql_ct = await pool.query(
+          "SELECT email, description, rating, name, \
+          CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END\
+          FROM Users NATURAL JOIN Caretakers WHERE email = $1\;",
+          [email]
+      );
+      const msql_po = await pool.query(
+          "select * from users U left join petowners PO on U.email = PO.email\
+          where U.email = $1;",
+          [email]
+      );
+      userProfileList.push(msql_ct.rows);
+      userProfileList.push(msql_po.rows);
+      console.log(userProfileList);
+      res.json(userProfileList);
+
+  } catch (err) {
+      console.error(err);
+  }
+});

@@ -3,3 +3,12 @@
     margin-top: 20vh;
     font-size: 2rem;
 }
+
+input {
+    font-size: 2rem;
+}
+
+textarea {
+    vertical-align: text-top;
+    font-size: 1.5rem;
+}

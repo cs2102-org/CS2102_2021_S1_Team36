@@ -1,7 +1,26 @@
 <div class="profile">
-    <p><b>Name:</b></p>
-    <p><b>Email:</b></p>
-    <p><b>Description:</b></p>
-    <p><b>Current Rating:</b></p>
-    <p><b>Status:</b></p>
+    <form class="form" [formGroup]="profileForm" (ngSubmit)="onSubmit(profileForm.value)">
+        <h1>Caretaker:</h1>
+        <div class="text-bar"><p>
+            <label><b>Name: </b></label>
+            <input type="text" formControlName="name">
+        </p></div>
+
+        <div class="text-bar"><p>
+            <label><b>Password: </b></label>
+            <input type="text" formControlName="password">
+        </p></div>
+
+        <div class="text-bar"><p>
+            <label><b>Description: </b></label>
+            <textarea rows="4" cols="50" formControlName="description"></textarea>
+        </p></div>
+
+        <p><b>Current Rating: </b></p>
+        <p><b>Employment: </b></p>
+        <h1>Pet Owner:</h1>
+
+        <button class="button" type="submit">Update</button>
+    </form>
+    
 </div>

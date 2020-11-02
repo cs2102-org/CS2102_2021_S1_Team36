@@ -347,7 +347,7 @@ caretakerRouter.get('/active', async(req, res) => {
     }
 });
 
-// Get detailed information of specified caretaker
+// Get detailed information of specified caretaker [for non-logged in view]
 caretakerRouter.get('/detailed/:email', async(req, res) => {
     try {
         const { email } = req.params;
