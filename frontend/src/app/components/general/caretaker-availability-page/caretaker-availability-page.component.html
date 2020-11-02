@@ -1,58 +1,82 @@
-<div id="#content">
+<div class="content">
     <div class="column-left">
-        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit(filterForm.value)">
+        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
 
             <div class="text-bar">
               <p><label>Search For Caretaker:</label></p>
-              <p> <input type="text" formControlName="search"></p>
+              <p> <input type="text" formControlName="substr"></p>
             </div>
 
             <div class="text-bar" style="float:left; margin-right:10px;">
               <p><label>Date From:</label></p>
-              <p><input type="date" formControlName="dateFrom"></p>
+              <p><input type="date" formControlName="start_date"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Date To:</label></p>
-              <p><input type="date" formControlName="dateTo"></p>
+              <p><input type="date" formControlName="end_date"></p>
             </div>
 
             <div class="text-bar">
-              <p><label>Type of Pet:</label></p>
-              <p><input type="text" formControlName="petType"></p>
+              <p><label>Type of Pet: </label>
+              <select type="text" formControlName="pet_type">
+                  <option></option>
+                  <option *ngFor="let type of petTypes">
+                      {{ type }}
+                  </option>
+              </select></p>
             </div>
 
             <div class="text-bar" style="float:left; margin-right:5px;">
               <p><label>Price From:</label></p>
-              <p><input style="margin-right:10px" type="text" formControlName="priceFrom"></p>
+              <p><input style="margin-right:10px" type="number" formControlName="min"></p>
             </div>
 
             <div class="text-bar">
               <p><label>Price To:</label></p>
-              <p><input style="margin-right:10px" type="text" formControlName="priceTo"></p>
+              <p><input style="margin-right:10px" type="number" formControlName="max"></p>
             </div>
 
             <div class="text-bar">
-              <p><label>Minimum Rating:</label></p>
-              <p><input type="text" formControlName="minRating"></p>
+              <p><label>Minimum Rating: </label>
+              <input type="number" min="0" max="5" step="1" formControlName="rating"></p>
             </div>
 
-            <button class="button" type="submit">Search</button>
+            <button class="button" type="submit" [disabled] = "!filterForm.valid">Search</button>
           </form>
     </div>
-    <div class="column-right">
-        <h2>List of Caretakers</h2>
-        <button>Show All</button>
-        <button>Recommended</button>
-        <button>Previously Transacted</button>
+    <div class="column-center">
+      <h2 *ngIf="typeOfList != ''">{{typeOfList}}</h2>
+      <h2>List of Caretakers</h2>
+      <button (click)="getActiveCaretakers()">Show All</button>
+      <button *ngIf="isLogged" (click)="showRecommendedCaretakers()">Recommended</button>
+      <button *ngIf="isLogged" (click)="showTransactedCaretakers()">Previously Transacted</button>
 
-        <ul class="heroes">
-          <li *ngFor="let hero of heroes">
-            <h4>{{hero.name}}</h4>
-            <p>{{hero.Rating}}</p>
-            <p>{{hero.from}} to {{hero.to}}</p>
-            <p>{{hero.price}}</p>
-          </li>
-        </ul>
+      <ul class="caretakers">
+        <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">
+          <div [ngClass]="selectedCaretaker != undefined && caretaker.id == selectedCaretaker.id ? 'selected': 'not-selected'">
+            <table class="caretaker">
+                <tr>
+                <th> <h3>{{caretaker.name}}</h3></th>
+                <td>Rating: {{caretaker.rating}}</td>
+                <td>{{caretaker.type}}</td>
+                <td *ngIf="caretaker.showTakeCare"><button (click)="showHide(caretaker)">Hide</button><td>
+                <td *ngIf="!caretaker.showTakeCare"><button (click)="showHide(caretaker)">Show Price</button><td>
+              </tr>
+            </table>
+            <table class="pets">
+              <tr *ngFor="let pet of caretaker.takesCare">
+                <td>{{pet.species}}</td>
+                <td>${{pet.daily_price}}</td>
+              </tr>
+            </table>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="selectedCaretaker != undefined" class="column-right">
+      <h2>Availability of {{selectedCaretaker.name}}</h2>
+      <button (click)="openMakeBid()">Bid Now/See More</button>
+      <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
 </div>

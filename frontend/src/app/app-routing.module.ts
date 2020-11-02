@@ -8,15 +8,22 @@ import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet
 import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
 import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-summary-page/caretaker-summary-page.component';
 import { ForumComponent } from './components/general/forum/forum.component';
+import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
+import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'caretaker-availabilities', component: CaretakerAvailabilityPageComponent },
   { path: 'signup', component: SignupComponent },
-  { path: 'pet-owner-bids', component: PetOwnerBidsComponent },
-  { path: 'caretaker-bids', component: CaretakerBidsComponent },
-  { path: 'caretaker-summary', component: CaretakerSummaryPageComponent },
-  { path: 'forum', component: ForumComponent }
+  { path: 'petowner/bids', component: PetOwnerBidsComponent },
+  { path: 'petowner/summary', component: PetOwnerSummaryComponent },
+  { path: 'caretaker/bids', component: CaretakerBidsComponent },
+  { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
+  { path: 'forum', component: ForumComponent },
+  { path: 'caretaker/bid/:caretaker', component: CaretakerMakeBidComponent },
+  { path: 'petowner/summary', component: PetOwnerSummaryComponent },
+  { path: 'admin/manage', component: ManageUsersComponent }
 ];
 
 @NgModule({

@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
+const { verifyJwt } = require('../auth/index')
 
 const bodyParser = require('body-parser')
 
@@ -30,9 +31,9 @@ var incDate = function(dateString, numDays) {
 
 // Give a specified caretaker leave on the interval [start_date, end_date]
 // todo: check for overlaps with existing leave dates
-caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
+caretakerRouter.post('/ft/leave/new/range', verifyJwt, async(req, res) => {
     try {
-        const {email} = req.params;
+        const email = res.locals.user.email;
         var {start_date, end_date} = req.body;
         start_date = new Date(start_date);
         end_date = new Date(end_date);
@@ -54,11 +55,22 @@ caretakerRouter.post('/ft/leave/new/range/:email', async(req, res) => {
 });
 
 // insert new caretaker
-caretakerRouter.post('/new', async(req, res) => {
+caretakerRouter.post('/new', verifyJwt, async(req, res) => {
     try {
-        const {email, full_time, rating} = req.body;
-        console.log(email);
+        const { email, full_time } = req.body;
         res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// view all caretakers
+caretakerRouter.get('/all', async(req, res) => {
+    try {
+        const cts = await pool.query(
+            "SELECT name, email, is_fulltime, rating FROM Caretakers NATURAL JOIN Users;",
+        );
+        res.json(cts.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -76,23 +88,46 @@ caretakerRouter.get('/ft/leave/all', async(req, res) => {
     }
 });
 
+// view a specified fulltime caretakers non-availability
+caretakerRouter.get('/ft/na/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = await pool.query(
+            "select email, to_char(leave_date, 'YYYY-mm-dd') as start, to_char(leave_date, 'YYYY-mm-dd') as end \
+            from fulltimeleave where email = $1 \
+            UNION \
+            select \
+                caretaker_email as email, \
+                to_char(start_date, 'YYYY-mm-dd') as start, \
+                to_char(end_date, 'YYYY-mm-dd') as end \
+            from bidsfor where \
+                caretaker_email = $1 and \
+                is_confirmed = true;",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave/:email', async(req, res) => {
+caretakerRouter.get('/ft/leave', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
         const { start_date, end_date } = req.body;
         console.log(start_date, end_date);
         if ( !start_date || !end_date ) {
             const msql = await pool.query(
-                "SELECT * FROM FullTimeLeave WHERE email = $1 AND clash(NOW()::date, (NOW() + interval '2 year')::date, leave_date)",
+                "SELECT to_char(leave_date, 'YYYY-MM-dd') as date FROM FullTimeLeave WHERE email = $1",
                 [email]
             );
             res.json(msql.rows);
         } else {
             const msql = await pool.query(
-                "SELECT * FROM FullTimeLeave WHERE email = $1 AND clash($2, $3, leave_date)",
+                "SELECT to_char(leave_date, 'YYYY-MM-dd') as date FROM FullTimeLeave WHERE email = $1 AND clash($2, $3, leave_date)",
                 [email, start_date, end_date]
             );
             res.json(msql.rows);
@@ -102,31 +137,53 @@ caretakerRouter.get('/ft/leave/:email', async(req, res) => {
     }
 });
 
-// get the availability of a specified part time caretaker
-// assumes specified caretaker is actually part time
-// if start_date and end_date not specified, assumes we want the interval [now, now + 2 years]
+// get the availability of a specified part time worker
+// i.e. their available dates - dates where they have confirmed bids
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
         const { email } = req.params;
-        const { start_date, end_date } = req.body;
-        console.log(start_date, end_date);
-        if ( !start_date || !end_date ) {
-            const msql = await pool.query(
-                "SELECT * FROM PartTimeAvail WHERE email = $1 AND clash(NOW()::date, (NOW() + interval '2 year')::date, work_date)",
-                [email]
+        const sql = await pool.query(
+            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
+            where email = $1 and \
+            not exists ( \
+            select 1 from bidsfor where \
+                is_confirmed = true and \
+                caretaker_email = $1 and \
+                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
+            );",
+            [email]
             );
-            res.json(msql.rows);
-        } else {
-            const msql = await pool.query(
-                "SELECT * FROM PartTimeAvail WHERE email = $1 AND clash($2, $3, work_date)",
-                [email, start_date, end_date]
-            );
-            res.json(msql.rows);
-        }
+        res.json(sql.rows); 
     } catch (err) {
         console.error(err);
     }
 });
+
+// // get the availability of a specified part time caretaker
+// // assumes specified caretaker is actually part time
+// // if start_date and end_date not specified, assumes we want the interval [now, now + 2 years]
+// caretakerRouter.get('/pt/avail/:email', async(req, res) => {
+//     try {
+//         const { email } = req.params;
+//         const { start_date, end_date } = req.body;
+//         console.log(start_date, end_date);
+//         if ( !start_date || !end_date ) {
+//             const msql = await pool.query(
+//                 "SELECT * FROM PartTimeAvail WHERE email = $1 AND clash(NOW()::date, (NOW() + interval '2 year')::date, work_date)",
+//                 [email]
+//             );
+//             res.json(msql.rows);
+//         } else {
+//             const msql = await pool.query(
+//                 "SELECT * FROM PartTimeAvail WHERE email = $1 AND clash($2, $3, work_date)",
+//                 [email, start_date, end_date]
+//             );
+//             res.json(msql.rows);
+//         }
+//     } catch (err) {
+//         console.error(err);
+//     }
+// });
 
 
 // given email
@@ -135,7 +192,7 @@ caretakerRouter.get('/caresfor/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const msql = await pool.query(
-            "select species, base_price, daily_price from takecareprice where email = $1;",
+            "select species, daily_price from takecareprice where email = $1 order by species asc;",
             [email]
             );
         res.json(msql.rows); 
@@ -179,12 +236,12 @@ caretakerRouter.get('/active', async(req, res) => {
         const msql = await pool.query(
             "select * from \
             (select email, U1.name, rating, \
-                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
+                'Full Time' as type\
             from caretakers NATURAL JOIN users as U1 \
             where is_fulltime = true \
             UNION  \
             select email, U2.name, rating, \
-                case when is_fulltime then 'Full Time' else 'Part Time' End as type\
+                'Part Time' as type\
             FROM \
             (select DISTINCT email, false as is_fulltime \
             from parttimeavail  \
@@ -198,13 +255,17 @@ caretakerRouter.get('/active', async(req, res) => {
     }
 });
 
-// view all caretakers
-caretakerRouter.get('/all', async(req, res) => {
+// Get detailed information of specified caretaker
+caretakerRouter.get('/detailed/:email', async(req, res) => {
     try {
-        const cts = await pool.query(
-            "SELECT * FROM Caretakers;",
+        const { email } = req.params;
+        const msql = await pool.query(
+            "SELECT email, description, rating, name, \
+            CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type \
+            FROM Users NATURAL JOIN Caretakers WHERE email = $1;",
+            [email]
         );
-        res.json(cts.rows); 
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
@@ -219,7 +280,7 @@ caretakerRouter.get('/all', async(req, res) => {
 // price: caretaker price for pet_type in range [min, max]
 // rating: caretaker rating >= rating
 // is_fulltime: true or false to filter for fulltime or parttime caretakers
-caretakerRouter.get('/filter', async(req, res) => {
+caretakerRouter.post('/filter', async(req, res) => {
     try {
         var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
         console.log(substr, start_date, end_date, pet_type, min, max, rating);
@@ -259,12 +320,11 @@ caretakerRouter.get('/filter', async(req, res) => {
     }
 });
 
-
 // find recommended caretakers
 // return email, name rating, is_fulltime
-caretakerRouter.get('/rec/:email', async(req, res) => {
+caretakerRouter.get('/rec', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email;
 
         const mkView = await pool.query(
             "CREATE OR REPLACE VIEW potentialCaretakers AS \
@@ -294,9 +354,9 @@ caretakerRouter.get('/rec/:email', async(req, res) => {
 });
 
 // returns a list of caretakers that :email has previously transacted with
-caretakerRouter.get('/txnbefore/:email', async(req, res) => {
+caretakerRouter.get('/txnbefore', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = res.locals.user.email
         const msql = await pool.query(
             "SELECT email, name, rating, \
                 CASE \

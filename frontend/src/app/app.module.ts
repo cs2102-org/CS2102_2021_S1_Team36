@@ -23,6 +23,13 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
+import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
+import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
+import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
+import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
+import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
+import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -42,7 +49,14 @@ FullCalendarModule.registerPlugins([
     PetOwnerBidsComponent,
     CaretakerBidsComponent,
     StatsComponent,
-    ForumComponent
+    ForumComponent,
+    CaretakerMakeBidComponent,
+    PetOwnerSummaryComponent,
+    SubmitRatingComponent,
+    BidDialogComponent,
+    ManageUsersComponent,
+    FormNewCaretakerComponent,
+    FormNewAdminComponent
   ],
   imports: [
     BrowserModule,

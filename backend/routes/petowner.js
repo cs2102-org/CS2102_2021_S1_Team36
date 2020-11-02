@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
+const { verifyJwt } = require('../auth/index')
 
 const petownerRouter = express.Router();
 
@@ -9,12 +10,31 @@ to test the endpoints here, use http://localhost:5000/api/petowner/ in front of 
 */
 
 // get the pets of a specified user
-petownerRouter.get('/:email/pets', async(req, res) => {
+petownerRouter.get('/pets', verifyJwt, async(req, res) => {
     try {
-        const { email } = req.params;
+        const user = res.locals.user;
+        const email = user.email;
         const pets = await pool.query(
             "SELECT * FROM Pets WHERE email = $1",
             [email]
+        );
+        res.json(pets.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get the pets of a specified user that can be taken care of by a caretaker
+petownerRouter.get('/pets/:caretaker', verifyJwt, async(req, res) => {
+    try {
+        const user = res.locals.user;
+        const userEmail = user.email;
+        const caretakerEmail = req.params.caretaker;
+        const pets = await pool.query(
+            "SELECT P.pet_name, P.species, P.description, P.species \
+            FROM Pets P INNER JOIN TakeCarePrice T ON P.species = T.species \
+            WHERE P.email = $1 and T.email=$2",
+            [userEmail, caretakerEmail]
         );
         res.json(pets.rows); 
     } catch (err) {
@@ -36,6 +56,18 @@ petownerRouter.post('/:email/pets', async (req, res) => {
              [email, pet_name, special_requirements, description, species]
         );
         res.status(200).send(`Inserted: ${email}, ${pet_name}, ${special_requirements}, ${description}, ${species}`);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// returns a list of all pet types
+petownerRouter.get('/alltypes', async(req, res) => {
+    try {
+        const msql = await pool.query(
+            "select * from Pettypes;"
+            );
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }
