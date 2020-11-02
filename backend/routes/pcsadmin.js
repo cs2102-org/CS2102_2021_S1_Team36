@@ -69,7 +69,7 @@ pcsRouter.delete('/comments', async (req, res) => {
 
 pcsRouter.get('/admins', async (req, res) => {
     const result = await pool.query(
-        'select email, name from Users natural join pcsadmins;',
+        'select email, name, description from Users natural join pcsadmins;',
     );
     return res.status(200).json(result.rows);
 });

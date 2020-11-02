@@ -13,6 +13,7 @@
         <th>Caretaker Name</th>
         <th>Email</th>
         <th>Type</th>
+        <th>Description</th>
         <th>Rating</th>
         <th></th>
         <th></th>
@@ -21,6 +22,7 @@
         <td>{{caretaker.name}}</td>
         <td>{{caretaker.email}}</td>
         <td>{{caretaker.is_fulltime}}</td>
+        <td>{{caretaker.description}}</td>
         <td>{{caretaker.rating}}</td>
         <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
         <th><button (click)="deleteUser(caretaker.email)">Delete</button></th>
@@ -34,11 +36,13 @@
     <tr>
         <th>Admin Name</th>
         <th>Email</th>
+        <th>Description</th>
         <th></th>
     </tr>
     <tr *ngFor="let admin of things">
         <td>{{admin.name}}</td>
         <td>{{admin.email}}</td>
+        <td>{{admin.description}}</td>
         <th><button (click)="deleteUser(admin.email)">Delete</button></th>
     </tr>
 </table>
@@ -65,11 +69,13 @@
     <tr>
         <th>Pet Owner Name</th>
         <th>Email</th>
+        <th>Description</th>
         <th></th>
     </tr>
     <tr *ngFor="let po of things">
         <td>{{po.name}}</td>
         <td>{{po.email}}</td>
+        <td>{{po.description}}</td>
         <th><button (click)="deleteUser(po.email)">Delete</button></th>
     </tr>
 </table>
