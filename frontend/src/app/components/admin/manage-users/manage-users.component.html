@@ -1,97 +1,113 @@
-<button (click)="getAllAdmins()">Admin</button>
-<button (click)="getAllCaretakers()">Caretakers</button>
-<button (click)="getAllPetOwners()">PetOwners</button>
-<button (click)="getAllPetTypes()">PetTypes</button>
+ <div class="content"> 
+    <div class="center"> 
+        <div class="content-box">
+            <h1>Manage Page</h1>
+
+            <button class="button button-margin" (click)="getAllAdmins()" [ngClass]="showType == 'Admins' ? 'selected': ''">Admin</button>
+            <button class="button button-margin" (click)="getAllCaretakers()" [ngClass]="showType == 'Caretakers' ? 'selected': ''">Caretakers</button>
+            <button class="button button-margin" (click)="getAllPetOwners()" [ngClass]="showType == 'Pet Owners' ? 'selected': ''">PetOwners</button>
+            <button class="button" (click)="getAllPetTypes()" [ngClass]="showType == 'Pet Types' ? 'selected': ''">PetTypes</button>
 
 
-<h3>{{showType}}</h3>
-<p>{{msg}}</p>
-<div *ngIf="showType==='Caretakers'">
-<button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
-<input type="text" [(ngModel)]="searchValue"/>
-<table>
-    <tr>
-        <th>Caretaker Name</th>
-        <th>Email</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Rating</th>
-        <th></th>
-        <th></th>
-    </tr>
-    <tr *ngFor="let caretaker of things | searchfilter: searchValue">
-        <td>{{caretaker.name}}</td>
-        <td>{{caretaker.email}}</td>
-        <td>{{caretaker.is_fulltime}}</td>
-        <td>{{caretaker.description}}</td>
-        <td>{{caretaker.rating}}</td>
-        <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
-        <th><button (click)="deleteUser(caretaker.email)">Delete</button></th>
-    </tr>
-</table>
-</div>
+            <p>{{msg}}</p>
+            <div *ngIf="showType==='Caretakers'">
+            <button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
+            <input type="text" [(ngModel)]="searchValue"/>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="theader">Caretaker Name</th>
+                        <th class="theader">Email</th>
+                        <th class="theader">Type</th>
+                        <th class="theader">Description</th>
+                        <th class="theader">Rating</th>
+                        <th class="theader"></th>
+                        <th class="theader"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let caretaker of things | searchfilter: searchValue">
+                        <td>{{caretaker.name}}</td>
+                        <td>{{caretaker.email}}</td>
+                        <td>{{caretaker.is_fulltime}}</td>
+                        <td>{{caretaker.description}}</td>
+                        <td>{{caretaker.rating}}</td>
+                        <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
+                        <th><button (click)="deleteUser(caretaker.email)" >Delete</button></th>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
 
-<div *ngIf="showType==='Admins'">
-<button (click)="openNewAdminForm()">Add New Admin</button><br>
-<input type="text" [(ngModel)]="searchValue"/>
-<table>
-    <tr>
-        <th>Admin Name</th>
-        <th>Email</th>
-        <th>Description</th>
-        <th></th>
-    </tr>
-    <tr *ngFor="let admin of things | searchfilter: searchValue">
-        <td>{{admin.name}}</td>
-        <td>{{admin.email}}</td>
-        <td>{{admin.description}}</td>
-        <th><button (click)="deleteUser(admin.email)">Delete</button></th>
-    </tr>
-</table>
-</div>
+            <div *ngIf="showType==='Admins'">
+            <button (click)="openNewAdminForm()">Add New Admin</button><br>
+            <input type="text" [(ngModel)]="searchValue"/>
+            <table>
+                <tr>
+                    <th class="theader">Admin Name</th>
+                    <th class="theader">Email</th>
+                    <th class="theader">Description</th>
+                    <th class="theader"></th>
+                </tr>
+                <tr *ngFor="let admin of things | searchfilter: searchValue">
+                    <td>{{admin.name}}</td>
+                    <td>{{admin.email}}</td>
+                    <td>{{admin.description}}</td>
+                    <th><button (click)="deleteUser(admin.email)">Delete</button></th>
+                </tr>
+            </table>
+            </div>
 
-<div *ngIf="showType ==='Pet Types'">
-<button (click)="openNewTypeForm()">Add New PetType</button>
-<table>
-    <tr>
-        <th>Pet Type</th>
-        <th>Quantity</th>
-        <th></th>
-    </tr>
-    <tr *ngFor="let pt of things">
-        <td>{{pt.species}}</td>
-        <td>{{pt.count}}</td>
-        <th><button>Delete</button></th>
-    </tr>
-</table>
-</div>
+            <div *ngIf="showType ==='Pet Types'">
+            <button (click)="openNewTypeForm()">Add New PetType</button>
+            <table>
+                <tr>
+                    <th class="theader">Pet Type</th>
+                    <th class="theader">Quantity</th>
+                    <th class="theader"></th>
+                </tr>
+                <tr *ngFor="let pt of things">
+                    <td>{{pt.species}}</td>
+                    <td>{{pt.count}}</td>
+                    <th><button>Delete</button></th>
+                </tr>
+            </table>
+            </div>
 
-<div *ngIf="showType==='Pet Owners'">
-<br>
-<input type="text" [(ngModel)]="searchValue"/>
-<table>
-    <tr>
-        <th>Pet Owner Name</th>
-        <th>Email</th>
-        <th>Description</th>
-        <th></th>
-    </tr>
-    <tr *ngFor="let po of things | searchfilter: searchValue">
-        <td>{{po.name}}</td>
-        <td>{{po.email}}</td>
-        <td>{{po.description}}</td>
-        <td>
-            <button *ngIf="po.show" (click)="showHide(po)">Hide</button>
-            <button *ngIf="!po.show" (click)="showHide(po)">Show Pets</button>
-        <td>
-        <table class="pets">
-            <tr *ngFor="let pet of po.pets">
-                <td>{{pet.pet_name}}</td>
-                <td>{{pet.species}}</td>
-                <td><button (click)="showDetailedPet(pet)">More</button></td>
-            </tr>
-        </table>
-        <td><button (click)="deleteUser(po.email)">Delete</button></td>
-    </tr>
-</table>
+            <div *ngIf="showType==='Pet Owners'">
+            <input type="text" [(ngModel)]="searchValue"/>
+            <table>
+                <tr>
+                    <th class="theader">Pet Owner Name</th>
+                    <th class="theader">Email</th>
+                    <th class="theader">Description</th>
+                    <th class="theader"></th>
+                    <th class="theader"></th>
+                </tr>
+                <tr *ngFor="let po of things | searchfilter: searchValue">
+                    <td>{{po.name}}</td>
+                    <td>{{po.email}}</td>
+                    <td>{{po.description}}</td>
+                    <th>
+                        <button *ngIf="po.show" (click)="showHide(po)">Hide</button>
+                        <button *ngIf="!po.show" (click)="showHide(po)">Show Pets</button>
+                        <table *ngIf="po.show" class="pets">
+                            <tr>
+                                <th class="theader2">Pet Name</th>
+                                <th class="theader2">Type</th>
+                                <th class="theader2"></th>
+                            </tr>
+                            <tr *ngFor="let pet of po.pets">
+                                <td>{{pet.pet_name}}</td>
+                                <td>{{pet.species}}</td>
+                                <th><button (click)="showDetailedPet(pet)">More</button></th>
+                            </tr>
+                        </table>
+                    </th>
+                    <th><button (click)="deleteUser(po.email)">Delete</button></th>
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div>
 </div>
