@@ -29,7 +29,7 @@ var incDate = function(dateString, numDays) {
     return dts
 };
 
-// Give a specified caretaker leave on the interval [start_date, end_date]
+// Give a specified fulltime caretaker leave on the interval [start_date, end_date]
 // todo: check for overlaps with existing leave dates
 caretakerRouter.post('/ft/leave/new/range', verifyJwt, async(req, res) => {
     try {
@@ -46,6 +46,31 @@ caretakerRouter.post('/ft/leave/new/range', verifyJwt, async(req, res) => {
             const msql = await pool.query(
                 "INSERT INTO FullTimeLeave(email, leave_date) VALUES ($1, $2)",
                 [email, leave_date]
+            );
+        }
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// Give a specified parttime caretaker avail dates on the interval [start_date, end_date]
+// todo: check for overlaps with existing avail dates
+caretakerRouter.post('/pt/avail/new/range', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        var {start_date, end_date} = req.body;
+        start_date = new Date(start_date);
+        end_date = new Date(end_date);
+
+        console.log(email, start_date, end_date);
+        var arr = getDaysArray(start_date, end_date);
+        var work_date;
+        for (var i = 0; i < arr.length; i++) {
+            work_date = `${arr[i].getFullYear()}-${arr[i].getMonth()+1}-${arr[i].getDate()}`;
+            const msql = await pool.query(
+                "INSERT INTO PartTimeAvail(email, work_date) VALUES ($1, $2)",
+                [email, work_date]
             );
         }
         res.json(true); 
