@@ -13,7 +13,7 @@ to test the endpoints here, use http://localhost:5000/api/petowner/ in front of 
 petownerRouter.get('/petowners', async(req, res) => {
     try {
         const pets = await pool.query(
-            "SELECT email, name, description FROM Users natural join Petowners",
+            "SELECT email, name, description FROM Users natural join Petowners order by name asc;",
         );
         res.json(pets.rows); 
     } catch (err) {

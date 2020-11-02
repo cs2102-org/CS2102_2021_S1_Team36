@@ -69,7 +69,7 @@ pcsRouter.delete('/comments', async (req, res) => {
 
 pcsRouter.get('/admins', async (req, res) => {
     const result = await pool.query(
-        'select email, name, description from Users natural join pcsadmins;',
+        'select email, name, description from Users natural join pcsadmins order by name asc;',
     );
     return res.status(200).json(result.rows);
 });
@@ -78,7 +78,7 @@ pcsRouter.get('/pet-types', async (req, res) => {
     try {
         const msql = await pool.query(
             "select species, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
-            from Pettypes P1;"
+            from Pettypes P1 order by species asc;"
             );
         res.json(msql.rows); 
     } catch (err) {
