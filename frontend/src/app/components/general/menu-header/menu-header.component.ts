@@ -11,6 +11,9 @@ import { LoginComponent } from '../login/login.component';
 })
 export class MenuHeaderComponent implements OnInit {
   isLogged: boolean = false;
+  isPetOwner: boolean = false;
+  isCaretaker: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(
     private dialog: MatDialog,
@@ -26,10 +29,24 @@ export class MenuHeaderComponent implements OnInit {
       .subscribe(message => {
         if (message == "Login success") {
           this.isLogged=true;
+          this.checkAccess();
         } else {
           this.isLogged=false;
         }
       });
+    this.checkAccess();
+  }
+
+  checkAccess() {
+    if (localStorage.hasOwnProperty('caretaker')) {
+      this.isCaretaker = true;
+    }
+    if (localStorage.hasOwnProperty('petowner')) {
+      this.isPetOwner = true;
+    }
+    if (localStorage.hasOwnProperty('admin')) {
+      this.isAdmin = true;
+    }
   }
 
   openLogin() {
@@ -39,5 +56,8 @@ export class MenuHeaderComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigateByUrl('caretaker-availabilities');
+    this.isCaretaker = false;
+    this.isPetOwner = false;
+    this.isAdmin = false;
   }
 }
