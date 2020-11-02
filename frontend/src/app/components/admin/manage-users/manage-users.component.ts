@@ -39,7 +39,7 @@ export class ManageUsersComponent implements OnInit {
   }
 
   getAllPetTypes() {
-    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
+    this.pcsAdminService.getListOfPetTypes().subscribe(petTypes => {
       this.showType = "Pet Types";
       this.things = petTypes;
     });

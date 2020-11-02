@@ -46,10 +46,12 @@
 <table>
     <tr>
         <th>Pet Type</th>
+        <th>Number</th>
         <th></th>
     </tr>
     <tr *ngFor="let pt of things">
         <td>{{pt.species}}</td>
+        <td>{{pt.count}}</td>
         <th><button>Delete</button></th>
     </tr>
 </table>

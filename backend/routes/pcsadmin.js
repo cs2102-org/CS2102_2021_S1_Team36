@@ -20,6 +20,18 @@ pcsRouter.get('/admins', async (req, res) => {
     return res.status(200).json(result.rows);
 });
 
+pcsRouter.get('/pet-types', async (req, res) => {
+    try {
+        const msql = await pool.query(
+            "select species, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
+            from Pettypes P1;"
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     pcsRouter
 }
