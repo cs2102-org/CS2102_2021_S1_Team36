@@ -11,37 +11,36 @@
 
             <p>{{msg}}</p>
             <div *ngIf="showType==='Caretakers'">
-            <button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
-            <input type="text" [(ngModel)]="searchValue"/>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="theader">Caretaker Name</th>
-                        <th class="theader">Email</th>
-                        <th class="theader">Type</th>
-                        <th class="theader">Description</th>
-                        <th class="theader">Rating</th>
-                        <th class="theader"></th>
-                        <th class="theader"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let caretaker of things | searchfilter: searchValue">
-                        <td>{{caretaker.name}}</td>
-                        <td>{{caretaker.email}}</td>
-                        <td>{{caretaker.is_fulltime}}</td>
-                        <td>{{caretaker.description}}</td>
-                        <td>{{caretaker.rating}}</td>
-                        <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
-                        <th><button (click)="deleteUser(caretaker.email)" >Delete</button></th>
-                    </tr>
-                </tbody>
-            </table>
+                <button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
+                <input type="text" [(ngModel)]="searchValue"/>
+                <div class="container">
+                    <table>
+                        <tr >
+                            <th class="theader">Caretaker Name</th>
+                            <th class="theader">Email</th>
+                            <th class="theader">Type</th>
+                            <th class="theader">Description</th>
+                            <th class="theader">Rating</th>
+                            <th class="theader"></th>
+                            <th class="theader"></th>
+                        </tr>
+                        <tr *ngFor="let caretaker of things | searchfilter: searchValue">
+                            <td>{{caretaker.name}}</td>
+                            <td>{{caretaker.email}}</td>
+                            <td>{{caretaker.is_fulltime}}</td>
+                            <td>{{caretaker.description}}</td>
+                            <td>{{caretaker.rating}}</td>
+                            <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
+                            <th><button (click)="deleteUser(caretaker.email)" >Delete</button></th>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <div *ngIf="showType==='Admins'">
             <button (click)="openNewAdminForm()">Add New Admin</button><br>
             <input type="text" [(ngModel)]="searchValue"/>
+            <div class="container">
             <table>
                 <tr>
                     <th class="theader">Admin Name</th>
@@ -57,9 +56,11 @@
                 </tr>
             </table>
             </div>
+            </div>
 
             <div *ngIf="showType ==='Pet Types'">
             <button (click)="openNewTypeForm()">Add New PetType</button>
+            <div class="container">
             <table>
                 <tr>
                     <th class="theader">Pet Type</th>
@@ -73,9 +74,11 @@
                 </tr>
             </table>
             </div>
+            </div>
 
             <div *ngIf="showType==='Pet Owners'">
             <input type="text" [(ngModel)]="searchValue"/>
+            <div class="container">
             <table>
                 <tr>
                     <th class="theader">Pet Owner Name</th>
@@ -107,6 +110,7 @@
                     <th><button (click)="deleteUser(po.email)">Delete</button></th>
                 </tr>
             </table>
+            </div>
             </div>
         </div>
     </div>

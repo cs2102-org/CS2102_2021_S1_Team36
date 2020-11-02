@@ -17,15 +17,6 @@ export class PetOwnerBidsComponent implements OnInit {
   bids;
   showType = "";
 
-  filterForm = new FormGroup({
-    substr: new FormControl(''),
-    start_date: new FormControl(''),
-    end_date: new FormControl(''),
-    pet_type: new FormControl(''),
-    min: new FormControl(''),
-    max: new FormControl(''),
-  });
-
   currentDate = new Date();
   petTypes: any;
 
@@ -114,10 +105,6 @@ export class PetOwnerBidsComponent implements OnInit {
       bid.is_confirmed = "Rejected"
     }
     return bid;
-  }
-
-  onSubmit() {
-    console.log('SENT');
   }
 
   showPendingBids() {

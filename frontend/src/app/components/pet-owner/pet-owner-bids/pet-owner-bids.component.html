@@ -1,81 +1,46 @@
-<div class="column-left">
-    <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
-
-    <div class="text-bar">
-      <p><label>Search For Caretaker:</label></p>
-      <p> <input type="text" formControlName="substr"></p>
+<div class="content">
+  <div class="center"> 
+    <div class="content-box">
+      <h2>My {{ showType }} Bids (Pet Owner)</h2>
+      <button class="button button-margin" (click)="showAllBids()" [ngClass]="showType == '' ? 'selected': ''">Show All</button>
+      <button class="button button-margin" (click)="showPendingBids()" [ngClass]="showType == 'Pending' ? 'selected': ''">Pending</button>
+      <button class="button button-margin" (click)="showRejectedBids()" [ngClass]="showType == 'Rejected' ? 'selected': ''">Rejected</button>
+      <button class="button button-margin" (click)="showDoneBids()" [ngClass]="showType == 'Done' ? 'selected': ''">Done</button>
+      <div class="spacing"></div>
+      <div class="container">
+        <table>
+          <tr> 
+            <th class="theader">Caretaker Name</th>
+            <th class="theader">Pet Name</th>
+            <th class="theader">Start Date</th>
+            <th class="theader">End Date</th>
+            <th class="theader">Payment Type</th>
+            <th class="theader">Transfer Type</th>
+            <th class="theader">Submission Time</th>
+            <th class="theader">Amount Bidded</th>
+            <th class="theader">Confirmed?</th>
+            <th class="theader">Paid?</th>
+            <th class="theader">Rating</th>
+            <th class="theader"></th>
+            <th class="theader"></th>
+          </tr>
+          <tr *ngFor="let bid of bids">
+            <td>{{bid.name}}</td>
+            <td>{{bid.pet_name}}</td>
+            <td>{{bid.start}}</td>
+            <td>{{bid.end}}</td>
+            <td>{{bid.payment_type}}</td>
+            <td>{{bid.transfer}}</td>
+            <td>{{bid.submission_time}}</td>
+            <td>${{bid.amount_bidded}}</td>
+            <td>{{bid.is_confirmed}}</td>
+            <td>{{bid.is_paid}}</td>
+            <td>{{bid.rating}}</td>
+            <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
+            <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button><td>
+          </tr>
+        </table>
+      </div>
+      </div>
     </div>
-
-    <div class="text-bar" >
-      <p><label>Date From:</label></p>
-      <p><input type="date" formControlName="start_date"></p>
-    </div>
-
-    <div class="text-bar">
-      <p><label>Date To:</label></p>
-      <p><input type="date" formControlName="end_date"></p>
-    </div>
-
-    <div class="text-bar">
-      <p><label>Type of Pet: </label>
-      <select type="text" formControlName="pet_type">
-          <option></option>
-          <option *ngFor="let type of petTypes">
-              {{ type }}
-          </option>
-      </select></p>
-    </div>
-
-    <div class="text-bar">
-      <p><label>Price From:</label></p>
-      <p><input style="margin-right:10px" type="number" formControlName="min"></p>
-    </div>
-
-    <div class="text-bar">
-      <p><label>Price To:</label></p>
-      <p><input style="margin-right:10px" type="number" formControlName="max"></p>
-    </div>
-
-    <button class="button" type="submit">Search</button>
-  </form>
-</div>
-<div >
-    <h2>My {{ showType }} Bids (Pet Owner)</h2>
-    <button (click)="showAllBids()">Show All</button>
-    <button (click)="showPendingBids()">Pending</button>
-    <button (click)="showRejectedBids()">Rejected</button>
-    <button (click)="showDoneBids()">Done</button>
-
-    <table>
-      <tr> 
-        <th>Caretaker Name</th>
-        <th>Pet Name</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Payment Type</th>
-        <th>Transfer Type</th>
-        <th>Submission Time</th>
-        <th>Amount Bidded</th>
-        <th>Confirmed?</th>
-        <th>Paid?</th>
-        <th>Rating</th>
-        <th></th>
-        <th></th>
-      </tr>
-      <tr *ngFor="let bid of bids">
-        <td>{{bid.name}}</td>
-        <td>{{bid.pet_name}}</td>
-        <td>{{bid.start}}</td>
-        <td>{{bid.end}}</td>
-        <td>{{bid.payment_type}}</td>
-        <td>{{bid.transfer}}</td>
-        <td>{{bid.submission_time}}</td>
-        <td>${{bid.amount_bidded}}</td>
-        <td>{{bid.is_confirmed}}</td>
-        <td>{{bid.is_paid}}</td>
-        <td>{{bid.rating}}</td>
-        <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button><td>
-      </tr>
-    </table>
 </div>
