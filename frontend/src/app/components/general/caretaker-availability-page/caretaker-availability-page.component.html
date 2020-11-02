@@ -38,11 +38,11 @@
             </div>
 
             <div class="text-bar">
-              <p><label>Minimum Rating:</label></p>
-              <p><input type="number" formControlName="rating"></p>
+              <p><label>Minimum Rating: </label>
+              <input type="number" min="0" max="5" step="1" formControlName="rating"></p>
             </div>
 
-            <button class="button" type="submit">Search</button>
+            <button class="button" type="submit" [disabled] = "!filterForm.valid">Search</button>
           </form>
     </div>
     <div class="column-center">
@@ -50,7 +50,7 @@
       <h2>List of Caretakers</h2>
       <button (click)="getActiveCaretakers()">Show All</button>
       <button *ngIf="isLogged" (click)="showRecommendedCaretakers()">Recommended</button>
-      <button *ngIf="isLogged">Previously Transacted</button>
+      <button *ngIf="isLogged" (click)="showTransactedCaretakers()">Previously Transacted</button>
 
       <ul class="caretakers">
         <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">

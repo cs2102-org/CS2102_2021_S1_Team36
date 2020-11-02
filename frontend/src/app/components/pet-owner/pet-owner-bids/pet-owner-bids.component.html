@@ -17,8 +17,13 @@
     </div>
 
     <div class="text-bar">
-      <p><label>Type of Pet:</label></p>
-      <p><input type="text" formControlName="pet_type"></p>
+      <p><label>Type of Pet: </label>
+      <select type="text" formControlName="pet_type">
+          <option></option>
+          <option *ngFor="let type of petTypes">
+              {{ type }}
+          </option>
+      </select></p>
     </div>
 
     <div class="text-bar">
@@ -35,11 +40,11 @@
   </form>
 </div>
 <div >
-    <h2>My Bids (Pet Owner)</h2>
-    <button>Show All</button>
-    <button>Pending</button>
-    <button>Rejected</button>
-    <button>Done</button>
+    <h2>My {{ showType }} Bids (Pet Owner)</h2>
+    <button (click)="showAllBids()">Show All</button>
+    <button (click)="showPendingBids()">Pending</button>
+    <button (click)="showRejectedBids()">Rejected</button>
+    <button (click)="showDoneBids()">Done</button>
 
     <table>
       <tr> 
@@ -60,8 +65,8 @@
       <tr *ngFor="let bid of bids">
         <td>{{bid.name}}</td>
         <td>{{bid.pet_name}}</td>
-        <td>{{bid.start_date}}</td>
-        <td>{{bid.end_date}}</td>
+        <td>{{bid.start}}</td>
+        <td>{{bid.end}}</td>
         <td>{{bid.payment_type}}</td>
         <td>{{bid.transfer_type}}</td>
         <td>{{bid.submission_time}}</td>
@@ -70,7 +75,7 @@
         <td>{{bid.is_paid}}</td>
         <td>{{bid.rating}}</td>
         <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-        <td><button (click)="openSubmitRating(bid)">Add Rating</button><td>
+        <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed">Add Rating</button><td>
       </tr>
     </table>
 </div>

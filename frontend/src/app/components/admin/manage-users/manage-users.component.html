@@ -1,0 +1,17 @@
+<button (click)="openNewCaretakerForm()">Add New Caretaker</button>
+<button (click)="openNewAdminForm()">Add New Admin</button>
+
+<table>
+    <tr>
+        <th>Caretaker Name</th>
+        <th>Email</th>
+        <th>Full Time</th>
+        <th>Rating</th>
+    </tr>
+    <tr *ngFor="let caretaker of caretakers">
+        <td>{{caretaker.name}}</td>
+        <td>{{caretaker.email}}</td>
+        <td>{{caretaker.is_fulltime}}</td>
+        <td>{{caretaker.rating}}</td>
+    </tr>
+</table>

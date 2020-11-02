@@ -6,6 +6,7 @@ import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { SubmitRatingComponent } from '../submit-rating/submit-rating.component';
+import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
 @Component({
   selector: 'app-pet-owner-bids',
@@ -14,6 +15,7 @@ import { SubmitRatingComponent } from '../submit-rating/submit-rating.component'
 })
 export class PetOwnerBidsComponent implements OnInit {
   bids;
+  showType = "";
 
   filterForm = new FormGroup({
     substr: new FormControl(''),
@@ -24,18 +26,34 @@ export class PetOwnerBidsComponent implements OnInit {
     max: new FormControl(''),
   });
 
-  constructor(private bidService: BidService, private router: Router, private dialog: MatDialog) { }
+  currentDate = new Date();
+  petTypes: any;
+
+  constructor(private bidService: BidService, private router: Router, private dialog: MatDialog,
+    private petOwnerService: PetownerService) { }
 
   ngOnInit(): void {
     this.showAllBids();
+    this.getListOfPetTypes();
   }
 
   showAllBids() {
+    this.showType = "";
     this.bidService.getBids().subscribe((bids) => {
-      console.log(bids);
       this.bids = bids;
     });
   }
+
+  getListOfPetTypes() {
+    this.petOwnerService.getGetListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
+    });
+  }
+
+  checkPastDate(date) {
+    return new Date(date) <= this.currentDate;
+  }
+
 
   openCaretaker(bid) {
     const encrypted =  Base64.stringify(Utf8.parse(bid.caretaker_email));
@@ -46,12 +64,38 @@ export class PetOwnerBidsComponent implements OnInit {
   }
 
   openSubmitRating(bid) {
-    this.dialog.open(SubmitRatingComponent, { data: {
-    dataKey: bid
-  }});
+    const dialogRef = this.dialog.open(SubmitRatingComponent, { data: {
+      dataKey: bid
+    }});
+    dialogRef.afterClosed().subscribe(result => {
+      if(result.data === 'Submit Success'){
+        this.ngOnInit();
+      }
+    });
   }
 
   onSubmit() {
     console.log('SENT');
+  }
+
+  showPendingBids() {
+    this.showType = "Pending";
+    this.bidService.getPendingBids().subscribe((bids) => {
+      this.bids = bids;
+    });
+  }
+
+  showRejectedBids() {
+    this.showType = "Rejected";
+    this.bidService.getRejectedBids().subscribe((bids) => {
+      this.bids = bids;
+    });
+  }
+
+  showDoneBids() {
+    this.showType = "Done";
+    this.bidService.getDoneBids().subscribe((bids) => {
+      this.bids = bids;
+    });
   }
 }

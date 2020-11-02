@@ -16,11 +16,15 @@ export class CaretakerService {
   }
 
   public getFilteredActiveCaretakers(details): Observable<any> {
-    return this.http.get(baseurl + '/api/caretaker/filter/', httpOptions);
+    return this.http.post(baseurl + '/api/caretaker/filter/', details, httpOptions);
   }
 
   public getRecommendedCaretakers(): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/rec/', getHttpOptionsWithAuth());
+  }
+
+  public getTransactedCaretakers(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/txnbefore', getHttpOptionsWithAuth());
   }
 
   public getAvailPartTimeCareTaker(email): Observable<any> {
@@ -37,5 +41,17 @@ export class CaretakerService {
 
   public getCareTakerDetails(email): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/detailed/' + email, httpOptions);
+  }
+
+  public getAllCaretakers(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/all', getHttpOptionsWithAuth());
+  }
+
+  public postNewLeave(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/ft/leave/new/range', details, getHttpOptionsWithAuth());
+  }
+
+  public getLeaveDates(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/ft/leave', getHttpOptionsWithAuth());
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, AbstractControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import { Subscription } from 'rxjs';
@@ -42,9 +42,10 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     start_date: new FormControl(''),
     end_date: new FormControl(''),
     pet_type: new FormControl(''),
-    min: new FormControl(''),
+    min: new FormControl('', Validators.min(0)),
     max: new FormControl(''),
-    rating: new FormControl('')
+    is_fulltime: new FormControl(''),
+    rating: new FormControl('', [Validators.min(0), Validators.max(5)])
   });
 
   caretakers: any[] = [];
@@ -79,8 +80,17 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
 
   showRecommendedCaretakers() {
     this.caretakerService.getRecommendedCaretakers().subscribe((caretakers) => {
-      console.log(caretakers);
       this.typeOfList = "Recommended";
+      let id = 1;
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
+  }
+
+  showTransactedCaretakers() {
+    this.caretakerService.getTransactedCaretakers().subscribe((caretakers) => {
+      console.log(caretakers);
+      this.typeOfList = "Previously Transacted";
       let id = 1;
       caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
       this.caretakers = caretakers;
@@ -95,9 +105,9 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     this.checkFormControl("min");
     this.checkFormControl("max");
     this.checkFormControl("substr");
+    this.checkFormControl("is_fulltime");
     console.log(this.filterForm.value);
     this.caretakerService.getFilteredActiveCaretakers(this.filterForm.value).subscribe((caretakers) => {
-      console.log(caretakers);
       let id = 1;
       caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
       this.caretakers = caretakers;
@@ -105,7 +115,6 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   }
 
   checkFormControl(name) {
-    console.log(name);
     if (this.filterForm.get(name).value === "") {
       this.filterForm.controls[name].setValue(null);
     }
