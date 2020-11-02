@@ -217,6 +217,28 @@ caretakerRouter.get('/pt/avail', verifyJwt, async(req, res) => {
     }
 });
 
+// get the availability of a specified part time worker
+// i.e. their available dates - dates where they have confirmed bids
+caretakerRouter.get('/pt/avail/:email', async(req, res) => {
+    try {
+        const email = req.params.email;
+        const sql = await pool.query(
+            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
+            where email = $1 and \
+            not exists ( \
+            select 1 from bidsfor where \
+                is_confirmed = true and \
+                caretaker_email = $1 and \
+                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
+            );",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // // get the availability of a specified part time caretaker
 // // assumes specified caretaker is actually part time
 // // if start_date and end_date not specified, assumes we want the interval [now, now + 2 years]
