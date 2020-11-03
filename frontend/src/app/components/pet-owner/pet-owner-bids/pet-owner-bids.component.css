@@ -77,3 +77,7 @@ tr:nth-child(even) {
   overflow-y: auto;
   height: 385px;
 }
+
+tr:hover {
+  background: rgb(255, 250, 182);
+}

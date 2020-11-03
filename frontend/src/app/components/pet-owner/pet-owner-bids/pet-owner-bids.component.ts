@@ -98,7 +98,7 @@ export class PetOwnerBidsComponent implements OnInit {
 
   changeConfirmation(bid) {
     if (bid.is_confirmed == null) {
-       bid.is_confirmed = "Not Confirmed";
+       bid.is_confirmed = "Pending";
     } else if (bid.is_confirmed) {
       bid.is_confirmed  = "Confirmed";
     } else {

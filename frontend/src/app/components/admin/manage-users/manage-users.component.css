@@ -88,3 +88,7 @@ tr:nth-child(even) {
 .spacing {
   padding: 7px;
 }
+
+tr:hover {
+  background: rgb(255, 250, 182);
+}

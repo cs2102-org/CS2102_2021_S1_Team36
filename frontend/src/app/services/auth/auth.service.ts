@@ -65,6 +65,9 @@ export class AuthService {
     if (data['aemail'] != null) {
       localStorage.setItem('admin', data['aemail']);
     }
+    if (data['is_fulltime'] != null) {
+      localStorage.setItem('is_fulltime', data['is_fulltime']);
+    }
     this.updateAccess(accessToken);
   }
 
