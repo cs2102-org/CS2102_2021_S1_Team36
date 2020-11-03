@@ -16,6 +16,17 @@
   background-color: #f8f8f8;
 }
 
+.success {
+  border-style: solid;
+  padding: 7px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  margin-bottom: 10px;
+  padding-left: 15px;
+}
+
 .form {
   border-style: solid;
   padding: 25px;

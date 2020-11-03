@@ -1,5 +1,8 @@
  <div class="content">
     <div class="column-left">
+        <div *ngIf="bidSuccess" class="success">
+            <p>Bid Successful!</p> 
+        </div>
         <div class="calendar">
             <h1>Availability</h1>
             <full-calendar #calendar [options]="calendarOptions"></full-calendar>
@@ -62,7 +65,6 @@
 
                 <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
             </form>
-            <p *ngIf="bidSuccess">Bid Successful!</p>
         </div>
         <ng-template #elseBlock>
             <h2>Please Login to bid</h2>

@@ -32,7 +32,9 @@ export class ManageUsersComponent implements OnInit {
   }
 
   getAllCaretakers() {
-    this.caretakerService.getAllCaretakers().subscribe(caretakers => {
+    const start = new Date('1000-01-01');
+    const end = new Date('3000-01-01');
+    this.pcsAdminService.getAllCaretakers({start_date: start, end_date: end}).subscribe(caretakers => {
       this.showType = "Caretakers";
       this.msg = '';
       this.things = caretakers.map(c => {c.is_fulltime = c.is_fulltime ? "Full Time" : "Part Time"; return c;});
