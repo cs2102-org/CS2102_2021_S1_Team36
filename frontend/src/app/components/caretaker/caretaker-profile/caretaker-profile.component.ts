@@ -73,7 +73,7 @@ export class CaretakerProfileComponent implements OnInit {
   ngOnInit(): void {
     this.getUserData();
     this.getOwnerPets();
-    console.log(this.petArrays.controls);
+    console.log(this.isPetOwner);
   }
 
   populatePetArray() {
