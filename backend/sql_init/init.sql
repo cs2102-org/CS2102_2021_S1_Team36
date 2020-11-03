@@ -74,15 +74,15 @@ CREATE TABLE BidsFor (
     owner_email VARCHAR(30),
     caretaker_email VARCHAR(30) REFERENCES CareTakers(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
-    submission_time TIMESTAMP,
-    start_date DATE,
-    end_date DATE,
-    price DECIMAL(10,2),
-    amount_bidded DECIMAL(10,2),
+    submission_time TIMESTAMP NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    amount_bidded DECIMAL(10,2) NOT NULL,
     is_confirmed BOOLEAN DEFAULT NULL,
     is_paid BOOLEAN DEFAULT False,
-    payment_type payment_type,
-    transfer_type transfer_type,
+    payment_type payment_type NOT NULL,
+    transfer_type transfer_type NOT NULL,
     rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
@@ -90,9 +90,9 @@ CREATE TABLE BidsFor (
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
-    daily_price DECIMAL(10,2),
+    daily_price DECIMAL(10,2) NOT NULL,
     email varchar(30) REFERENCES Caretakers(email) ON DELETE cascade, -- references the caretaker
-    species varchar(30) REFERENCES PetTypes(species),
+    species varchar(30) REFERENCES PetTypes(species) ON DELETE cascade,
     PRIMARY KEY (email, species)
 );
 
