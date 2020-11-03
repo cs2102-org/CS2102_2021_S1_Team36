@@ -1,6 +1,8 @@
 <div class="content">
     <div class="column-left">
-        <form class="form" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+      <div class="form">
+        <h2 style="margin-top: 5px;">List of Caretakers</h2>
+        <form [formGroup]="filterForm" (ngSubmit)="onSubmit()">
 
             <div class="text-bar">
               <p><label>Search For Caretaker:</label></p>
@@ -53,39 +55,49 @@
 
             <button class="button" type="submit" [disabled] = "!filterForm.valid">Search</button>
           </form>
+        </div>
     </div>
     <div class="column-center">
-      <h2 *ngIf="typeOfList != ''">{{typeOfList}}</h2>
-      <h2>List of Caretakers</h2>
-      <button (click)="getActiveCaretakers()">Show All</button>
-      <button *ngIf="isLogged" (click)="showRecommendedCaretakers()">Recommended</button>
-      <button *ngIf="isLogged" (click)="showTransactedCaretakers()">Previously Transacted</button>
+      <div class="list">
+        <button (click)="getActiveCaretakers()" class="button button-margin" [ngClass]="typeOfList == '' ? 'selected': ''">Show All</button>
+        <button *ngIf="isLogged" class="button button-margin" [ngClass]="typeOfList == 'Recommended' ? 'selected': ''"(click)="showRecommendedCaretakers()">Recommended</button>
+        <button *ngIf="isLogged" class="button" [ngClass]="typeOfList == 'Previously Transacted' ? 'selected': ''" (click)="showTransactedCaretakers()">Previously Transacted</button>
 
-      <ul class="caretakers">
-        <li *ngFor="let caretaker of caretakers" (click)="select(caretaker)">
-          <div [ngClass]="selectedCaretaker != undefined && caretaker.id == selectedCaretaker.id ? 'selected': 'not-selected'">
-            <table class="caretaker">
-                <tr>
-                <th> <h3>{{caretaker.name}}</h3></th>
-                <td>Rating: {{caretaker.rating}}</td>
-                <td>{{caretaker.type}}</td>
-                <td *ngIf="caretaker.showTakeCare"><button (click)="showHide(caretaker)">Hide</button><td>
-                <td *ngIf="!caretaker.showTakeCare"><button (click)="showHide(caretaker)">Show Price</button><td>
-              </tr>
-            </table>
-            <table class="pets">
-              <tr *ngFor="let pet of caretaker.takesCare">
-                <td>{{pet.species}}</td>
-                <td>${{pet.daily_price}}</td>
-              </tr>
-            </table>
-          </div>
-        </li>
-      </ul>
+        <div class="spacing"></div>
+
+        <div class="container">
+          <table>
+            <tr>  
+              <th class="theader">Name</th>
+              <th class="theader">Rating</th>
+              <th class="theader">Type</th>
+              <th class="theader">Pet: Cost</th>
+            </tr>
+
+            <tr *ngFor="let caretaker of caretakers" (click)="select(caretaker)" [ngClass]="selectedCaretaker != undefined && caretaker.id == selectedCaretaker.id ? 'selected-c': 'not-selected'">
+              <td>{{caretaker.name}}</td>
+              <td>{{caretaker.rating}}</td>
+              <td>{{caretaker.type}}</td>
+              <th>
+                <button (click)="showHide(caretaker)" *ngIf="caretaker.showTakeCare">Hide</button>
+                <button (click)="showHide(caretaker)" *ngIf="!caretaker.showTakeCare">Show Price</button>
+                <table class="pets">
+                  <tr *ngFor="let pet of caretaker.takesCare">
+                    <td>{{pet.species}}</td>
+                    <td>${{pet.daily_price}}</td>
+                  </tr>
+                </table>
+              </th>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
     <div *ngIf="selectedCaretaker != undefined" class="column-right">
-      <h2>Availability of {{selectedCaretaker.name}}</h2>
-      <button (click)="openMakeBid()">Bid Now/See More</button>
-      <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+      <div class="calendar">
+        <h2>Availability of {{selectedCaretaker.name}}</h2>
+        <button (click)="openMakeBid()">Bid Now/See More</button>
+        <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+      </div>
     </div>
 </div>
