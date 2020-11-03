@@ -92,3 +92,17 @@ tr:nth-child(even) {
 tr:hover {
   background: rgb(255, 250, 182);
 }
+
+.delete-button {
+  width: 100%;
+  background-color: #eb756c;
+  border: none;
+  color: white;
+}
+
+.show-button {
+  width: 100%;
+  background-color: #5eda62;
+  border: none;
+  color: white;
+}

@@ -72,7 +72,7 @@ td {
 
 table {
   width: 100%;
-  border: 1px solid black;
+  border: 2px solid rgb(175, 175, 175);
   border-collapse: collapse;
 }
 
@@ -94,7 +94,7 @@ table {
 }
 
 .button:hover {
-  background-color: #e6e47e;
+  background-color: #e6e47e !important;
   /* Green */
   color: black;
 }
@@ -127,4 +127,18 @@ tr:hover {
 .container {
   overflow-y: auto;
   height: 530px;
+}
+
+.show-button {
+  width: 100%;
+  background-color: #5eda62;
+  border: none;
+  color: white;
+}
+
+.hide-button {
+  width: 100%;
+  background-color: #eb756c;
+  border: none;
+  color: white;
 }

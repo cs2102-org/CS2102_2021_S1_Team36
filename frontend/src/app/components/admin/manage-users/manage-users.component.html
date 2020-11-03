@@ -29,8 +29,8 @@
                             <td>{{caretaker.is_fulltime}}</td>
                             <td>{{caretaker.description}}</td>
                             <td>{{caretaker.rating}}</td>
-                            <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button>
-                            <button (click)="deleteUser(caretaker.email)" >Delete</button></th>
+                            <th><button (click)="openMakeBid(caretaker)" class="show-button">Show More</button>
+                            <button (click)="deleteUser(caretaker.email)" class="delete-button">Delete</button></th>
                         </tr>
                     </table>
                 </div>
@@ -51,7 +51,7 @@
                     <td>{{admin.name}}</td>
                     <td>{{admin.email}}</td>
                     <td>{{admin.description}}</td>
-                    <th><button (click)="deleteUser(admin.email)">Delete</button></th>
+                    <th><button (click)="deleteUser(admin.email)" class="delete-button">Delete</button></th>
                 </tr>
             </table>
             </div>
@@ -70,7 +70,7 @@
                 <tr *ngFor="let pt of things">
                     <td>{{pt.species}}</td>
                     <td>{{pt.count}}</td>
-                    <th><button>Delete</button></th>
+                    <th><button class="delete-button">Delete</button></th>
                 </tr>
             </table>
             </div>
@@ -91,8 +91,8 @@
                     <td>{{po.email}}</td>
                     <td>{{po.description}}</td>
                     <th>
-                        <button *ngIf="po.show" (click)="showHide(po)">Hide</button>
-                        <button *ngIf="!po.show" (click)="showHide(po)">Show Pets</button>
+                        <button *ngIf="po.show" (click)="showHide(po)" class="delete-button">Hide</button>
+                        <button *ngIf="!po.show" (click)="showHide(po)"  class="show-button">Show Pets</button>
                         <table *ngIf="po.show" class="pets">
                             <tr>
                                 <th class="theader2">Pet Name</th>
@@ -102,10 +102,10 @@
                             <tr *ngFor="let pet of po.pets">
                                 <td>{{pet.pet_name}}</td>
                                 <td>{{pet.species}}</td>
-                                <th><button (click)="showDetailedPet(pet)">More</button></th>
+                                <th><button (click)="showDetailedPet(pet)" class="show-button">More</button></th>
                             </tr>
                         </table>
-                    <button (click)="deleteUser(po.email)">Delete</button></th>
+                    <button (click)="deleteUser(po.email)" class="delete-button">Delete</button></th>
                 </tr>
             </table>
             </div>

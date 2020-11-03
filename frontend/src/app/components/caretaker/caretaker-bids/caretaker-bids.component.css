@@ -81,3 +81,16 @@ tr:hover {
 .spacing {
   padding: 10px;
 }
+.reject-button {
+  width: 100%;
+  background-color: #eb756c;
+  border: none;
+  color: white;
+}
+
+.accept-button {
+  width: 100%;
+  background-color: #5eda62;
+  border: none;
+  color: white;
+}
