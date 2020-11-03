@@ -54,7 +54,20 @@ export class AuthService {
   }
 
   private updateAfterLogin(data): void {
+    console.log(data);
     const accessToken = data['token'];
+    if (data['pemail'] != null) {
+      localStorage.setItem('petowner', data['pemail']);
+    }
+    if (data['cemail'] != null) {
+      localStorage.setItem('caretaker', data['cemail']);
+    }
+    if (data['aemail'] != null) {
+      localStorage.setItem('admin', data['aemail']);
+    }
+    if (data['is_fulltime'] != null) {
+      localStorage.setItem('is_fulltime', data['is_fulltime']);
+    }
     this.updateAccess(accessToken);
   }
 

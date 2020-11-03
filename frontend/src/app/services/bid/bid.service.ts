@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { baseurl, getHttpOptionsWithAuth } from '../commons.service';
+import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../commons.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,15 +35,15 @@ export class BidService {
   }
 
   public getBidsCaretaker(): Observable<any> {
-    return this.http.post(baseurl + '/api/bids/for', '', getHttpOptionsWithAuth());
+    return this.http.post(baseurl + '/api/bids/for', {},getHttpOptionsWithAuth());
+  }
+
+  public getConfirmedBidsCaretaker(): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "confirmed"}, getHttpOptionsWithAuth());
   }
 
   public getPendingBidsCaretaker(): Observable<any> {
     return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "pending"}, getHttpOptionsWithAuth());
-  }
-
-  public getDoneBidsCaretaker(): Observable<any> {
-    return this.http.post(baseurl + '/api/bids/for', {'is_confirmed': "done"}, getHttpOptionsWithAuth());
   }
 
   public getRejectedBidsCaretaker(): Observable<any> {
@@ -58,7 +58,11 @@ export class BidService {
     return this.http.put(baseurl + '/api/bids/status', details, getHttpOptionsWithAuth());
   }
 
-    public getCaretakerEarnings(details): Observable<any> {
+  public getCaretakerEarnings(details): Observable<any> {
     return this.http.post(baseurl + '/api/bids/hist/range/', details, getHttpOptionsWithAuth());
+  }
+
+  public postPaidBid(details): Observable<any> {
+    return this.http.put(baseurl + '/api/bids/paid', details, getHttpOptionsWithAuth());
   }
 }

@@ -17,15 +17,15 @@ pcsRouter.post('/pet-types', async (req, res) => {
     }
 });
 
-pcsRouter.delete('/user', async (req, res) => {
+pcsRouter.delete('/user/:email', async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { email } = req.params;
         await pool.query(
             `
             DELETE FROM Users 
-            WHERE name = $1 AND email = $2 
+            WHERE email = $1 
             `,
-            [name, email],
+            [email],
         );
         return res.status(204).send('Account successfully deleted');
     } catch (err) {
@@ -67,6 +67,25 @@ pcsRouter.delete('/comments', async (req, res) => {
     }
 });
 
+pcsRouter.get('/admins', async (req, res) => {
+    const result = await pool.query(
+        'select email, name, description from Users natural join pcsadmins order by name asc;',
+    );
+    return res.status(200).json(result.rows);
+});
+
+pcsRouter.get('/pet-types', async (req, res) => {
+    try {
+        const msql = await pool.query(
+            "select species, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
+            from Pettypes P1 order by species asc;"
+            );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 //create a new pcsadmin, or return an error message if unable to
 pcsRouter.post('/', async (req, res) => {
     try {
@@ -84,6 +103,20 @@ pcsRouter.post('/', async (req, res) => {
             "select createPcsAdmin($1, $2);",
             [email, name]);
         return res.json("User successfully created.");
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get the pets of a specified user by admin
+pcsRouter.get('/pets/:email', async(req, res) => {
+    try {
+        const email = req.params.email;
+        const pets = await pool.query(
+            "SELECT * FROM Pets WHERE email = $1",
+            [email]
+        );
+        res.json(pets.rows); 
     } catch (err) {
         console.error(err);
     }

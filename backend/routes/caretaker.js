@@ -79,6 +79,39 @@ caretakerRouter.post('/pt/avail/new/range', verifyJwt, async(req, res) => {
     }
 });
 
+//delete full time leave
+caretakerRouter.delete('/ft/leave/:date', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const leave_date = req.params.date;
+        const msql = await pool.query(
+            "DELETE FROM FullTimeLeave \
+            WHERE email = $1 and leave_date = $2",
+            [email, leave_date]
+        );
+        
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+//delete part time avail
+caretakerRouter.delete('/pt/avail/:date', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const work_date = req.params.date;
+        const msql = await pool.query(
+            "DELETE FROM PartTimeAvail \
+            WHERE email = $1 and work_date = $2",
+            [email, work_date]
+        );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // insert new caretaker
 caretakerRouter.post('/new', verifyJwt, async(req, res) => {
     try {
@@ -93,7 +126,7 @@ caretakerRouter.post('/new', verifyJwt, async(req, res) => {
 caretakerRouter.get('/all', async(req, res) => {
     try {
         const cts = await pool.query(
-            "SELECT name, email, is_fulltime, rating FROM Caretakers NATURAL JOIN Users;",
+            "SELECT name, email, is_fulltime, rating, description FROM Caretakers NATURAL JOIN Users order by name asc;",
         );
         res.json(cts.rows); 
     } catch (err) {
@@ -164,9 +197,31 @@ caretakerRouter.get('/ft/leave', verifyJwt, async(req, res) => {
 
 // get the availability of a specified part time worker
 // i.e. their available dates - dates where they have confirmed bids
+caretakerRouter.get('/pt/avail', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const sql = await pool.query(
+            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
+            where email = $1 and \
+            not exists ( \
+            select 1 from bidsfor where \
+                is_confirmed = true and \
+                caretaker_email = $1 and \
+                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
+            );",
+            [email]
+            );
+        res.json(sql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get the availability of a specified part time worker
+// i.e. their available dates - dates where they have confirmed bids
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     try {
-        const { email } = req.params;
+        const email = req.params.email;
         const sql = await pool.query(
             "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
             where email = $1 and \
@@ -344,6 +399,125 @@ caretakerRouter.post('/filter', async(req, res) => {
         console.error(err);
     }
 });
+
+caretakerRouter.post('/filter/recommended', verifyJwt, async(req, res) => {
+    try {
+        var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
+        console.log(substr, start_date, end_date, pet_type, min, max, rating);
+        const email = res.locals.user.email;
+
+        const mkView = await pool.query(
+            "CREATE OR REPLACE VIEW potentialCaretakers AS \
+                (select DISTINCT caretaker_email as email from bidsfor where is_confirmed = True and owner_email in \
+                    (select DISTINCT owner_email from bidsfor where is_confirmed = True and caretaker_email in \
+                        (select caretaker_email from bidsfor where owner_email = '" + email + "' and is_confirmed = True))) \
+                EXCEPT \
+                (select caretaker_email as email from bidsfor where owner_email = '" + email + "' and is_confirmed = True);"
+        );
+
+        var selectCaretakers = "(select email, name, rating, \
+            case when is_fulltime then 'Full Time' else 'Part Time' End \
+            as type from (potentialCaretakers NATURAL JOIN Caretakers NATURAL JOIN Users) as PC \
+            where exists ( \
+	            (select species from takecareprice T1 where T1.email = PC.email) \
+	            INTERSECT \
+	            (select species from pets P1 where P1.email = $9) \
+            ));"
+
+        var nameRating = "select email, rating, is_fulltime from caretakers NATURAL JOIN Users\
+            where \
+                (rating >= $7 or $7 is null) and \
+                (name LIKE '%' || $1 || '%' or $1 is null)";
+        var speciesPrice = "select email, rating, is_fulltime from takecareprice NATURAL JOIN Caretakers \
+            where \
+                (species = $4 or $4 is null) and \
+                (daily_price >= $5 or $5 is null) and \
+                (daily_price <= $6 or $6 is null)";
+        var canWork = "select email, rating, is_fulltime from caretakers \
+            where \
+                canWork(email, $2, $3) or \
+                $2 is null or \
+                $3 is null";
+        var fullTime = "select email, rating, is_fulltime from caretakers \
+            where \
+                is_fulltime = $8 or \
+                $8 is null";
+        var combine = "(select F.email, US.name, rating, \
+            CASE \
+                WHEN is_fulltime THEN 'Full Time' \
+                ELSE 'Part Time' \
+            END \
+            as type \
+            FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
+            AS F NATURAL JOIN Users US) \
+            INTERSECT " +
+            selectCaretakers;
+        const msql = await pool.query(
+            combine,
+            [substr, start_date, end_date, pet_type, min, max, rating, is_fulltime, email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+caretakerRouter.post('/filter/transacted', verifyJwt, async(req, res) => {
+    try {
+        var { substr, start_date, end_date, pet_type, min, max, rating, is_fulltime } = req.body;
+        console.log(substr, start_date, end_date, pet_type, min, max, rating);
+        const email = res.locals.user.email;
+
+        var tranx = "(SELECT email, name, rating, \
+                CASE \
+                    WHEN is_fulltime THEN 'Full Time' \
+                    ELSE 'Part Time' \
+                END \
+                as type FROM \
+                (select DISTINCT caretaker_email as email from bidsFor \
+                where \
+                    owner_email = $9 and \
+                    is_confirmed = True \
+                ) AS TB \
+                NATURAL JOIN Users NATURAL JOIN Caretakers)";
+        var nameRating = "select email, rating, is_fulltime from caretakers NATURAL JOIN Users\
+            where \
+                (rating >= $7 or $7 is null) and \
+                (name LIKE '%' || $1 || '%' or $1 is null)";
+        var speciesPrice = "select email, rating, is_fulltime from takecareprice NATURAL JOIN Caretakers \
+            where \
+                (species = $4 or $4 is null) and \
+                (daily_price >= $5 or $5 is null) and \
+                (daily_price <= $6 or $6 is null)";
+        var canWork = "select email, rating, is_fulltime from caretakers \
+            where \
+                canWork(email, $2, $3) or \
+                $2 is null or \
+                $3 is null";
+        var fullTime = "select email, rating, is_fulltime from caretakers \
+            where \
+                is_fulltime = $8 or \
+                $8 is null";
+        var combine = "(select F.email, US.name, rating, \
+            CASE \
+                WHEN is_fulltime THEN 'Full Time' \
+                ELSE 'Part Time' \
+            END \
+            as type \
+            FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
+            AS F NATURAL JOIN Users US) " + 
+            "INTERSECT " + tranx;
+        const msql = await pool.query(
+            combine,
+            [substr, start_date, end_date, pet_type, min, max, rating, is_fulltime, email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+
 
 // find recommended caretakers
 // return email, name rating, is_fulltime

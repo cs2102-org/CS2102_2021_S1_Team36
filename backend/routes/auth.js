@@ -2,7 +2,6 @@ const express = require('express');
 const pool = require('../db');
 const { jwt, verifyJwt } = require('../auth/index');
 const bcrypt = require('bcrypt');
-const { json } = require('express');
 
 const saltRounds = 10;
 
@@ -20,15 +19,22 @@ authRouter.get("/", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const { rows } = await pool.query(
-    "SELECT * FROM Users WHERE email=$1 and password=$2;"
+    "SELECT U.email, password, is_fulltime, U.email AS uemail, P.email AS pemail, C.email AS cemail, A.email AS aemail \
+      FROM ((Users U LEFT JOIN PetOwners P ON U.email=P.email) \
+        LEFT JOIN Caretakers C ON U.email=C.email) \
+          LEFT JOIN PCSAdmins A on U.email=A.email \
+    WHERE U.email=$1 AND U.password=$2"
   , [email, password]);
 
   if (rows.length > 0) {
-    // const passwordStored = rows[0].password;
+    const user = rows[0];
+    // const passwordStored = user.password;
     // const validPass = await bcrypt.compare(password, passwordStored);
     // if (validPass) {
       return jwt.sign(rows[0], 'secretkey', (err, token) => {
-        return res.status(200).json({token});
+        const { pemail, cemail, aemail, is_fulltime } = rows[0];
+        const returnJson = Object.assign({}, { token }, { pemail, cemail, aemail, is_fulltime });
+        return res.status(200).json(returnJson);
       });
     // }
   } 
@@ -38,12 +44,18 @@ authRouter.post("/login", async (req, res) => {
 
 // User signup
 authRouter.post("/signup", async (req, res) => {
-  const { name, email, password, desc } = req.body;
+  const { name, email, password, desc, caretaker, pet_owner, type } = req.body;
   // const hash = await bcrypt.hash(password, saltRounds);
   try {
     await pool.query(
-      "INSERT INTO Users VALUES ($1, $2, $3, $4);"
-    , [name, email, desc, password]);
+      "INSERT INTO Users VALUES ($1, $2, $3, $4);",
+    [name, email, desc, password]);
+
+    if (pet_owner) {
+      await pool.query(
+        "INSERT INTO PetOwners VALUES (email);",
+      [email]);
+    }
   } catch (e) {
     return res.status(404).json({ error: e.toString() });
   }

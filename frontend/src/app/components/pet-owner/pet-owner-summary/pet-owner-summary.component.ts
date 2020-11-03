@@ -36,7 +36,8 @@ export class PetOwnerSummaryComponent implements OnInit {
   
   openBidDialog(selectionInfo) {
     this.dialog.open(BidDialogComponent, { data: {
-      dataKey: this.bids[selectionInfo.event.id]
+      dataKey: this.bids[selectionInfo.event.id],
+      type: "Caretaker: "
     }});
   }
 

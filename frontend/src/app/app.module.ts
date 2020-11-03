@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MenuHeaderComponent } from './components/general/menu-header/menu-header.component';
 import { LoginComponent } from './components/general/login/login.component';
@@ -31,6 +31,10 @@ import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.c
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
 import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
+import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
+import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
+import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
+import { SearchfilterPipe } from './searchfilter.pipe';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -58,7 +62,11 @@ FullCalendarModule.registerPlugins([
     BidDialogComponent,
     ManageUsersComponent,
     FormNewCaretakerComponent,
-    FormNewAdminComponent
+    FormNewAdminComponent,
+    FormNewPetTypeComponent,
+    DeleteLeaveAvailComponent,
+    DetailedPetComponent,
+    SearchfilterPipe,
   ],
   imports: [
     BrowserModule,
@@ -70,6 +78,7 @@ FullCalendarModule.registerPlugins([
     MatIconModule,
     FullCalendarModule,
     HttpClientModule,
+    FormsModule,
     // MatDatepickerModule,
     // MatFormFieldModule,
   ],

@@ -1,18 +1,33 @@
-<div>
-    <full-calendar #calendar [options]="calendarOptions" style="width: 700px; margin: auto; margin-top: 5%;"></full-calendar>
+<div class="content">
+    <div class="column-left">
+         <div class="calendar">
+            <full-calendar #calendar [options]="calendarOptions" style="margin: auto; margin-top: 5%;"></full-calendar>
+        </div>
+    </div>
+
+<div class="column-right">
+    <div>
+        <p>{{msg}}</p>
+    </div>
+    <div class="details">
+        <h2>This Month</h2>
+        <h3>Earnings: ${{earningsInThatMonth}}</h3>
+        <h3>Days Worked: {{numOfWorkDaysInThatMonth}} Days</h3>
+    </div>
+    <br>
+    <div class="form">
+        <div *ngIf="caretakerType === 'Full Time'">
+            <h2>Apply For Leave</h2>
+            <p>You have chosen: {{form.get('start_date').value}} - {{form.get('end_date').value}}</p>
+            <button (click)="onLeaveSubmit()">Submit</button>
+        </div>
+
+        <div *ngIf="caretakerType === 'Part Time'">
+            <h2>Apply For Availability</h2>
+            <p>You have chosen: {{form.get('start_date').value}} - {{form.get('end_date').value}}</p>
+            <button (click)="onAvailSubmit()">Submit</button>
+        </div>
+    </div>
 </div>
 
-<h3>Earnings: ${{earningsInThatMonth}}</h3>
-<h3>Days Worked: {{numOfWorkDaysInThatMonth}} Days</h3>
-
-<div *ngIf="caretakerType === 'Full Time'">
-    <h2>Apply For Leave</h2>
-    <p>You have chosen: {{form.get('start_date').value}} - {{form.get('end_date').value}}</p>
-    <button (click)="onLeaveSubmit()">Submit</button>
-</div>
-
-<div *ngIf="caretakerType === 'Part Time'">
-    <h2>Apply For Availability</h2>
-    <p>You have chosen: {{form.get('start_date').value}} - {{form.get('end_date').value}}</p>
-    <button (click)="onLeaveSubmit()">Submit</button>
 </div>
