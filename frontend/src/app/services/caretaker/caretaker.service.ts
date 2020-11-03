@@ -78,4 +78,8 @@ export class CaretakerService {
   public deleteAvail(date): Observable<any> {
     return this.http.delete(baseurl + '/api/caretaker/pt/avail/' + date, getHttpOptionsWithAuth());
   }
+
+  public getCaretakerReviews(email): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/reviews/' + email, httpOptions);
+  }
 }

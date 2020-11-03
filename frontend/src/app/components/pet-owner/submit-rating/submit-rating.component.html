@@ -1,7 +1,12 @@
 <form class="form" [formGroup]="ratingForm" (ngSubmit)="onSubmit()">
     <p *ngIf="hasError">{{ error }}</p>
-    <h4>Submit rating for {{ name }}</h4>
+    <h4>Submit review for {{ name }}</h4>
+
+    <textarea formControlName="review" rows="4" cols="50"></textarea>
+    <br>
+    <label>Rating: </label>
     <input type="number" formControlName="rating">
+    <div style="padding: 7px;"></div>
 
     <button type="submit" [disabled] = "!ratingForm.valid"> Submit </button>
 </form>

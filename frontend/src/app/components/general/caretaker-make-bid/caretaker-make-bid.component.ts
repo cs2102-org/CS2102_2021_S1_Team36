@@ -56,6 +56,7 @@ export class CaretakerMakeBidComponent implements OnInit {
     transfer_type: new FormControl('', Validators.required),
     amount_bidded: new FormControl('', [Validators.required, (control: AbstractControl) => Validators.min(this.currentMinPrice)(control)]),
   });
+  reviews: any;
 
   constructor(private caretakerService: CaretakerService, 
     private route: ActivatedRoute,
@@ -101,6 +102,7 @@ export class CaretakerMakeBidComponent implements OnInit {
       this.checkIsLogged();
       this.loadCalendar();
       this.findTakeCares();
+      this.getReviews();
     });
   }
 
@@ -228,5 +230,12 @@ export class CaretakerMakeBidComponent implements OnInit {
         }
       }
   }
+
+  getReviews() {
+    this.caretakerService.getCaretakerReviews(this.caretaker.email).subscribe(reviews => {
+      this.reviews = reviews;
+    });
+  }
+
 
 }

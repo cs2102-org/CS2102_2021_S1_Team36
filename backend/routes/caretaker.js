@@ -577,6 +577,20 @@ caretakerRouter.get('/txnbefore', verifyJwt, async(req, res) => {
     }
 });
 
+caretakerRouter.get('/reviews/:email', async(req, res) => {
+    try {
+        const email = req.params.email;
+        const msql = await pool.query(
+            "SELECT U.name, review, rating FROM bidsFor B inner join Users U on B.owner_email = U.email WHERE \
+            caretaker_email = $1 ",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 module.exports = {
     caretakerRouter
 }
