@@ -222,6 +222,33 @@ BEGIN
 END;
 $$;
 
+-- void function. Creates a new user and pcsadmin in a single transaction.
+drop function if exists createPcsAdmin;
+CREATE OR REPLACE FUNCTION createPcsAdmin(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into pcsadmins values (email);
+END;
+$$;
+
+-- void function. Creates a new user and fulltime caretaker in a single transaction.
+drop function if exists createFtCaretaker;
+CREATE OR REPLACE FUNCTION createFtCaretaker(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into caretakers (email, is_fulltime) values (email, true);
+END;
+$$;
+
+
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');

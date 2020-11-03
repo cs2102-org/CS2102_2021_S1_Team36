@@ -86,6 +86,28 @@ pcsRouter.get('/pet-types', async (req, res) => {
     }
 });
 
+//create a new pcsadmin, or return an error message if unable to
+pcsRouter.post('/', async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const user_query = await pool.query(
+            "select * from users where email=$1",
+            [email]
+        );
+        if (user_query.rows.length > 0) {
+            //user with this email already exists
+            return res.json("This email is already taken. User creation failed. ");
+        }
+        // else, create the new user and insert in pcsadmin table in a single transaction
+        const create_user = await pool.query(
+            "select createPcsAdmin($1, $2);",
+            [email, name]);
+        return res.json("User successfully created.");
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // get the pets of a specified user by admin
 pcsRouter.get('/pets/:email', async(req, res) => {
     try {
@@ -95,6 +117,28 @@ pcsRouter.get('/pets/:email', async(req, res) => {
             [email]
         );
         res.json(pets.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+//create a new FT caretaker or return an error message if unable to
+pcsRouter.post('/ft', async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const user_query = await pool.query(
+            "select * from users where email=$1",
+            [email]
+        );
+        if (user_query.rows.length > 0) {
+            //user with this email already exists
+            return res.json("This email is already taken. User creation failed. ");
+        }
+        // else, create the new user and insert in caretakers table in a single transaction
+        const create_user = await pool.query(
+            "select createFtCaretaker($1, $2);",
+            [email, name]);
+        return res.json("User successfully created.");
     } catch (err) {
         console.error(err);
     }
