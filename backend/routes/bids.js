@@ -263,19 +263,24 @@ bidsRouter.post('/hist/range', verifyJwt, async(req, res) => {
 });
 
 // find the number of days worked and total earnings for each caretaker over a specified range
-// returns table (caretaker_email, days_worked, total_earnings)
+// returns table (email, name, type, description, rating, days_worked, total_earnings)
 // only caretakers with nonzero work days appear in the result
-bidsRouter.get('/earnings/range', async(req, res) => {
+bidsRouter.post('/earnings/range', async(req, res) => {
     try {
         var { start_date, end_date } = req.body;
+        console.log(start_date, end_date);
         const msql = await pool.query(
-            "select caretaker_email, COUNT(*) as days_worked, SUM(amount) as total_earnings from \
-                (select caretaker_email, \
-                generate_series(start_date, end_date, '1 day'::interval)::date as date, \
-                amount_bidded as amount \
-                from bidsfor where is_confirmed = true) as Q1 \
-            where $1::date <= Q1.date and Q1.date <= $2::date \
-            group by caretaker_email",
+            "select email, name, CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type, description, \
+            rating, days_worked, total_earnings \
+            FROM Users NATURAL JOIN Caretakers NATURAL JOIN ( \
+                select caretaker_email as email, COUNT(*) as days_worked, SUM(amount) as total_earnings from \
+                    (select caretaker_email, \
+                        generate_series(start_date, end_date, '1 day'::interval)::date as date, \
+                        amount_bidded as amount \
+                    from bidsfor where is_confirmed = true) as Q1 \
+                where $1::date <= Q1.date and Q1.date <= $2::date \
+                group by caretaker_email \
+            ) AS Q2",
             [start_date, end_date]
             );
         res.json(msql.rows); 

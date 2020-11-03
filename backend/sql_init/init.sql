@@ -84,7 +84,7 @@ CREATE TABLE BidsFor (
     payment_type payment_type,
     transfer_type transfer_type,
     rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
-    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name),
+    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
 
@@ -98,7 +98,7 @@ CREATE TABLE TakecarePrice (
 
 CREATE TABLE Posts (
 	post_id SERIAL PRIMARY KEY,
-    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
+    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE CASCADE,
     title VARCHAR(255),
     cont TEXT,
     last_modified TIMESTAMP DEFAULT NOW()
@@ -106,7 +106,7 @@ CREATE TABLE Posts (
 
 CREATE TABLE Comments (
 	post_id INTEGER REFERENCES Posts(post_id) ON DELETE CASCADE,
-    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE CASCADE,
     date_time TIMESTAMP DEFAULT NOW(),
     cont TEXT,
     PRIMARY KEY (post_id, email, date_time)
@@ -221,6 +221,33 @@ BEGIN
 	return isAvail(cemail, s, e) AND hasSpareCapacity(cemail, s, e);
 END;
 $$;
+
+-- void function. Creates a new user and pcsadmin in a single transaction.
+drop function if exists createPcsAdmin;
+CREATE OR REPLACE FUNCTION createPcsAdmin(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into pcsadmins values (email);
+END;
+$$;
+
+-- void function. Creates a new user and fulltime caretaker in a single transaction.
+drop function if exists createFtCaretaker;
+CREATE OR REPLACE FUNCTION createFtCaretaker(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into caretakers (email, is_fulltime) values (email, true);
+END;
+$$;
+
 
 --=================================================== END HELPER ============================================================
 
