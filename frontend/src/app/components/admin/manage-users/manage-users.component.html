@@ -22,7 +22,6 @@
                             <th class="theader">Description</th>
                             <th class="theader">Rating</th>
                             <th class="theader"></th>
-                            <th class="theader"></th>
                         </tr>
                         <tr *ngFor="let caretaker of things | searchfilter: searchValue">
                             <td>{{caretaker.name}}</td>
@@ -30,8 +29,8 @@
                             <td>{{caretaker.is_fulltime}}</td>
                             <td>{{caretaker.description}}</td>
                             <td>{{caretaker.rating}}</td>
-                            <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button></th>
-                            <th><button (click)="deleteUser(caretaker.email)" >Delete</button></th>
+                            <th><button (click)="openMakeBid(caretaker)">Show Details/Availability</button>
+                            <button (click)="deleteUser(caretaker.email)" >Delete</button></th>
                         </tr>
                     </table>
                 </div>
@@ -86,7 +85,6 @@
                     <th class="theader">Email</th>
                     <th class="theader">Description</th>
                     <th class="theader"></th>
-                    <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let po of things | searchfilter: searchValue">
                     <td>{{po.name}}</td>
@@ -107,8 +105,7 @@
                                 <th><button (click)="showDetailedPet(pet)">More</button></th>
                             </tr>
                         </table>
-                    </th>
-                    <th><button (click)="deleteUser(po.email)">Delete</button></th>
+                    <button (click)="deleteUser(po.email)">Delete</button></th>
                 </tr>
             </table>
             </div>

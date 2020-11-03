@@ -22,7 +22,6 @@
             <th class="theader">Paid?</th>
             <th class="theader">Rating</th>
             <th class="theader"></th>
-            <th class="theader"></th>
           </tr>
           <tr *ngFor="let bid of bids">
             <td>{{bid.name}}</td>
@@ -36,8 +35,8 @@
             <td>{{bid.is_confirmed}}</td>
             <td>{{bid.is_paid}}</td>
             <td>{{bid.rating}}</td>
-            <th><button (click)="openCaretaker(bid)">Show Caretaker</button></th>
-            <th><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button></th>
+            <th><button (click)="openCaretaker(bid)">Show Caretaker</button>
+            <button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button></th>
           </tr>
         </table>
       </div>
