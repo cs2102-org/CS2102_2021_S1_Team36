@@ -36,8 +36,8 @@
             <td>{{bid.is_confirmed}}</td>
             <td>{{bid.is_paid}}</td>
             <td>{{bid.rating}}</td>
-            <td><button (click)="openCaretaker(bid)">Show Caretaker</button><td>
-            <td><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button><td>
+            <th><button (click)="openCaretaker(bid)">Show Caretaker</button></th>
+            <th><button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button></th>
           </tr>
         </table>
       </div>
