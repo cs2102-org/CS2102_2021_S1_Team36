@@ -1043,4 +1043,36 @@ CREATE TRIGGER trigger_block_taking_leave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
 
+
+-- trigger: prevent full time caretaker from taking leave if no 2x150 consec working days
+-- CREATE OR REPLACE FUNCTION check_working_days() RETURNS TRIGGER
+--     AS $$
+-- BEGIN
+
+-- END
+-- $$ LANGUAGE plpgsql;
+
+-- DROP TRIGGER IF EXISTS check_working_days ON FullTimeLeave;
+-- CREATE TRIGGER check_working_days
+--     BEFORE INSERT ON FullTimeLeave
+--     EXECUTE PROCEDURE check_working_days();
+
+-- trigger: full time caretaker accept bid immediately if he can work
+CREATE OR REPLACE FUNCTION ft_accept_bid() RETURNS TRIGGER
+    AS $$
+BEGIN
+    UPDATE BidsFor BF
+    SET is_confirmed = true
+    WHERE 
+        BF.caretaker_email = NEW.caretaker_email AND
+        canWork(NEW.caretaker_email, BF.start_date, BF.end_date);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS ft_accept_bid ON BidsFor;
+CREATE TRIGGER ft_accept_bid
+    AFTER INSERT ON BidsFor
+    EXECUTE PROCEDURE ft_accept_bid();
+
 -- =============================================== END TRIGGERS ====================================================
