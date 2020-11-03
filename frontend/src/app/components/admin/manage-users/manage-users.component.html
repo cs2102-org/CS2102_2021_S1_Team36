@@ -90,14 +90,14 @@
                     <td>{{po.name}}</td>
                     <td>{{po.email}}</td>
                     <td>{{po.description}}</td>
-                    <th>
+                    <td style="text-align: center;">
                         <button *ngIf="po.show" (click)="showHide(po)" class="delete-button">Hide</button>
                         <button *ngIf="!po.show" (click)="showHide(po)"  class="show-button">Show Pets</button>
                         <div *ngFor="let pet of po.pets">
                             <span>{{pet.pet_name}} ({{pet.species}})
                             <button (click)="showDetailedPet(pet)">More</button></span>
                         </div>
-                    <button (click)="deleteUser(po.email)" class="delete-button">Delete</button></th>
+                    <button (click)="deleteUser(po.email)" class="delete-button">Delete</button></td>
                 </tr>
             </table>
             </div>
