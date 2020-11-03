@@ -59,11 +59,11 @@
             <tr *ngFor="let pet of petArrays.controls; let i=index">
               <div [formGroupName]="i">
                 <table>
-                <td>Pet Name :<input type="text" formControlName="pet_name"></td>
+                <td>Pet Name: {{ pet.value.pet_name }}</td>
                 
-                <td>Special Requirements:<input type="text" formControlName="special_requirements"></td>
+                <td>Special Requirements: <input type="text" formControlName="special_requirements"></td>
                 
-                <td>Description:<input type="text" formControlName="description"></td>
+                <td>Description: <input type="text" formControlName="description"></td>
                 
                 <td>Species<input type="text" formControlName="species"></td>
                 <td><button (click)="updatePet(i)">Save</button></td>

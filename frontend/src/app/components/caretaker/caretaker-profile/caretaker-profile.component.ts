@@ -21,6 +21,7 @@ export class CaretakerProfileComponent implements OnInit {
   isCaretaker = false;
   isPetOwner = false;
   pets = [];
+  petTypes;
 
   petArray = new FormArray([]);
   petForm: FormGroup;
@@ -72,6 +73,7 @@ export class CaretakerProfileComponent implements OnInit {
   ngOnInit(): void {
     this.getUserData();
     this.getOwnerPets();
+    console.log(this.petArrays.controls);
   }
 
   populatePetArray() {
@@ -89,6 +91,15 @@ export class CaretakerProfileComponent implements OnInit {
     }
   }
 
+  getListOfPetTypes() {
+    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
+    });
+  }
+
+  // this.caretakerService.getCareTakerPrice(caretaker.email).subscribe((prices) => {
+  //   prices;
+  // });
 
   get petArrays(): FormArray {
     return this.petForm.get("petArrays") as FormArray;
