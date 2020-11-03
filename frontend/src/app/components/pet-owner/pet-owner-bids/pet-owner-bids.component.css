@@ -81,3 +81,10 @@ tr:nth-child(even) {
 tr:hover {
   background: rgb(255, 250, 182);
 }
+
+.show-button {
+  width: 100%;
+  background-color: #5eda62;
+  border: none;
+  color: white;
+}

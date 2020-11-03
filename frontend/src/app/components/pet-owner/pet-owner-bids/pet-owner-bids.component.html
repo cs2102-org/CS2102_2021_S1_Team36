@@ -1,7 +1,7 @@
 <div class="content">
   <div class="center"> 
     <div class="content-box">
-      <h2>My {{ showType }} Bids (Pet Owner)</h2>
+      <h2>Pet Owner Bids</h2>
       <button class="button button-margin" (click)="showAllBids()" [ngClass]="showType == '' ? 'selected': ''">Show All</button>
       <button class="button button-margin" (click)="showPendingBids()" [ngClass]="showType == 'Pending' ? 'selected': ''">Pending</button>
       <button class="button button-margin" (click)="showRejectedBids()" [ngClass]="showType == 'Rejected' ? 'selected': ''">Rejected</button>
@@ -35,8 +35,8 @@
             <td>{{bid.is_confirmed}}</td>
             <td>{{bid.is_paid}}</td>
             <td>{{bid.rating}}</td>
-            <th><button (click)="openCaretaker(bid)">Show Caretaker</button>
-            <button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'">Add Rating</button></th>
+            <th><button (click)="openCaretaker(bid)" class="show-button">Show Caretaker</button>
+            <button (click)="openSubmitRating(bid)" *ngIf="checkPastDate(bid.end) && bid.rating == null && bid.is_confirmed==='Confirmed'" class="show-button">Add Rating</button></th>
           </tr>
         </table>
       </div>
