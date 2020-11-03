@@ -1,6 +1,6 @@
 <div class="profile">
     <form class="form" [formGroup]="profileForm" (ngSubmit)="onSubmit(profileForm.value)">
-        <h1>Caretaker:</h1>
+        <h2>Personal Details:</h2>
         <div class="text-bar"><p>
             <label><b>Name: </b></label>
             <input type="text" formControlName="name">
@@ -16,11 +16,66 @@
             <textarea rows="4" cols="50" formControlName="description"></textarea>
         </p></div>
 
-        <p><b>Current Rating: </b></p>
-        <p><b>Employment: </b></p>
-        <h1>Pet Owner:</h1>
+        <div *ngIf="isCaretaker">
+            <h2>Caretaker Details</h2>
+            <p><b>Current Rating: </b>{{ flatData.rating}} </p>
+            <p><b>Employment: </b>{{ flatData.case }}</p>
+        </div>
 
+        <div *ngIf="isPetOwner">
+            <h2>Your own pets:</h2>
+            <table>
+                <td>Pet Name</td>
+                <td>Special Requirements</td>
+                <td>Description</td>
+                <td>Species</td>
+                <tr *ngFor="let pet of pets">
+                    <td>{{ pet.pet_name }}</td>
+                    <td>{{ pet.special_requirements}}</td>
+                    <td>{{ pet.description}}</td>
+                    <td>{{ pet.species}}</td>
+                </tr>
+              </table>
+        </div>
         <button class="button" type="submit">Update</button>
     </form>
-    
+    <!-- <div formArrayName="petArray">
+    <div *ngFor="let pet of petArray.controls; let i=index;">
+        {{ pet }}
+        <div [formGroupName]="i">
+            <form class="form" [formGroup]="petForm">
+                <input type="text" formControlName="pet_name">
+                <input type="text" formControlName="special_requirements">
+            </form>
+        </div>
+    </div>
+    </div> -->
+    <div class="pet-portion">
+    <form [formGroup]="petForm" (ngSubmit)="onSubmitPetArray()">
+        <p>
+            Petz
+        </p>
+        <div formArrayName="petArrays">
+            <tr *ngFor="let pet of petArrays.controls; let i=index">
+              <div [formGroupName]="i">
+                <table>
+                <td>Pet Name :<input type="text" formControlName="pet_name"></td>
+                
+                <td>Special Requirements:<input type="text" formControlName="special_requirements"></td>
+                
+                <td>Description:<input type="text" formControlName="description"></td>
+                
+                <td>Species<input type="text" formControlName="species"></td>
+                <td><button (click)="updatePet(i)">Save</button></td>
+                <td><button (click)="removePet(i)">Remove</button></td>
+                </table>
+                
+              </div>
+            </tr>
+          </div>
+    </form>
+    <p>
+        <button type="button" (click)="addPets()">Add PETZ</button>
+    </p>
+    </div>
 </div>

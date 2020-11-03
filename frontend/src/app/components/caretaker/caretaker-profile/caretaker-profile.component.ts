@@ -3,9 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../../../services/commons.service';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
+import { NONE_TYPE } from '@angular/compiler';
+import { registerLocaleData } from '@angular/common';
 
 @Component({
   selector: 'app-caretaker-profile',
@@ -14,47 +16,113 @@ import { PetownerService } from 'src/app/services/petowner/petowner.service';
 })
 export class CaretakerProfileComponent implements OnInit {
 
-  pets;
-  email;
+  userData = {caretaker: NONE_TYPE, petowner: NONE_TYPE};
+  flatData;
+  isCaretaker = false;
+  isPetOwner = false;
+  pets = [];
+
+  petArray = new FormArray([]);
+  petForm: FormGroup;
 
   constructor(private http: HttpClient,
               private fb: FormBuilder,
               private authService: AuthService,
-              private petOwnerService: PetownerService) { }
+              private petOwnerService: PetownerService) {
+                this.petForm = this.fb.group({
+                  name:'',
+                  petArrays: this.fb.array([]),
+                })
+              }
 
   profileForm = new FormGroup({
     name: new FormControl(''),
     password: new FormControl(''),
     description: new FormControl(''),
+    case: new FormControl(''),
   });
 
-  public getCaretaker(): Observable<any> {
+  public getUser(): Observable<any> {
     return this.http.get(baseurl + '/api/auth/profile', getHttpOptionsWithAuth());
   }
 
-  // public getPetOwnerPetsWithCaretaker() {
+  getOwnerPets() {
+    this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
+       this.pets = pets;
+       this.petArray = new FormArray([]);
+       console.log(pets);
+       this.populatePetArray();
+    });
+  }
 
-  // }
-
-  // getPetOwnerPets() {
-  //   this.petOwnerService.getPetOwnerPetsWithCaretaker().subscribe((pets) => {
-  //     this.pets = pets.reduce((accumulator, currentValue) => {
-  //       accumulator[currentValue.pet_name] = currentValue.species;
-  //       return accumulator;
-  //     }, {});
-  //   });
-  // }
+  getUserData() {
+    this.getUser().subscribe((user) => {
+      
+      this.flatData = user.flat()[0];      
+      if (user[0][0] != undefined) {this.userData['caretaker'] = user[0][0]; this.isCaretaker = true;}
+      if (user[1][0] != undefined) {this.userData['petowner'] = user[1][0]; this.isPetOwner = true;}
+      console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner);
+      console.log(this.userData);
+      this.profileForm.patchValue({
+        name: [this.flatData.name],
+        description: [this.flatData.description],
+      })});
+  }
 
   ngOnInit(): void {
-    console.log(this.getCaretaker());
-    this.profileForm.patchValue({
-      name: ['Lam'],
-      description: ['Desccc'],
+    this.getUserData();
+    this.getOwnerPets();
+  }
+
+  populatePetArray() {
+    for (const pet of this.pets) {
+      console.log(pet);
+      
+      const group = this.fb.group({
+      pet_name: pet.pet_name,
+      special_requirements: pet.special_requirements,
+      description: '',
+      species: '',
+      })
+
+      this.petArrays.push(group);
+    }
+  }
+
+
+  get petArrays(): FormArray {
+    return this.petForm.get("petArrays") as FormArray;
+  }
+
+  newPet(): FormGroup {
+    return this.fb.group({
+      pet_name: '',
+      special_requirements: '',
+      description: '',
+      species: '',
     })
+  }
+
+  addPets() {
+    this.petArrays.push(this.newPet());
+  }
+
+  updatePet(i: number) {
+    console.log(this.petArrays.at(i).value);
+    console.log("Original pet: ");
+    console.log(this.pets[i]);
+  }
+
+  removePet(i: number) {
+    this.petArrays.removeAt(i);
   }
 
   onSubmit(profileParam): void {
     console.log('SENT');
     console.log(profileParam);
+  }
+
+  onSubmitPetArray() {
+    console.log(this.petForm.value);
   }
 }

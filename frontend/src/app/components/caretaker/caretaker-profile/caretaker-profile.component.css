@@ -12,3 +12,24 @@ textarea {
     vertical-align: text-top;
     font-size: 1.5rem;
 }
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 70vw;
+    font-size: 1rem;
+}
+
+.pet-portion {
+    font-size: 0.3rem;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
