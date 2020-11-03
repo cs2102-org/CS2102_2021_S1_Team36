@@ -81,11 +81,9 @@
               <th>
                 <button (click)="showHide(caretaker)" *ngIf="caretaker.showTakeCare" class="hide-button">Hide</button>
                 <button (click)="showHide(caretaker)" *ngIf="!caretaker.showTakeCare" class="show-button">Show</button>
-                <table id="special-table">
-                  <tr *ngFor="let pet of caretaker.takesCare">
-                    <td>{{pet.species}}: ${{pet.daily_price}}</td>
-                  </tr>
-                </table>
+                <div *ngFor="let pet of caretaker.takesCare">
+                  <span>{{pet.species}}: ${{pet.daily_price}}</span>
+                </div>
               </th>
             </tr>
           </table>
