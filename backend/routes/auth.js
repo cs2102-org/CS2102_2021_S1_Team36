@@ -79,7 +79,8 @@ authRouter.get('/profile', verifyJwt, async(req, res) => {
           [email]
       );
       const msql_po = await pool.query(
-          "select * from users U left join petowners PO on U.email = PO.email\
+          // "select * from users U left join petowners PO on U.email = PO.email\
+          "select * from users U natural join petowners\
           where U.email = $1;",
           [email]
       );

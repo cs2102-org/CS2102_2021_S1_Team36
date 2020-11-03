@@ -35,6 +35,7 @@ import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/fo
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
 import { SearchfilterPipe } from './searchfilter.pipe';
+import { FilterspeciesPipe } from './filterspecies.pipe';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -67,6 +68,7 @@ FullCalendarModule.registerPlugins([
     DeleteLeaveAvailComponent,
     DetailedPetComponent,
     SearchfilterPipe,
+    FilterspeciesPipe,
   ],
   imports: [
     BrowserModule,

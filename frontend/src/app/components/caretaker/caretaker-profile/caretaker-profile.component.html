@@ -15,43 +15,44 @@
             <label><b>Description: </b></label>
             <textarea rows="4" cols="50" formControlName="description"></textarea>
         </p></div>
-
-        <div *ngIf="isCaretaker">
-            <h2>Caretaker Details</h2>
-            <p><b>Current Rating: </b>{{ flatData.rating}} </p>
-            <p><b>Employment: </b>{{ flatData.case }}</p>
-        </div>
-
-        <div *ngIf="isPetOwner">
-            <h2>Your own pets:</h2>
-            <table>
-                <td>Pet Name</td>
-                <td>Special Requirements</td>
-                <td>Description</td>
-                <td>Species</td>
-                <tr *ngFor="let pet of pets">
-                    <td>{{ pet.pet_name }}</td>
-                    <td>{{ pet.special_requirements}}</td>
-                    <td>{{ pet.description}}</td>
-                    <td>{{ pet.species}}</td>
-                </tr>
-              </table>
-        </div>
         <button class="button" type="submit">Update</button>
     </form>
-    <!-- <div formArrayName="petArray">
-    <div *ngFor="let pet of petArray.controls; let i=index;">
-        {{ pet }}
-        <div [formGroupName]="i">
-            <form class="form" [formGroup]="petForm">
-                <input type="text" formControlName="pet_name">
-                <input type="text" formControlName="special_requirements">
+
+    <div *ngIf="isCaretaker">
+        <h2>Caretaker Details</h2>
+        <p><b>Current Rating: </b>{{ flatData.rating}} </p>
+        <p><b>Employment: </b>{{ flatData.case }}</p>
+
+        <h1>TakeCare Info</h1>
+
+        <div class="takecare-portion" *ngIf="isCaretaker">
+            <form [formGroup]="takeCareForm">
+                <div formArrayName="takeCareArrays">
+                    <tr *ngFor="let takecare of takeCareArrays.controls; let i=index">
+                      <div [formGroupName]="i">
+                        <table>
+                        <td>Pet Species: {{ takecare.value.species }}</td>
+                        <td><select class="custom-select" formControlName="species">
+                            <option value="" disabled>Choose your species</option>
+                            <option *ngFor="let species of petTypes | filterspecies: takeCareSpecies" [ngValue]="species">{{species}}</option>
+                         </select></td>
+                        <td>Daily Price: $<input type="text" formControlName="daily_price"></td>
+                        <td><button (click)="updateTakeCare(i)">Save</button></td>
+                        <td><button (click)="removeTakeCare(i)">Remove</button></td>
+                        </table>
+                      </div>
+                    </tr>
+                  </div>
             </form>
-        </div>
+            <p>
+                <button type="button" (click)="addTakeCare()">Add Take Care</button>
+            </p>
+            </div>
+
     </div>
-    </div> -->
-    <div class="pet-portion">
-    <form [formGroup]="petForm" (ngSubmit)="onSubmitPetArray()">
+
+    <div class="pet-portion" *ngIf="isPetOwner">
+    <form [formGroup]="petForm">
         <p>
             Petz
         </p>

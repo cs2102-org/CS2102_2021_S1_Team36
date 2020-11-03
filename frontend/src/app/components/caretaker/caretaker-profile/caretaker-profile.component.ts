@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
 import { NONE_TYPE } from '@angular/compiler';
 import { registerLocaleData } from '@angular/common';
+import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 
 @Component({
   selector: 'app-caretaker-profile',
@@ -22,19 +23,31 @@ export class CaretakerProfileComponent implements OnInit {
   isPetOwner = false;
   pets = [];
   petTypes;
+  email;
 
   petArray = new FormArray([]);
   petForm: FormGroup;
 
+  takeCareArray = new FormArray([]);
+  takeCareForm: FormGroup;
+  prices;
+  takeCareSpecies;
+
   constructor(private http: HttpClient,
               private fb: FormBuilder,
               private authService: AuthService,
+              private caretakerService: CaretakerService,
               private petOwnerService: PetownerService) {
-                this.petForm = this.fb.group({
-                  name:'',
-                  petArrays: this.fb.array([]),
-                })
-              }
+    this.petForm = this.fb.group({
+      name:'',
+      petArrays: this.fb.array([]),
+    });
+
+    this.takeCareForm = this.fb.group({
+      name:'',
+      takeCareArrays: this.fb.array([]),
+    })
+  }
 
   profileForm = new FormGroup({
     name: new FormControl(''),
@@ -63,7 +76,8 @@ export class CaretakerProfileComponent implements OnInit {
       if (user[0][0] != undefined) {this.userData['caretaker'] = user[0][0]; this.isCaretaker = true;}
       if (user[1][0] != undefined) {this.userData['petowner'] = user[1][0]; this.isPetOwner = true;}
       console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner);
-      console.log(this.userData);
+      console.log(user);
+      this.getPrices();
       this.profileForm.patchValue({
         name: [this.flatData.name],
         description: [this.flatData.description],
@@ -73,7 +87,8 @@ export class CaretakerProfileComponent implements OnInit {
   ngOnInit(): void {
     this.getUserData();
     this.getOwnerPets();
-    console.log(this.isPetOwner);
+    this.getListOfPetTypes();
+    console.log(getHttpOptionsWithAuth());
   }
 
   populatePetArray() {
@@ -91,15 +106,6 @@ export class CaretakerProfileComponent implements OnInit {
     }
   }
 
-  getListOfPetTypes() {
-    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
-      this.petTypes = petTypes.map(elem => elem.species);
-    });
-  }
-
-  // this.caretakerService.getCareTakerPrice(caretaker.email).subscribe((prices) => {
-  //   prices;
-  // });
 
   get petArrays(): FormArray {
     return this.petForm.get("petArrays") as FormArray;
@@ -135,5 +141,91 @@ export class CaretakerProfileComponent implements OnInit {
 
   onSubmitPetArray() {
     console.log(this.petForm.value);
+  }
+
+
+  ///////////////// CareTaker TakeCare Price///////////////////////
+
+  populateTakeCareArray() {
+    for (const takecare of this.prices) {
+      const group = this.fb.group({
+      species: takecare.species,
+      daily_price: takecare.daily_price,
+      })
+
+      this.takeCareArrays.push(group);
+    }
+    this.takeCareSpecies = this.prices.map((x) => x.species);
+    console.log(this.takeCareSpecies);
+  }
+
+  getListOfPetTypes() {
+    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
+      console.log(this.petTypes);
+    });
+  }
+
+  getPrices() {
+    this.caretakerService.getCareTakerPrice(this.flatData.email).subscribe((prices) => {
+      this.prices = prices;
+      this.populateTakeCareArray();
+      console.log(prices);
+    });
+  }
+
+  get takeCareArrays(): FormArray {
+    return this.takeCareForm.get("takeCareArrays") as FormArray;
+  }
+
+  newTakeCare(): FormGroup {
+    return this.fb.group({
+      species: '',
+      daily_price: '',
+    })
+  }
+
+  addTakeCare() {
+    this.takeCareArrays.push(this.newTakeCare());
+  }
+
+  updateTakeCare(i: number) {
+    const updated = this.takeCareArrays.at(i).value;
+    const original = this.prices[i];
+    console.log(updated);
+    console.log(original);
+    if (original == undefined) {
+      this.addTakeCareHttp(updated);
+      return;
+    }
+    this.updateTakeCareHttp(updated);
+  }
+
+  public updateTakeCareHttp(details) {
+    this.http.put(baseurl + '/api/caretaker/updateprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+    });
+  }
+  
+  public addTakeCareHttp(details) {
+    this.http.post(baseurl + '/api/caretaker/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+    });
+  }
+
+  public removeTakeCareHttp(details) {
+    this.http.post(baseurl + '/api/caretaker/removeprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+    });
+  }
+
+  removeTakeCare(i: number) {
+    const removed = this.takeCareArrays.at(i).value;
+    this.removeTakeCareHttp(removed);
+    this.takeCareArrays.removeAt(i);
+  }
+
+  onSubmitTakeCareArray() {
+    console.log(this.takeCareForm.value);
   }
 }
