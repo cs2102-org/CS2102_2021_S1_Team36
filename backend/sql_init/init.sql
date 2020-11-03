@@ -84,6 +84,7 @@ CREATE TABLE BidsFor (
     payment_type payment_type,
     transfer_type transfer_type,
     rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
+    review VARCHAR(255) DEFAULT NULL,
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
