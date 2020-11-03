@@ -113,7 +113,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   getBids(dates) {
-    this.bidService.getBidsCaretaker().subscribe((bids) => {
+    this.bidService.getConfirmedBidsCaretaker().subscribe((bids) => {
       let id = 1;
       const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
       const copyBids =JSON.parse(JSON.stringify(bidsUpdated));

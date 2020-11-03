@@ -55,7 +55,7 @@ export class CaretakerBidsComponent implements OnInit {
 
   showDoneBids() {
     this.showType = "Done";
-    this.bidService.getDoneBidsCaretaker().subscribe((bids) => {
+    this.bidService.getConfirmedBidsCaretaker().subscribe((bids) => {
       this.bids = bids.map(this.changeTransferType)
         .map(this.changePaymentType)
         .map(this.changeConfirmation)
