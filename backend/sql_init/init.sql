@@ -248,6 +248,46 @@ BEGIN
 END;
 $$;
 
+-- void function. Creates a new user and part time caretaker in a single transaction.
+drop function if exists createPtCaretaker;
+CREATE OR REPLACE FUNCTION createPtCaretaker(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into caretakers (email, is_fulltime) values (email, false);
+END;
+$$;
+
+-- void function. Creates a new user and petowner in a single transaction.
+drop function if exists createPetOwner;
+CREATE OR REPLACE FUNCTION createPetOwner(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+END;
+$$;
+
+-- void function. Creates a new user, petowner and part time caretaker in a single transaction.
+drop function if exists createPtAndPo;
+CREATE OR REPLACE FUNCTION createPtAndPo (email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+    insert into caretakers (email, is_fulltime) values (email, false);
+END;
+$$;
+
 
 --=================================================== END HELPER ============================================================
 
