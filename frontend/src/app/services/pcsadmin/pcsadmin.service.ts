@@ -29,4 +29,16 @@ export class PcsadminService {
   public getPetOwnerPets(email): Observable<any> {
     return this.http.get(baseurl + '/api/pcs-admins/pets/' + email, httpOptions);
   }
+
+  public getAllCaretakers(details): Observable<any> {
+    return this.http.post(baseurl + '/api/bids/earnings/range', details, httpOptions);
+  }
+
+  public postNewAdmin(details): Observable<any> {
+    return this.http.post(baseurl + '/api/pcs-admins/', details, httpOptions);
+  }
+
+   public postNewFullTime(details): Observable<any> {
+    return this.http.post(baseurl + '/api/pcs-admins/ft', details, httpOptions);
+  }
 }
