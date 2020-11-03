@@ -88,3 +88,8 @@ tr:hover {
   border: none;
   color: white;
 }
+
+.show-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}

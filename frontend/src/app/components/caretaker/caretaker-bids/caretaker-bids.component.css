@@ -94,3 +94,13 @@ tr:hover {
   border: none;
   color: white;
 }
+
+.reject-button:hover {
+    background-color: #e6e47e !important;
+    color: black;
+}
+
+.accept-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}

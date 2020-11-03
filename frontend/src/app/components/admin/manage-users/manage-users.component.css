@@ -106,3 +106,13 @@ tr:hover {
   border: none;
   color: white;
 }
+
+.delete-button:hover {
+    background-color: #e6e47e !important;
+    color: black;
+}
+
+.show-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
