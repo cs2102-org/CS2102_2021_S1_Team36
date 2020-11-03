@@ -26,6 +26,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
     select: this.selectDate.bind(this),
     datesSet: this.viewRenderer.bind(this),
     eventClick: this.openBidDialog.bind(this),
+    height: 500,
   };
 
   form = new FormGroup({
