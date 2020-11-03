@@ -117,6 +117,7 @@ tr:nth-child(even) {
 
 tr:hover {
   background: rgb(255, 250, 182);
+  cursor: pointer;
 }
 
 .selected-c {
