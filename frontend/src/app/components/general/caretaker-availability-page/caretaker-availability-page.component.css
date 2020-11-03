@@ -5,7 +5,7 @@
 }
 
 .column-left {
-  width: 25%;
+  width: 26%;
   padding-top: 2%;
   padding-left: 2%;
   padding-right: 1%;
@@ -27,6 +27,7 @@
   width: 30%;
   padding: 30px;
   padding-right: 1%;
+  padding-left: 1%;
   padding-bottom: 0px;
   float: left;
   word-wrap: break-word;
@@ -45,6 +46,7 @@
 .column-right {
   width: 35%;
   padding-top: 2%;
+  padding-left: 1%;
   float: left;
   height: 90vh;
   overflow-y: auto;
@@ -141,4 +143,30 @@ tr:hover {
   background-color: #eb756c;
   border: none;
   color: white;
+}
+
+.button-search {
+  font-size: 12px;
+  background-color: #5eda62;
+  color: white;
+  padding: 10px 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  border-style: none;
+  outline: 0;
+}
+
+.button-search:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
+
+.show-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
+
+.hide-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
 }

@@ -1,10 +1,8 @@
- <div class="background">
-    <div class="content">
-        <p *ngIf="signUpSuccess">Signup Success. Login Now!</p>
-        <p *ngIf="errorMessage!=''">{{errorMessage}}</p>
-        <div class="title">
-            <h1>Join Us!</h1>
-        </div>
+ <div class="content">
+    <p *ngIf="signUpSuccess">Signup Success. Login Now!</p>
+    <p *ngIf="errorMessage!=''">{{errorMessage}}</p>
+    <div class="content-box">
+        <h1>Join Us!</h1>
         <p *ngIf="signUpForm.get('password_confirm').touched && signUpForm.hasError('notMatched')">Passwords do not match</p>
         <p *ngIf="signUpForm.get('email').invalid && signUpForm.get('email').touched"> Not a valid email</p>
 
@@ -44,5 +42,8 @@
                 <button type="submit" [disabled]="!signUpForm.valid" (click)="onSubmitSignUp()">Submit</button>
             </div>
         </form>
+    </div>
+    <div id="photo-one">
+        <img src="assets/img/leaves.jpg" width="500" >
     </div>
 </div>
