@@ -1059,7 +1059,7 @@ CREATE TRIGGER trigger_update_rating
     EXECUTE PROCEDURE update_rating();
 
 
--- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
+-- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date (Full Time)
 CREATE OR REPLACE FUNCTION block_taking_leave()
 RETURNS trigger
 language plpgsql
@@ -1083,5 +1083,31 @@ CREATE TRIGGER trigger_block_taking_leave
     BEFORE INSERT ON FullTimeLeave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
+
+
+-- trigger: prevent deleting avail when you have a confirmed bid that overlaps with the avail date (Part Time)
+CREATE OR REPLACE FUNCTION block_deleting_avail()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+		select 1 from bidsFor
+		where
+			caretaker_email = OLD.email and
+			((start_date, end_date + interval '1 day') overlaps (OLD.work_date, OLD.work_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'You have a job on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_deleting_avail on PartTimeAvail;
+CREATE TRIGGER trigger_block_deleting_avail
+    BEFORE DELETE ON PartTimeAvail
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_deleting_avail();
 
 -- =============================================== END TRIGGERS ====================================================

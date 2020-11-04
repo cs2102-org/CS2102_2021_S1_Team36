@@ -50,6 +50,7 @@ caretakerRouter.post('/ft/leave/new/range', verifyJwt, async (req, res) => {
         }
         res.json(true);
     } catch (err) {
+        res.status(403).json({ error: err.toString() });
         console.error(err);
     }
 });
@@ -75,6 +76,7 @@ caretakerRouter.post('/pt/avail/new/range', verifyJwt, async (req, res) => {
         }
         res.json(true);
     } catch (err) {
+        res.status(403).json({ error: err.toString() });
         console.error(err);
     }
 });
@@ -108,6 +110,7 @@ caretakerRouter.delete('/pt/avail/:date', verifyJwt, async (req, res) => {
         );
         res.json(true);
     } catch (err) {
+        res.status(403).json({ error: err.toString() });
         console.error(err);
     }
 });

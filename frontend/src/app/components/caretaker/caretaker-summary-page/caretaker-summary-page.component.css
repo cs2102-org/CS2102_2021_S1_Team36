@@ -17,7 +17,7 @@
 }
 
 .column-right {
-  padding-top: 1%;
+  padding-top: 2%;
   float: left;
   border-radius: 10px;
 }
@@ -26,6 +26,15 @@
   background-color: #1e77aa;
   height: 95vh;
   width: 100%;
+}
+
+.message {
+  border-style: solid;
+  padding: 25px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
 }
 
 .details {

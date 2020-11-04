@@ -6,9 +6,10 @@
     </div>
 
 <div class="column-right">
-    <div>
+    <div class="message" *ngIf="msg != ''">
         <p>{{msg}}</p>
     </div>
+    <br>
     <div class="details">
         <h2>This Month</h2>
         <h3>Earnings: ${{earningsInThatMonth}}</h3>

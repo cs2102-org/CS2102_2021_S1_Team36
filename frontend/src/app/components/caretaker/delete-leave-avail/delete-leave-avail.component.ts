@@ -11,6 +11,7 @@ import { BidDialogComponent } from '../../general/bid-dialog/bid-dialog.componen
 export class DeleteLeaveAvailComponent implements OnInit {
   date;
   type;
+  msg='';
 
   constructor(private dialogRef: MatDialogRef<BidDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any, private caretakerService: CaretakerService) { }
@@ -30,7 +31,10 @@ export class DeleteLeaveAvailComponent implements OnInit {
     } else {
       this.caretakerService.deleteAvail(this.date).subscribe(msg => {
         this.dialogRef.close(true);
-      });
+      }, (err) => {
+        this.msg = "You have a job on this date!";
+      }
+      );
     }
   }
 }
