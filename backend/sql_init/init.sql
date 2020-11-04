@@ -94,7 +94,7 @@ CREATE TABLE TakecarePrice (
     daily_price DECIMAL(10,2),
     email varchar(30) REFERENCES Caretakers(email) ON DELETE cascade, -- references the caretaker
     species varchar(30) REFERENCES PetTypes(species),
-    PRIMARY KEY (email, species)
+    PRIMARY KEY (email, species)  --- daily price > base price
 );
 
 CREATE TABLE Posts (

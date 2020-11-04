@@ -30,7 +30,7 @@
         <br>
         <div *ngIf="isLogged; else elseBlock">
             <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
-                <h3>Bid Form</h3>
+                <h2>Bid Form</h2>
                 <p>Choose the dates by clicking and dragging on the calendar</p>
                 <p>You have chosen: {{bidForm.get('start_date').value}} - {{bidForm.get('end_date').value}}</p>
                 <p><label>Choose which pet: </label>

@@ -145,11 +145,8 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     } else {
       this.caretakerService.getAvailFullTimeCareTaker(caretaker.email).subscribe((dates) => {
         dates.map(function(elem) { 
-          let aDate = new Date(elem.end);
-          aDate.setDate(aDate.getDate() + 1);
           elem.display = 'background';
           elem.groupId = 'No'; 
-          elem.end = aDate.toISOString().slice(0,10);
           return elem;
         });
         this.calendarOptions.events = dates;
