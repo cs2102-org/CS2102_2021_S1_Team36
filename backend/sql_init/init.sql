@@ -248,7 +248,91 @@ BEGIN
 END;
 $$;
 
+-- getPetDays(email, start, end) -> int :: total pet days worked
+-- returns NULL if email hasn't completed any jobs that month (have to check division by NULL)
+drop function if exists getPetDays;
+CREATE OR REPLACE FUNCTION getPetDays(cemail varchar, s date, e date)
+RETURNS int
+language plpgsql
+as
+$$
+declare 
+	daysWorked INTEGER;
+BEGIN
+	select sum(end_date - start_date + 1) into daysWorked
+	from bidsfor
+	where caretaker_email=cemail
+		and (s <= end_date and end_date <= e)
+		and is_paid
+	group by cemail;
+	
+	return daysWorked;
+END;
+$$;
 
+-- getTotalRevenue(email, start, end) -> float :: total revenue
+-- returns NULL if email hasn't completed any jobs that month hence earned no revenue 
+-- take note of this when doing arithmetic with this result
+drop function if exists getTotalRevenue;
+CREATE OR REPLACE FUNCTION getTotalRevenue(cemail varchar, s date, e date)
+RETURNS FLOAT
+language plpgsql
+as
+$$
+declare 
+	revenue FLOAT;
+BEGIN
+	select sum((end_date - start_date + 1) * amount_bidded) into revenue
+	from bidsfor 
+	where is_paid 
+		and (s <= end_date and end_date <= e)
+		and caretaker_email=cemail
+	group by cemail;
+	
+	return revenue;
+END;
+$$;
+
+-- getSalary(email, start, end) -> float
+-- gets salary to be paid to a caretaker for jobs COMPLETED during 
+-- [start, end] inclusive
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the job
+-- in Feb
+drop function if exists getSalary;
+CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
+RETURNS float
+language plpgsql
+as
+$$
+declare
+    -- these vars are null, caretaker didn't complete any jobs during period
+    totalRev FLOAT := getTotalRevenue(cemail, s, e);
+    daysWorked INT := getPetDays(cemail, s, e);
+	avgPricePerDay FLOAT := totalRev / daysWorked;
+	is_ft BOOLEAN;
+BEGIN	
+	select is_fulltime into is_ft
+	from caretakers
+	where email=cemail;
+	
+    if daysWorked is null then
+        daysWorked := 0;
+    end if;
+	
+    if totalRev is null then
+        totalRev := 0;
+    end if;
+
+	if is_ft and daysWorked <= 60 then
+        -- less than 60 pet days worked
+		return 3000;
+	elsif is_ft and daysWorked > 60 then
+		return 3000 + ((daysWorked - 60) * avgPricePerDay);
+	else -- is parttime
+		return 0.75 * totalRev;
+	end if;
+END;
+$$;
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');

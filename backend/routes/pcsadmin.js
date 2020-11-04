@@ -111,6 +111,31 @@ pcsRouter.post('/ft', async (req, res) => {
     }
 });
 
+// This only counts jobs that were COMPLETED (end_date) during [start, end] inclusive
+// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards his Feb salary
+// bc there is min 3k salary for FT, only makes sense when querying entire months
+// e.g. start: 2020-01-01, end: 2020-01-31
+// returns table of (email, name, type, description, salary)
+pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
+    try {
+        const { start_date, end_date } = req.params;
+        console.log(start_date, end_date);
+        const msql = await pool.query(
+            "select \
+                email,  \
+                name,   \
+                CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type,    \
+                description,    \
+                getSalary(email, $1, $2)    \
+            from \
+                users natural join caretakers;",
+            [start_date, end_date]);
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     pcsRouter
 }
