@@ -1,7 +1,7 @@
 const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
-// const { verifyJwt } = require('../auth/index')
+const { verifyJwt } = require('../auth/index')
 
 const commentsRouter = express.Router();
 
@@ -23,10 +23,10 @@ commentsRouter.get('/', async (req, res) => {
 });
 
 // create a comment
-commentsRouter.post('/', async (req, res) => {
+commentsRouter.post('/', verifyJwt, async (req, res) => {
     try {
-        // const email = res.locals.user.email;
-        const { post_id, email, cont } = req.body;
+        const email = res.locals.user.email;
+        const { post_id, cont } = req.body;
         const result = await pool.query(
             `
             INSERT INTO Comments(post_id, email, date_time, cont)
@@ -42,10 +42,10 @@ commentsRouter.post('/', async (req, res) => {
 });
 
 // update a comment
-commentsRouter.put('/', async (req, res) => {
+commentsRouter.put('/', verifyJwt, async (req, res) => {
     try {
-        // const email = res.locals.user.email;
-        const { post_id, email, date_time, cont } = req.body;
+        const email = res.locals.user.email;
+        const { post_id, date_time, cont } = req.body;
         const result = await pool.query(
             `
             UPDATE Comments
@@ -64,10 +64,10 @@ commentsRouter.put('/', async (req, res) => {
 });
 
 // delete a comment 
-commentsRouter.delete('/', async (req, res) => {
+commentsRouter.delete('/', verifyJwt, async (req, res) => {
     try {
-        // const email = res.locals.user.email;
-        const { post_id, email, date_time } = req.body;
+        const email = res.locals.user.email;
+        const { post_id, date_time } = req.body;
         const result = await pool.query(
             `
             DELETE FROM Comments
