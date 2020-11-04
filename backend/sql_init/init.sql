@@ -327,7 +327,7 @@ BEGIN
         -- less than 60 pet days worked
 		return 3000;
 	elsif is_ft and daysWorked > 60 then
-		return 3000 + (daysWorked - 60) * avgPricePerDay);
+		return 3000 + ((daysWorked - 60) * avgPricePerDay);
 	else -- is parttime
 		return 0.75 * totalRev;
 	end if;
