@@ -159,7 +159,10 @@ pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
                 name,   \
                 CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type,    \
                 description,    \
-                getSalary(email, $1, $2)    \
+                rating, \
+                getSalary(email, $1, $2),    \
+                getWorkDays(email, $1, $2),  \
+                CASE WHEN is_fulltime THEN getTotalRevenue(email, $1, $2) ELSE null END as revenue \
             from \
                 users natural join caretakers;",
             [start_date, end_date]);
