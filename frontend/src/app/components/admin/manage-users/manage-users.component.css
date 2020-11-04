@@ -86,7 +86,7 @@ tr:nth-child(even) {
 
 .container {
   overflow-y: auto;
-  height: 350px;
+  height: 30vh;
 }
 
 .spacing {
