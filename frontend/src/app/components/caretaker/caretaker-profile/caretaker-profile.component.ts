@@ -101,10 +101,10 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(pet);
       
       const group = this.fb.group({
-      pet_name: pet.pet_name,
+      pet_name: {value: pet.pet_name, disabled: true},
       special_requirements: pet.special_requirements,
-      description: '',
-      species: '',
+      description: pet.description,
+      species: pet.species,
       })
 
       this.petArrays.push(group);
@@ -130,15 +130,24 @@ export class CaretakerProfileComponent implements OnInit {
   }
 
   updatePet(i: number) {
-    console.log(this.petArrays.at(i).value);
-    console.log("Original pet: ");
-    console.log(this.pets[i]);
+    var updated = this.petArrays.at(i).value;
+    var original = this.pets[i];
+    console.log(original == undefined);
+    // if (original == undefined) {
+    //   this.addTakeCareHttp(updated);
+    //   return;
+    // }
+    // this.updateTakeCareHttp(updated);
   }
 
   removePet(i: number) {
     this.petArrays.removeAt(i);
   }
 
+  addPetHttp(updated){}
+
+  updatePetHttp(updated){}
+  
   onSubmit(profileParam): void {
     console.log('SENT');
     console.log(profileParam);

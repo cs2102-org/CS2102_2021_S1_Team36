@@ -58,30 +58,31 @@
 
     <div class="pet-portion" *ngIf="isPetOwner">
     <form [formGroup]="petForm">
-        <p>
-            Petz
-        </p>
+        <h2><b>
+            Your Pets
+        </b></h2>
         <div formArrayName="petArrays">
             <tr *ngFor="let pet of petArrays.controls; let i=index">
               <div [formGroupName]="i">
                 <table>
-                <td>Pet Name: {{ pet.value.pet_name }}</td>
+                <td>Pet Name: <input type="text" formControlName="pet_name" [disabled]='i'></td>
                 
                 <td>Special Requirements: <input type="text" formControlName="special_requirements"></td>
                 
                 <td>Description: <input type="text" formControlName="description"></td>
                 
-                <td>Species<input type="text" formControlName="species"></td>
+                <td>Species<select class="custom-select" formControlName="species">
+                    <option value="" disabled>Choose your species</option>
+                    <option *ngFor="let species of petTypes" [ngValue]="species">{{species}}</option></select></td>
                 <td><button (click)="updatePet(i)">Save</button></td>
                 <td><button (click)="removePet(i)">Remove</button></td>
                 </table>
-                
               </div>
             </tr>
           </div>
     </form>
     <p>
-        <button type="button" (click)="addPets()">Add PETZ</button>
+        <button type="button" (click)="addPets()">Add New Pet</button>
     </p>
     </div>
 </div>

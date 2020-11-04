@@ -147,25 +147,6 @@ caretakerRouter.get('/ft/leave/all', async (req, res) => {
 });
 
 // view a specified fulltime caretakers non-availability
-<<<<<<< HEAD
-caretakerRouter.get('/ft/na/:email', async (req, res) => {
-    try {
-        const { email } = req.params;
-        const sql = await pool.query(
-            "select email, to_char(leave_date, 'YYYY-mm-dd') as start, to_char(leave_date, 'YYYY-mm-dd') as end \
-            from fulltimeleave where email = $1 \
-            UNION \
-            select \
-                caretaker_email as email, \
-                to_char(start_date, 'YYYY-mm-dd') as start, \
-                to_char(end_date, 'YYYY-mm-dd') as end \
-            from bidsfor where \
-                caretaker_email = $1 and \
-                is_confirmed = true;",
-            [email]
-        );
-        res.json(sql.rows);
-=======
 caretakerRouter.get('/ft/na/:email', async(req, res) => {
     const date = new Date(), y = date.getFullYear(), m = date.getMonth();
     const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
@@ -179,7 +160,6 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
             [firstDay, lastDay, email]
         );
         res.json(sql.rows); 
->>>>>>> fix-frontend-yj
     } catch (err) {
         console.error(err);
     }
@@ -233,17 +213,11 @@ caretakerRouter.get('/pt/avail', verifyJwt, async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-// get the availability of a specified part time worker
-// i.e. their available dates - dates where they have confirmed bids
-caretakerRouter.get('/pt/avail/:email', async (req, res) => {
-=======
 // view a specified fulltime caretakers non-availability
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     const date = new Date(), y = date.getFullYear(), m = date.getMonth();
     const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
     const lastDay = new Date(y + 2, m, 2).toISOString().slice(0,10);
->>>>>>> fix-frontend-yj
     try {
         const { email } = req.params;
         const sql = await pool.query(
@@ -594,17 +568,6 @@ caretakerRouter.post('/filter/transacted', verifyJwt, async (req, res) => {
             where \
                 is_fulltime = $8 or \
                 $8 is null";
-<<<<<<< HEAD
-        var combine = "(select F.email, US.name, rating, \
-            CASE \
-                WHEN is_fulltime THEN 'Full Time' \
-                ELSE 'Part Time' \
-            END \
-            as type \
-            FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
-            AS F NATURAL JOIN Users US) " +
-            "INTERSECT " + tranx;
-=======
         var combine = "select * from \
             ((select F.email, US.name, rating, \
                 CASE \
@@ -615,7 +578,6 @@ caretakerRouter.post('/filter/transacted', verifyJwt, async (req, res) => {
                 FROM (" + nameRating + " INTERSECT " + speciesPrice + " INTERSECT " + canWork + " INTERSECT " + fullTime + ") \
                 AS F NATURAL JOIN Users US) " + 
                 "INTERSECT (" + tranx + ")) as temp order by rating desc";
->>>>>>> fix-frontend-yj
         const msql = await pool.query(
             combine,
             [substr, start_date, end_date, pet_type, min, max, rating, is_fulltime, email]
