@@ -213,22 +213,19 @@ caretakerRouter.get('/pt/avail', verifyJwt, async(req, res) => {
     }
 });
 
-// get the availability of a specified part time worker
-// i.e. their available dates - dates where they have confirmed bids
+// view a specified fulltime caretakers non-availability
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
+    const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+    const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
+    const lastDay = new Date(y + 2, m, 2).toISOString().slice(0,10);
     try {
-        const email = req.params.email;
+        const { email } = req.params;
         const sql = await pool.query(
-            "select email, to_char(work_date, 'YYYY-mm-dd') as date from parttimeavail \
-            where email = $1 and \
-            not exists ( \
-            select 1 from bidsfor where \
-                is_confirmed = true and \
-                caretaker_email = $1 and \
-                (start_date, end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day')\
-            );",
-            [email]
-            );
+            "SELECT to_char(date_trunc('day', dd)::date, 'YYYY-MM-dd') as date\
+                FROM generate_series ( $1::timestamp, $2::timestamp, '1 day'::interval) dd \
+            WHERE canWork($3, date_trunc('day', dd)::date, date_trunc('day', dd)::date);",
+            [firstDay, lastDay, email]
+        );
         res.json(sql.rows); 
     } catch (err) {
         console.error(err);
