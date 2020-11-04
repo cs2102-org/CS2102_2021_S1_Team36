@@ -125,3 +125,7 @@ table {
   overflow-y: auto;
   height: 100px;
 }
+
+td {
+  padding-left: 10px;
+}

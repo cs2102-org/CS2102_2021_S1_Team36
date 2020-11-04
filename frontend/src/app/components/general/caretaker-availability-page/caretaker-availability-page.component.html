@@ -75,9 +75,9 @@
             </tr>
 
             <tr *ngFor="let caretaker of caretakers" (click)="select(caretaker)" [ngClass]="selectedCaretaker != undefined && caretaker.id == selectedCaretaker.id ? 'selected-c': 'not-selected'">
-              <td>{{caretaker.name}}</td>
-              <td>{{caretaker.rating}}</td>
-              <td>{{caretaker.type}}</td>
+              <td class="td-pads">{{caretaker.name}}</td>
+              <td class="td-pads">{{caretaker.rating}}</td>
+              <td class="td-pads">{{caretaker.type}}</td>
               <td style="text-align: center;">
                 <button (click)="showHide(caretaker)" *ngIf="caretaker.showTakeCare" class="hide-button">Hide</button>
                 <button (click)="showHide(caretaker)" *ngIf="!caretaker.showTakeCare" class="show-button">Show</button>

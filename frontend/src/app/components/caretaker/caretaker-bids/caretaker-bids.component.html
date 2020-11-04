@@ -25,17 +25,17 @@
             <th class="theader"></th>
           </tr>
           <tr *ngFor="let bid of bids">
-            <td>{{bid.name}}</td>
-            <td>{{bid.pet_name}}</td>
-            <td>{{bid.start}}</td>
-            <td>{{bid.end}}</td>
-            <td>{{bid.payment_type}}</td>
-            <td>{{bid.transfer}}</td>
-            <td>{{bid.submission_time}}</td>
-            <td>${{bid.amount_bidded}}</td>
-            <td>{{bid.is_confirmed}}</td>
-            <td>{{bid.is_paid}}</td>
-            <td>{{bid.rating}}</td>
+            <td class="td-pads">{{bid.name}}</td>
+            <td class="td-pads">{{bid.pet_name}}</td>
+            <td class="td-pads">{{bid.start}}</td>
+            <td class="td-pads">{{bid.end}}</td>
+            <td class="td-pads">{{bid.payment_type}}</td>
+            <td class="td-pads">{{bid.transfer}}</td>
+            <td class="td-pads">{{bid.submission_time}}</td>
+            <td class="td-pads">${{bid.amount_bidded}}</td>
+            <td class="td-pads">{{bid.is_confirmed}}</td>
+            <td class="td-pads">{{bid.is_paid}}</td>
+            <td class="td-pads">{{bid.rating}}</td>
             <th>
               <div *ngIf="bid.is_confirmed === 'Pending'">
                 <button (click)="acceptBid(bid)" class="accept-button">Accept</button>

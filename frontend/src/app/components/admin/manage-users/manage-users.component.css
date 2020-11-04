@@ -23,6 +23,10 @@ th,td {
   border: 2px solid rgb(175, 175, 175);
 }
 
+.td-pads {
+  padding-left: 10px;
+}
+
 table {
   width: 100%;
   border: 2px solid rgb(175, 175, 175);
