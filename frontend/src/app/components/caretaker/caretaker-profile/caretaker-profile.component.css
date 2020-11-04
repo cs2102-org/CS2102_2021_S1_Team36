@@ -33,3 +33,7 @@ td, th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+input.ng-invalid {
+    border: 5px solid red;
+}

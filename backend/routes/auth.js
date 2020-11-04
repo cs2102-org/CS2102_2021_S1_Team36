@@ -73,7 +73,7 @@ authRouter.get('/profile', verifyJwt, async(req, res) => {
       const email = user.email;
       const userProfileList = [];
       const msql_ct = await pool.query(
-          "SELECT email, description, rating, name, \
+          "SELECT email, description, rating, name, password, \
           CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END\
           FROM Users NATURAL JOIN Caretakers WHERE email = $1\;",
           [email]
@@ -92,4 +92,25 @@ authRouter.get('/profile', verifyJwt, async(req, res) => {
   } catch (err) {
       console.error(err);
   }
+});
+
+// Update User's Name, Password and Description
+authRouter.put("/update", verifyJwt, async (req, res) => {
+  const user = res.locals.user;
+  const email = user.email;
+  const {name, password, description} = req.body;
+  try {
+    const { rows } = await pool.query(
+      "UPDATE users SET \
+        name = $1,\
+        password = $2, \
+        description = $3 \
+      WHERE email=$4;"
+    , [name, password, description, email]);
+    res.json(true);
+    console.log(req.body);
+    } catch (err) {
+      console.log(err);
+      res.json(false);
+    }
 });

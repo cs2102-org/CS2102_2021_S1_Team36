@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../../../services/commons.service';
-import { FormControl, FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
 import { NONE_TYPE } from '@angular/compiler';
@@ -51,7 +51,7 @@ export class CaretakerProfileComponent implements OnInit {
 
   profileForm = new FormGroup({
     name: new FormControl(''),
-    password: new FormControl(''),
+    password: new FormControl('', [Validators.required, Validators.minLength(4)]),
     description: new FormControl(''),
     case: new FormControl(''),
   });
@@ -60,13 +60,8 @@ export class CaretakerProfileComponent implements OnInit {
     return this.http.get(baseurl + '/api/auth/profile', getHttpOptionsWithAuth());
   }
 
-  getOwnerPets() {
-    this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
-       this.pets = pets;
-       this.petArray = new FormArray([]);
-       console.log(pets);
-       this.populatePetArray();
-    });
+  public updateUser(details): Observable<any> {
+    return this.http.put(baseurl + '/api/auth/update', details, getHttpOptionsWithAuth());
   }
 
   getUserData() {
@@ -79,9 +74,19 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(user);
       this.getPrices();
       this.profileForm.patchValue({
-        name: [this.flatData.name],
-        description: [this.flatData.description],
+        name: this.flatData.name,
+        password: this.flatData.password,
+        description: this.flatData.description,
       })});
+  }
+
+  getOwnerPets() {
+    this.petOwnerService.getPetOwnerPets().subscribe((pets) => {
+       this.pets = pets;
+       this.petArray = new FormArray([]);
+       console.log(pets);
+       this.populatePetArray();
+    });
   }
 
   ngOnInit(): void {
@@ -137,6 +142,11 @@ export class CaretakerProfileComponent implements OnInit {
   onSubmit(profileParam): void {
     console.log('SENT');
     console.log(profileParam);
+    this.updateUser(profileParam).subscribe(x => {
+      if (!x) {
+        alert("Please enter valid details");
+      }
+    });
   }
 
   onSubmitPetArray() {
@@ -204,12 +214,18 @@ export class CaretakerProfileComponent implements OnInit {
   public updateTakeCareHttp(details) {
     this.http.put(baseurl + '/api/caretaker/updateprice', details, getHttpOptionsWithAuth()).subscribe(x => {
       console.log(x);
+      if (!x) {
+        alert("Incorrect Params");
+      }
     });
   }
   
   public addTakeCareHttp(details) {
     this.http.post(baseurl + '/api/caretaker/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
       console.log(x);
+      if (!x) {
+        alert("Incorrect Params");
+      }
     });
   }
 

@@ -328,6 +328,7 @@ caretakerRouter.put('/updateprice', verifyJwt, async (req, res) => {
         res.json(msql.rows);
     } catch (err) {
         console.error(err);
+        res.json(false);
     }
 });
 
@@ -347,6 +348,7 @@ caretakerRouter.post('/addprice', verifyJwt, async (req, res) => {
         res.json(msql.rows);
     } catch (err) {
         console.error(err);
+        res.json(false);
     }
 });
 
@@ -365,7 +367,7 @@ caretakerRouter.post('/removeprice', verifyJwt, async (req, res) => {
 
         res.json(msql.rows);
     } catch (err) {
-        console.error(err);
+        res.json(false);
     }
 });
 
