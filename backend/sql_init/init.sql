@@ -350,7 +350,8 @@ BEGIN
 	where exists (select 1 
                     from bidsFor B
                 where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
-                and is_paid);
+                and is_paid
+                and B.email=cemail);
 	
 	return daysWorked;
 END;
