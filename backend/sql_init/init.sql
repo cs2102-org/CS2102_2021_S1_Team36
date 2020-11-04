@@ -333,6 +333,28 @@ BEGIN
 	end if;
 END;
 $$;
+
+-- getWorkDays(email, start, end) -> int :: total working days worked
+-- returns 0 if email hasn't completed any jobs that month
+drop function if exists getWorkDays;
+CREATE OR REPLACE FUNCTION getWorkDays(cemail varchar, s date, e date)
+RETURNS int
+language plpgsql
+as
+$$
+declare 
+	daysWorked INTEGER;
+BEGIN
+	select count(dd) into daysWorked
+	from generate_series (s::timestamp, e::timestamp, '1 day'::interval) dd 
+	where exists (select 1 
+                    from bidsFor B
+                where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
+                and is_paid);
+	
+	return daysWorked;
+END;
+$$;
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
@@ -760,12 +782,12 @@ INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'roger',
 '2020-10-25', '2020-01-01', '2020-01-01',
 100, 110,
-false, false, '1', '1', 5
+false, true, '1', '1', 5
 );
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'alfie',
 '2020-10-25', '2020-01-01', '2020-01-05',
 80, 130,
-false, false, '1', '1', 5
+false, true, '1', '1', 5
 );
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'carl@gmail.com', 'fido',
 '2020-10-26', '2020-01-01', '2020-01-05',
