@@ -1065,7 +1065,11 @@ BEGIN
     SET is_confirmed = true
     WHERE 
         BF.caretaker_email = NEW.caretaker_email AND
-        canWork(NEW.caretaker_email, BF.start_date, BF.end_date);
+        BF.owner_email = NEW.owner_email AND
+        BF.pet_name = NEW.pet_name AND
+        BF.submission_time = NEW.submission_time AND 
+        canWork(NEW.caretaker_email, NEW.start_date, NEW.end_date) AND
+        EXISTS (select 1 from Caretakers where email = New.caretaker_email and is_fulltime=true);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
