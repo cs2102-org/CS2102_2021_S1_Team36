@@ -1110,4 +1110,35 @@ CREATE TRIGGER trigger_block_deleting_avail
     FOR EACH ROW
     EXECUTE PROCEDURE block_deleting_avail();
 
+-- trigger: prevent adding bid when you have no avail date (Part Time)
+CREATE OR REPLACE FUNCTION block_inserting_bid_part_time()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+        select 1 from CareTakers
+        where 
+            email = NEW.caretaker_email and is_fulltime = true
+    ) 
+    AND
+    NOT EXISTS (
+		select 1 from PartTimeAvail
+		where
+			email = NEW.caretaker_email and
+			((NEW.start_date, NEW.end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'Part time worker does not have availability on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_inserting_bid_part_time on BidsFor;
+CREATE TRIGGER trigger_block_inserting_bid_part_time
+    BEFORE INSERT ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_inserting_bid_part_time();
+
 -- =============================================== END TRIGGERS ====================================================
