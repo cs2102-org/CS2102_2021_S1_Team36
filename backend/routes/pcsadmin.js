@@ -164,7 +164,7 @@ pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
                 getWorkDays(email, $1, $2),  \
                 CASE WHEN is_fulltime THEN getTotalRevenue(email, $1, $2) ELSE null END as revenue \
             from \
-                users natural join caretakers;",
+                users natural join caretakers order by type asc, name asc;",
             [start_date, end_date]);
         res.json(msql.rows); 
     } catch (err) {
