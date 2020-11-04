@@ -71,6 +71,9 @@ table {
 .theader {
   background-color:#429bce;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .column-right {
@@ -116,4 +119,9 @@ table {
   margin-left: 80%;
   font-size: small;
   padding-bottom: 10px;
+}
+
+.container {
+  overflow-y: auto;
+  height: 100px;
 }

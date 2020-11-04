@@ -116,3 +116,9 @@ tr:hover {
   background-color: #e6e47e !important;
   color: black;
 }
+
+
+.smaller-container{
+  overflow-y: auto;
+  height: 60px;
+}

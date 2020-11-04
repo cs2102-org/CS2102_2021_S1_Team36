@@ -16,16 +16,18 @@
             <h3>Rating: {{caretaker.rating}}</h3>
             <h3>{{caretaker.type}}</h3>
             <p>{{caretaker.description}}</p>
-            <table class="table">
-                <tr>
-                    <th class="theader">Type</th>
-                    <th class="theader">Daily price</th>
-                </tr>
-                <tr *ngFor="let pet of takesCare">
-                    <td>{{pet.species}}</td>
-                    <td>${{pet.daily_price}}</td>
-                </tr>
-            </table>
+            <div class="container">
+                <table class="table">
+                    <tr>
+                        <th class="theader">Type</th>
+                        <th class="theader">Daily price</th>
+                    </tr>
+                    <tr *ngFor="let pet of takesCare">
+                        <td>{{pet.species}}</td>
+                        <td>${{pet.daily_price}}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <br>
         <div *ngIf="isLogged; else elseBlock">
