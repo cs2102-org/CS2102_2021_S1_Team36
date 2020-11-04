@@ -12,6 +12,11 @@
             <p>{{msg}}</p>
             <div *ngIf="showType==='Caretakers'">
                 <button (click)="openNewCaretakerForm()">Add New Caretaker</button><br>
+                <div style="text-align:center">
+                    <button (click)="toggleDateLeft()" class="button-date"><</button>
+                    <h2 style="display:inline-block">{{month}} {{year}}</h2>
+                    <button (click)="toggleDateRight()" class="button-date">></button>
+                </div>
                 <input type="text" [(ngModel)]="searchValue"/>
                 <div class="container">
                     <table>
@@ -19,16 +24,24 @@
                             <th class="theader">Caretaker Name</th>
                             <th class="theader">Email</th>
                             <th class="theader">Type</th>
-                            <th class="theader">Description</th>
                             <th class="theader">Rating</th>
+                            <th class="theader">Workdays</th>
+                            <th class="theader">Salary</th>
+                            <th class="theader">Profit</th>
                             <th class="theader"></th>
                         </tr>
                         <tr *ngFor="let caretaker of things | searchfilter: searchValue">
-                            <td>{{caretaker.name}}</td>
-                            <td>{{caretaker.email}}</td>
-                            <td>{{caretaker.is_fulltime}}</td>
-                            <td>{{caretaker.description}}</td>
-                            <td>{{caretaker.rating}}</td>
+                            <td class="td-pads">{{caretaker.name}}</td>
+                            <td class="td-pads">{{caretaker.email}}</td>
+                            <td class="td-pads">{{caretaker.type}}</td>
+                            <td class="td-pads">{{caretaker.rating}}</td>
+                            <td class="td-pads">{{caretaker.getworkdays}}</td>
+                            <td class="td-pads">${{caretaker.getsalary}}</td>
+                            <td>
+                                <div *ngIf="checkAboveZero(caretaker.profit)" style="color:green;">${{caretaker.profit}}</div>
+                                <div *ngIf="checkBelowZero(caretaker.profit)" style="color:red;">${{caretaker.profit}}</div>
+                                <div *ngIf="!checkBelowZero(caretaker.profit) && !checkAboveZero(caretaker.profit)">${{caretaker.profit}}</div>
+                            </td>
                             <th><button (click)="openMakeBid(caretaker)" class="show-button">Show More</button>
                             <button (click)="deleteUser(caretaker.email)" class="delete-button">Delete</button></th>
                         </tr>
@@ -48,9 +61,9 @@
                     <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let admin of things | searchfilter: searchValue">
-                    <td>{{admin.name}}</td>
-                    <td>{{admin.email}}</td>
-                    <td>{{admin.description}}</td>
+                    <td class="td-pads">{{admin.name}}</td>
+                    <td class="td-pads">{{admin.email}}</td>
+                    <td class="td-pads">{{admin.description}}</td>
                     <th><button (click)="deleteUser(admin.email)" class="delete-button">Delete</button></th>
                 </tr>
             </table>
@@ -68,8 +81,8 @@
                     <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let pt of things">
-                    <td>{{pt.species}}</td>
-                    <td>{{pt.count}}</td>
+                    <td class="td-pads">{{pt.species}}</td>
+                    <td class="td-pads">{{pt.count}}</td>
                     <th><button class="delete-button">Delete</button></th>
                 </tr>
             </table>
@@ -87,9 +100,9 @@
                     <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let po of things | searchfilter: searchValue">
-                    <td>{{po.name}}</td>
-                    <td>{{po.email}}</td>
-                    <td>{{po.description}}</td>
+                    <td class="td-pads">{{po.name}}</td>
+                    <td class="td-pads">{{po.email}}</td>
+                    <td class="td-pads">{{po.description}}</td>
                     <td style="text-align: center;">
                         <button *ngIf="po.show" (click)="showHide(po)" class="delete-button">Hide</button>
                         <button *ngIf="!po.show" (click)="showHide(po)"  class="show-button">Show Pets</button>

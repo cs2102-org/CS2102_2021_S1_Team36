@@ -21,6 +21,14 @@ export class ManageUsersComponent implements OnInit {
   things;
   msg = '';
   searchValue: string;
+  maxMonth;
+  maxYear;
+  month;
+  date;
+  year;
+  monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   constructor(private caretakerService: CaretakerService, private dialog: MatDialog,
     private pcsAdminService: PcsadminService,
@@ -29,15 +37,59 @@ export class ManageUsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllAdmins();
+    const currDate = new Date();
+    currDate.setMonth(currDate.getMonth() - 1);
+    this.date = currDate;
+    this.setMonthYear();
+    this.maxMonth = this.date.getMonth();
+    this.maxYear = this.date.getFullYear();
+  }
+
+  toggleDateLeft() {
+    this.date.setMonth(this.date.getMonth() - 1);
+    this.setMonthYear();
+    this.getAllCaretakers();
+  }
+
+  toggleDateRight() {
+    this.getCurrentRange();
+    if (this.date.getMonth() == this.maxMonth && this.date.getFullYear() == this.maxYear) {
+
+    } else {
+      this.date.setMonth(this.date.getMonth() + 1);
+      this.setMonthYear();
+      this.getAllCaretakers();
+    }
+  }
+
+  getCurrentRange() {
+    const y = this.date.getFullYear(), m = this.date.getMonth();
+    const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
+    const lastDay = new Date(y, m + 1, 1).toISOString().slice(0,10);
+    return [firstDay, lastDay];
+  }
+
+  setMonthYear() {
+    this.month = this.monthNames[this.date.getMonth()];
+    this.year = this.date.getFullYear();
+  }
+
+  getProfit(caretaker) {
+    if (caretaker.type == "Part Time") {
+      caretaker.profit = '-';
+    } else if (caretaker.revenue == null) {
+      caretaker.profit = -caretaker.getsalary;
+    } else {
+      caretaker.profit = caretaker.revenue - caretaker.getsalary;
+    }
+    return caretaker;
   }
 
   getAllCaretakers() {
-    const start = new Date('1000-01-01');
-    const end = new Date('3000-01-01');
-    this.pcsAdminService.getAllCaretakers({start_date: start, end_date: end}).subscribe(caretakers => {
+    this.pcsAdminService.getAllCaretakers(this.getCurrentRange()).subscribe(caretakers => {
       this.showType = "Caretakers";
       this.msg = '';
-      this.things = caretakers.map(c => {c.is_fulltime = c.is_fulltime ? "Full Time" : "Part Time"; return c;});
+      this.things = caretakers.map(this.getProfit);
     });
   }
 
@@ -94,6 +146,14 @@ export class ManageUsersComponent implements OnInit {
         this.refreshAfterChange();
       };
     })
+  }
+
+  checkAboveZero(e) {
+    return e != '-' && e > 0;
+  }
+
+  checkBelowZero(e) {
+    return e != '-' && e < 0;
   }
 
   openNewAdminForm() {

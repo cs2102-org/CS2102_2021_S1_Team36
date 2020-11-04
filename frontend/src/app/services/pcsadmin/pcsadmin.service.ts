@@ -31,7 +31,9 @@ export class PcsadminService {
   }
 
   public getAllCaretakers(details): Observable<any> {
-    return this.http.post(baseurl + '/api/bids/earnings/range', details, httpOptions);
+    const start = details[0];
+    const end = details[1];
+    return this.http.get(baseurl + '/api/pcs-admins/salaries/' + start + "/" + end, httpOptions);
   }
 
   public postNewAdmin(details): Observable<any> {

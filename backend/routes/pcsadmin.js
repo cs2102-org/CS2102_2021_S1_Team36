@@ -144,6 +144,61 @@ pcsRouter.post('/ft', async (req, res) => {
     }
 });
 
+// This only counts jobs that were COMPLETED (end_date) during [start_date, end_date] inclusive
+// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards his Feb salary
+// bc there is min 3k salary for FT, only makes sense when querying entire months
+// e.g. start: 2020-01-01, end: 2020-01-31
+// returns table of (email, name, type, description, salary)
+pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
+    try {
+        const { start_date, end_date } = req.params;
+        console.log(start_date, end_date);
+        const msql = await pool.query(
+            "select \
+                email,  \
+                name,   \
+                CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END as type,    \
+                description,    \
+                rating, \
+                getSalary(email, $1, $2),    \
+                getWorkDays(email, $1, $2),  \
+                CASE WHEN is_fulltime THEN getTotalRevenue(email, $1, $2) ELSE null END as revenue \
+            from \
+                users natural join caretakers order by type asc, name asc;",
+            [start_date, end_date]);
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// This only counts jobs that were COMPLETED (end_date) during [start_date, end_date] inclusive
+// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards his Feb salary
+// bc there is min 3k salary for FT, only makes sense when querying entire months
+// e.g. start: 2020-01-01, end: 2020-01-31
+// returns (salary, pet_days_counted)
+pcsRouter.get('/salaries/:email/:start_date/:end_date', async(req, res) => {
+    try {
+        const { email, start_date, end_date } = req.params;
+        console.log(start_date, end_date);
+        const msql = await pool.query(
+            "select \
+                getSalary(email, $1, $2),    \
+                CASE WHEN getpetdays(email, $1, $2) IS NULL \
+                    THEN 0  \
+                    ELSE getpetdays(email, $1, $2) END \
+                        as pet_days_counted    \
+            from \
+                users natural join caretakers   \
+            where   \
+                email=$3;",
+            [start_date, end_date, email]);
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     pcsRouter
 }

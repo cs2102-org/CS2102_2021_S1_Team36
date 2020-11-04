@@ -7,7 +7,7 @@
 .column-left {
   width: 32%;
   padding-top: 2%;
-  padding-left: 21%;
+  padding-left: 15%;
   padding-right: 2%;
   float: left;
   word-wrap: break-word;
@@ -69,14 +69,14 @@
   box-shadow: 5px 5px 20px;
   background-color: #f8f8f8;
   float: left;
-  margin-left: 23%;
+  margin-left: 13%;
   margin-top: 2%;
 }
 
 textarea {
     vertical-align: text-top;
     width: 100%;
-    height: 150px;
+    height: 120px;
 }
 
 table {
@@ -113,10 +113,10 @@ input.ng-invalid {
 
 .container-one {
   overflow-y: auto;
-  height: 150px;
+  height: 120px;
 }
 
 .container-two {
   overflow-y: auto;
-  height: 90px;
+  height: 80px;
 }

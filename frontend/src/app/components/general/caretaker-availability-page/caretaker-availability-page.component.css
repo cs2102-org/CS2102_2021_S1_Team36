@@ -170,3 +170,7 @@ tr:hover {
   background-color: #e6e47e !important;
   color: black;
 }
+
+.td-pads {
+  padding-left: 10px;
+}

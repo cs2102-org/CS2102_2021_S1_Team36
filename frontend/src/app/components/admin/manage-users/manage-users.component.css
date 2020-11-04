@@ -23,6 +23,10 @@ th,td {
   border: 2px solid rgb(175, 175, 175);
 }
 
+.td-pads {
+  padding-left: 10px;
+}
+
 table {
   width: 100%;
   border: 2px solid rgb(175, 175, 175);
@@ -82,7 +86,7 @@ tr:nth-child(even) {
 
 .container {
   overflow-y: auto;
-  height: 275px;
+  height: 30vh;
 }
 
 .spacing {
@@ -121,4 +125,11 @@ tr:hover {
 .smaller-container{
   overflow-y: auto;
   height: 60px;
+}
+
+.button-date {
+  display:inline-block;
+  padding: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
