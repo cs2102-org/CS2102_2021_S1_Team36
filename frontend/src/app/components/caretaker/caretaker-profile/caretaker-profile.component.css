@@ -95,3 +95,28 @@ tr:nth-child(even) {
 input.ng-invalid {
     border: 5px solid red;
 }
+
+.message {
+  border-style: solid;
+  padding: 25px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.message-container {
+  padding-top: 0.5%;
+}
+
+.container-one {
+  overflow-y: auto;
+  height: 150px;
+}
+
+.container-two {
+  overflow-y: auto;
+  height: 90px;
+}

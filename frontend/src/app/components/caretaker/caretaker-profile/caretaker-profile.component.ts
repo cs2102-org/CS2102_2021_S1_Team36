@@ -24,6 +24,7 @@ export class CaretakerProfileComponent implements OnInit {
   pets = [];
   petTypes;
   email;
+  msg = '';
 
   petArray = new FormArray([]);
   petForm: FormGroup;
@@ -163,6 +164,8 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(x);
       if (!x) {
         alert("Incorrect Params");
+      } else {
+        this.msg = "Updated Successfully!";
       }
     });
   }
@@ -179,6 +182,8 @@ export class CaretakerProfileComponent implements OnInit {
     this.updateUser(profileParam).subscribe(x => {
       if (!x) {
         alert("Please enter valid details");
+      } else {
+        this.msg = "Updated Successfully!";
       }
     });
   }
@@ -250,6 +255,8 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(x);
       if (!x) {
         alert("Incorrect Params");
+      } else {
+        this.msg = "Updated Successfully!";
       }
     });
   }
@@ -258,7 +265,9 @@ export class CaretakerProfileComponent implements OnInit {
     this.http.post(baseurl + '/api/caretaker/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
       console.log(x);
       if (!x) {
-        alert("Incorrect Params");
+        alert("Incorrect Params"); 
+      } else {
+        this.msg = "Updated Successfully!";
       }
     });
   }
