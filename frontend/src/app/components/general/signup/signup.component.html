@@ -1,8 +1,7 @@
  <div class="content">
-    <p *ngIf="signUpSuccess">Signup Success. Login Now!</p>
-    <p *ngIf="errorMessage!=''">{{errorMessage}}</p>
     <div class="content-box">
         <h1>Join Us!</h1>
+        <p *ngIf="message!=''">{{message}}</p>
         <p *ngIf="signUpForm.get('password_confirm').touched && signUpForm.hasError('notMatched')">Passwords do not match</p>
         <p *ngIf="signUpForm.get('email').invalid && signUpForm.get('email').touched"> Not a valid email</p>
 
@@ -27,19 +26,15 @@
             <input type="checkbox" id="po" formControlName="pet_owner" value="true">
             <label for="po">Pet Owner</label>
             <input type="checkbox" id="ct" formControlName="caretaker" value="true">
-            <label for="ct">Caretaker</label><br>
+            <label for="ct">Part Time Caretaker</label><br>
             <div *ngIf="signUpForm.get('caretaker').value === true">
-                <p>Type: </p>
-                <input type="radio" id="pt" formControlName="caretaker_type" value="Part Time">
-                <label for="pt">Part Time</label>
-                <input type="radio" id="cf" formControlName="caretaker_type" value="Full Time">
-                <label for="ft">Full Time</label><br>
+                <p>Please contact admin@pcs.com to sign up as full time caretaker.</p>
             </div>
             <p>A Short Description of You: </p>
             <textarea formControlName="description" rows="4" cols="50"></textarea><br>
             <div class="buttons">
                 <button class="button" type="button" (click)="openLogin()">Existing User</button>
-                <button type="submit" [disabled]="!signUpForm.valid" (click)="onSubmitSignUp()">Submit</button>
+                <button type="submit" [disabled]="!signUpForm.valid">Submit</button>
             </div>
         </form>
     </div>

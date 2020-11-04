@@ -44,17 +44,23 @@ authRouter.post("/login", async (req, res) => {
 
 // User signup
 authRouter.post("/signup", async (req, res) => {
-  const { name, email, password, desc, caretaker, pet_owner, type } = req.body;
+  const { name, email, password, description, caretaker, pet_owner } = req.body;
   // const hash = await bcrypt.hash(password, saltRounds);
   try {
-    await pool.query(
-      "INSERT INTO Users VALUES ($1, $2, $3, $4);",
-    [name, email, desc, password]);
-
-    if (pet_owner) {
+    if (pet_owner && caretaker) {
       await pool.query(
-        "INSERT INTO PetOwners VALUES (email);",
-      [email]);
+        "select createPtAndPo($1, $2, $3, $4);",
+      [email, name, description, password]);
+    } else if (pet_owner) {
+      await pool.query(
+        "select createPetOwner($1, $2, $3, $4);",
+      [email, name, description, password]);
+    } else if (caretaker){
+      await pool.query(
+        "select createPtCaretaker($1, $2, $3, $4);",
+      [email, name, description, password]);
+    } else {
+      return res.status(404).json({ error: "No options chosen." });
     }
   } catch (e) {
     return res.status(404).json({ error: e.toString() });

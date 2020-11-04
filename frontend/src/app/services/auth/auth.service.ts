@@ -42,7 +42,7 @@ export class AuthService {
           this.notiSignal.next("Signup success");
         },
         (err) => {
-          const error = err['error']['error'];
+          this.errors = err['error']['error'];
           this.errorSignal.next(this.errors);
         }
       );

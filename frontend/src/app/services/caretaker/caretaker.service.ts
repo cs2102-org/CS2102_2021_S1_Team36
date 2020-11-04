@@ -64,7 +64,7 @@ export class CaretakerService {
   }
 
   public getAvailDates(): Observable<any> {
-    return this.http.get(baseurl + '/api/caretaker/pt/avail', getHttpOptionsWithAuth());
+    return this.http.get(baseurl + '/api/caretaker/pt/av', getHttpOptionsWithAuth());
   }
 
    public postNewAvail(details): Observable<any> {
@@ -77,5 +77,9 @@ export class CaretakerService {
 
   public deleteAvail(date): Observable<any> {
     return this.http.delete(baseurl + '/api/caretaker/pt/avail/' + date, getHttpOptionsWithAuth());
+  }
+
+  public getCaretakerReviews(email): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/reviews/' + email, httpOptions);
   }
 }

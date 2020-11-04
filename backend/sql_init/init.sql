@@ -84,6 +84,7 @@ CREATE TABLE BidsFor (
     payment_type payment_type,
     transfer_type transfer_type,
     rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
+    review VARCHAR(255) DEFAULT NULL,
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
@@ -93,7 +94,7 @@ CREATE TABLE TakecarePrice (
     daily_price DECIMAL(10,2),
     email varchar(30) REFERENCES Caretakers(email) ON DELETE cascade, -- references the caretaker
     species varchar(30) REFERENCES PetTypes(species),
-    PRIMARY KEY (email, species)
+    PRIMARY KEY (email, species)  --- daily price > base price
 );
 
 CREATE TABLE Posts (
@@ -245,6 +246,46 @@ $$
 BEGIN
     insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
     insert into caretakers (email, is_fulltime) values (email, true);
+END;
+$$;
+
+-- void function. Creates a new user and part time caretaker in a single transaction.
+drop function if exists createPtCaretaker;
+CREATE OR REPLACE FUNCTION createPtCaretaker(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into caretakers (email, is_fulltime) values (email, false);
+END;
+$$;
+
+-- void function. Creates a new user and petowner in a single transaction.
+drop function if exists createPetOwner;
+CREATE OR REPLACE FUNCTION createPetOwner(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+END;
+$$;
+
+-- void function. Creates a new user, petowner and part time caretaker in a single transaction.
+drop function if exists createPtAndPo;
+CREATE OR REPLACE FUNCTION createPtAndPo (email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+    insert into caretakers (email, is_fulltime) values (email, false);
 END;
 $$;
 

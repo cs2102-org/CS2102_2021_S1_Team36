@@ -78,13 +78,13 @@
               <td>{{caretaker.name}}</td>
               <td>{{caretaker.rating}}</td>
               <td>{{caretaker.type}}</td>
-              <th>
+              <td style="text-align: center;">
                 <button (click)="showHide(caretaker)" *ngIf="caretaker.showTakeCare" class="hide-button">Hide</button>
                 <button (click)="showHide(caretaker)" *ngIf="!caretaker.showTakeCare" class="show-button">Show</button>
                 <div *ngFor="let pet of caretaker.takesCare">
                   <span>{{pet.species}}: ${{pet.daily_price}}</span>
                 </div>
-              </th>
+              </td>
             </tr>
           </table>
         </div>

@@ -95,7 +95,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   checkFullTime() {
-    this.caretakerType = localStorage.hasOwnProperty('is_fulltime') ? "Full Time" : "Part Time";
+    this.caretakerType = localStorage.getItem('is_fulltime') == 'true' ? "Full Time" : "Part Time";
   }
 
   getDates() {

@@ -9,8 +9,9 @@
         </div>
     </div>
 
-    <div class="column-right">
+    <div class="column-center">
         <div class="details" *ngIf="caretaker != null">
+            <h2>Details</h2>
             <h3>{{caretaker.name}}</h3>
             <h3>Rating: {{caretaker.rating}}</h3>
             <h3>{{caretaker.type}}</h3>
@@ -29,7 +30,7 @@
         <br>
         <div *ngIf="isLogged; else elseBlock">
             <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
-                <h3>Bid Form</h3>
+                <h2>Bid Form</h2>
                 <p>Choose the dates by clicking and dragging on the calendar</p>
                 <p>You have chosen: {{bidForm.get('start_date').value}} - {{bidForm.get('end_date').value}}</p>
                 <p><label>Choose which pet: </label>
@@ -67,7 +68,19 @@
             </form>
         </div>
         <ng-template #elseBlock>
-            <h2>Please Login to bid</h2>
+            <div class="details">
+                <h3>Please Login to bid</h3>
+            </div>
         </ng-template>
+    </div>
+
+    <div class="column-right">
+        <div class="container-2">
+            <h2>Reviews</h2>
+            <div *ngFor="let review of reviews" class="review">
+                <p id="review-body">{{review.review}}</p>
+                <p id="review-user">{{review.name}} Rating: {{review.rating}}</p>
+            </div>
+        </div>
     </div>
 </div>
