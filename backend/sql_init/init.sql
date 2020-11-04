@@ -351,7 +351,7 @@ BEGIN
                     from bidsFor B
                 where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
                 and is_paid
-                and B.email=cemail);
+                and B.caretaker_email=cemail);
 	
 	return daysWorked;
 END;
