@@ -298,7 +298,7 @@ $$;
 -- getSalary(email, start, end) -> float
 -- gets salary to be paid to a caretaker for jobs COMPLETED during 
 -- [start, end] inclusive
--- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the job
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the entire job 
 -- in Feb
 drop function if exists getSalary;
 CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
