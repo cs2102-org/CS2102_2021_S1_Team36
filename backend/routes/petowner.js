@@ -73,6 +73,63 @@ petownerRouter.post('/:email/pets', async (req, res) => {
     }
 });
 
+// Add new pet to database of user (with verifyJwt)
+petownerRouter.post('/addpet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const {pet_name, special_requirements, description, species} = req.body;
+    try {
+    const { rows } = await pool.query(
+        "INSERT INTO pets (email, pet_name, special_requirements, description, species) \
+        VALUES ($1, $2, $3, $4, $5);",
+    [email, pet_name, special_requirements, description, species]);
+    res.json(true);
+    console.log(req.body);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
+// Update existing pet to database of user (with verifyJwt)
+petownerRouter.put('/updatepet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const {pet_name, special_requirements, description, species} = req.body;
+    console.log(req.body);
+    try {
+    const { rows } = await pool.query(
+        "UPDATE pets SET \
+        special_requirements = $3, \
+        description = $4, \
+        species = $5 \
+        WHERE email = $1 and pet_name = $2",
+    [email, pet_name, special_requirements, description, species]);
+    res.json(true);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
+// Remove existing pet from database of user (with verifyJwt)
+petownerRouter.post('/deletepet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const { pet_name } = req.body;
+    try {
+    const { rows } = await pool.query(
+        "DELETE FROM pets \
+        WHERE email = $1 and pet_name = $2",
+    [email, pet_name]);
+    res.json(true);
+    console.log(email+pet_name);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
 // returns a list of all pet types
 petownerRouter.get('/alltypes', async(req, res) => {
     try {

@@ -132,22 +132,47 @@ export class CaretakerProfileComponent implements OnInit {
   updatePet(i: number) {
     var updated = this.petArrays.at(i).value;
     var original = this.pets[i];
-    console.log(original == undefined);
-    // if (original == undefined) {
-    //   this.addTakeCareHttp(updated);
-    //   return;
-    // }
-    // this.updateTakeCareHttp(updated);
+    console.log(updated);
+    console.log(this.pets);
+    if (original == undefined) {
+      this.addPetHttp(updated);
+      return;
+    }
+    updated.pet_name = this.pets[i].pet_name;
+    this.updatePetHttp(updated);
   }
 
   removePet(i: number) {
+    var removal = this.petArrays.at(i).value;
+    removal.pet_name = this.pets[i].pet_name;
     this.petArrays.removeAt(i);
+    this.removePetHttp(removal);
   }
 
-  addPetHttp(updated){}
+  addPetHttp(details){
+    this.http.post(baseurl + '/api/petowner/addpet', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+      if (!x) {
+        alert("Incorrect Params");
+      }
+    });
+  }
 
-  updatePetHttp(updated){}
-  
+  updatePetHttp(details){
+    this.http.put(baseurl + '/api/petowner/updatepet', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+      if (!x) {
+        alert("Incorrect Params");
+      }
+    });
+  }
+
+  removePetHttp(details) {
+    this.http.post(baseurl + '/api/petowner/deletepet', details, getHttpOptionsWithAuth()).subscribe(x => {
+      console.log(x);
+    });
+  }
+
   onSubmit(profileParam): void {
     console.log('SENT');
     console.log(profileParam);
