@@ -23,6 +23,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
     selectable: true,
     unselectAuto: false,
     eventTextColor: 'black',
+    eventBackgroundColor: 'lightblue',
     select: this.selectDate.bind(this),
     datesSet: this.viewRenderer.bind(this),
     eventClick: this.openBidDialog.bind(this),
@@ -40,7 +41,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
   currentEnd;
   numOfWorkDaysInThatMonth = 0;
   earningsInThatMonth;
-  msg;
+  msg = '';
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService
     , private dialog: MatDialog) { }
@@ -144,12 +145,18 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   onLeaveSubmit() {
-    this.caretakerService.postNewLeave(this.form.value).subscribe(msg => {
+    this.caretakerService.postNewLeave(this.form.value).subscribe((msg) => {
       if (msg) {
         this.msg = "Leave was successfully added";
         this.getDates();
+      }}, (err) => {
+        if (err['error']['error'].indexOf('You have a job') >= 0) {
+          this.msg = "You have a job on this date!";
+        } else {
+          this.msg = "You already have a leave on this date!";
+        }
       }
-    });
+    );
   }
 
   onAvailSubmit() {
@@ -157,8 +164,10 @@ export class CaretakerSummaryPageComponent implements OnInit {
       if (msg) {
         this.msg = "Availability was successfully added";
         this.getDates();
+      }}, (err) => {
+        this.msg = "You already declared availability on this date!";
       }
-    });
+    );
   }
 
 }
