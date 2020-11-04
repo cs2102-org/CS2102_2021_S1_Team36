@@ -1,1 +1,13 @@
-<p>forum works!</p>
+<div class="fixed-bg">
+
+<div class="header">Forum</div>
+
+<ul class="striations">
+  <li *ngFor="let post of fakePosts">
+      <div class="post-title">{{post.title}}</div>
+      <div class="post-desc">{{post.content}}</div>
+      <div class="post-author">Posted By: {{post.name}} | Comments: 0</div>
+  </li>
+</ul>
+
+</div>

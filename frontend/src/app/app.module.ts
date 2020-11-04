@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ForumComponent } from './components/general/forum/forum.component';
+<<<<<<< HEAD
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
@@ -36,6 +37,12 @@ import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-a
 import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
 import { SearchfilterPipe } from './searchfilter.pipe';
 import { FilterspeciesPipe } from './filterspecies.pipe';
+import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
+import { PostComponent } from './components/general/forum/post/post.component';
+=======
+import { PostComponent } from './components/general/forum/post/post.component';
+import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
+>>>>>>> forum
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -69,6 +76,8 @@ FullCalendarModule.registerPlugins([
     DetailedPetComponent,
     SearchfilterPipe,
     FilterspeciesPipe,
+    PostComponent,
+    CreatePostComponent
   ],
   imports: [
     BrowserModule,
