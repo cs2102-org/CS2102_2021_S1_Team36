@@ -6,6 +6,7 @@
     <ng-template #elseBlock>
         <button (click)="logout()" id="button-login">Logout</button>
     </ng-template>
+    <div *ngIf="isLogged;" id="button-forum" [routerLink] = "['/profile']">Profile</div>
     <app-auto-dropdown id="button-pet-owner" *ngIf="isPetOwner">
         <div trigger>Pet Owner</div>
         <div content>
@@ -16,7 +17,6 @@
     <app-auto-dropdown id="button-caretaker" *ngIf="isCaretaker">
         <div trigger>Caretaker</div>
         <div content>
-            <span mat-menu-item [routerLink] = "['/caretaker/profile']">Profile</span>
             <span mat-menu-item [routerLink] = "['/caretaker/bids']">Bids</span>
             <span mat-menu-item [routerLink] = "['/caretaker/summary']">Summary</span>
         </div>

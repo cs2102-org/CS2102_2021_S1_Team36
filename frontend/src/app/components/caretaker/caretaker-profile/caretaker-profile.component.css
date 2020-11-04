@@ -1,33 +1,91 @@
-.profile {
-    margin-left: 20vw;
-    margin-top: 20vh;
-    font-size: 2rem;
+.content {
+  background-color: #1e77aa;
+  height: 95vh;
+  width: 100%;
 }
 
-input {
-    font-size: 2rem;
+.column-left {
+  width: 32%;
+  padding-top: 2%;
+  padding-left: 21%;
+  padding-right: 2%;
+  float: left;
+  word-wrap: break-word;
+}
+
+.column-right {
+  padding-top: 2%;
+  float: left;
+  border-radius: 10px;
+}
+
+.form {
+  border-style: solid;
+  padding: 25px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+}
+
+.caretaker-details {
+  border-style: solid;
+  padding: 25px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+}
+
+.remove-button {
+  width: 100%;
+  background-color: #eb756c;
+  border: none;
+  color: white;
+}
+
+.save-button {
+  width: 100%;
+  background-color: #5eda62;
+  border: none;
+  color: white;
+}
+
+.remove-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
+
+.save-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
+
+.petowner-details {
+  border-style: solid;
+  padding: 25px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  float: left;
+  margin-left: 23%;
+  margin-top: 2%;
 }
 
 textarea {
     vertical-align: text-top;
-    font-size: 1.5rem;
+    width: 100%;
+    height: 150px;
 }
 
 table {
-    font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 70vw;
-    font-size: 1rem;
 }
 
-.pet-portion {
-    font-size: 1.5rem;
-}
 
 td, th {
     border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
 }
 
 tr:nth-child(even) {

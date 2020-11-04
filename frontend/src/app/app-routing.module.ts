@@ -21,7 +21,7 @@ const routes: Routes = [
   { path: 'petowner/summary', component: PetOwnerSummaryComponent },
   { path: 'caretaker/bids', component: CaretakerBidsComponent },
   { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
-  { path: 'caretaker/profile', component: CaretakerProfileComponent },
+  { path: 'profile', component: CaretakerProfileComponent },
   { path: 'forum', component: ForumComponent },
   { path: 'caretaker/bid/:caretaker', component: CaretakerMakeBidComponent },
   { path: 'petowner/summary', component: PetOwnerSummaryComponent },
