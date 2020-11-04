@@ -1,0 +1,88 @@
+<div class="profile">
+    <form class="form" [formGroup]="profileForm" (ngSubmit)="onSubmit(profileForm.value)">
+        <h2>Personal Details:</h2>
+        <div class="text-bar"><p>
+            <label><b>Name: </b></label>
+            <input type="text" formControlName="name" required minlength="3">
+        </p></div>
+
+        <div class="text-bar"><p>
+            <label><b>Password: </b></label>
+            <input type="text" name="passwords" formControlName="password" required minlength="4">
+        </p></div>
+
+        <div class="text-bar"><p>
+            <label><b>Email: </b>{{ flatData.email }}</label>
+        </p>
+        </div>
+
+        <div class="text-bar"><p>
+            <label><b>Description: </b></label>
+            <textarea rows="4" cols="50" formControlName="description"></textarea>
+        </p></div>
+        <button class="button" [disabled]="!profileForm.valid" type="submit">Update</button>
+    </form>
+
+    <div *ngIf="isCaretaker">
+        <h2>Caretaker Details</h2>
+        <p><b>Current Rating: </b>{{ flatData.rating}} </p>
+        <p><b>Employment: </b>{{ flatData.case }}</p>
+
+        <h1>TakeCare Info</h1>
+
+        <div class="takecare-portion" *ngIf="isCaretaker">
+            <form [formGroup]="takeCareForm">
+                <div formArrayName="takeCareArrays">
+                    <tr *ngFor="let takecare of takeCareArrays.controls; let i=index">
+                      <div [formGroupName]="i">
+                        <table>
+                        <td>Pet Species: {{ takecare.value.species }}</td>
+                        <td><select class="custom-select" formControlName="species">
+                            <option value="" disabled>Choose your species</option>
+                            <option *ngFor="let species of petTypes | filterspecies: takeCareSpecies" [ngValue]="species">{{species}}</option>
+                         </select></td>
+                        <td>Daily Price: $<input type="text" formControlName="daily_price"></td>
+                        <td><button (click)="updateTakeCare(i)">Save</button></td>
+                        <td><button (click)="removeTakeCare(i)">Remove</button></td>
+                        </table>
+                      </div>
+                    </tr>
+                  </div>
+            </form>
+            <p>
+                <button type="button" (click)="addTakeCare()">Add Take Care</button>
+            </p>
+            </div>
+
+    </div>
+
+    <div class="pet-portion" *ngIf="isPetOwner">
+    <form [formGroup]="petForm">
+        <h2><b>
+            Your Pets
+        </b></h2>
+        <div formArrayName="petArrays">
+            <tr *ngFor="let pet of petArrays.controls; let i=index">
+              <div [formGroupName]="i">
+                <table>
+                <td>Pet Name: <input type="text" formControlName="pet_name" [disabled]='i'></td>
+                
+                <td>Special Requirements: <input type="text" formControlName="special_requirements"></td>
+                
+                <td>Description: <input type="text" formControlName="description"></td>
+                
+                <td>Species<select class="custom-select" formControlName="species">
+                    <option value="" disabled>Choose your species</option>
+                    <option *ngFor="let species of petTypes" [ngValue]="species">{{species}}</option></select></td>
+                <td><button (click)="updatePet(i)">Save</button></td>
+                <td><button (click)="removePet(i)">Remove</button></td>
+                </table>
+              </div>
+            </tr>
+          </div>
+    </form>
+    <p>
+        <button type="button" (click)="addPets()">Add New Pet</button>
+    </p>
+    </div>
+</div>

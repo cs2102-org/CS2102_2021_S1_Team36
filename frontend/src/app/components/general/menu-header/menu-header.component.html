@@ -16,6 +16,7 @@
     <app-auto-dropdown id="button-caretaker" *ngIf="isCaretaker">
         <div trigger>Caretaker</div>
         <div content>
+            <span mat-menu-item [routerLink] = "['/caretaker/profile']">Profile</span>
             <span mat-menu-item [routerLink] = "['/caretaker/bids']">Bids</span>
             <span mat-menu-item [routerLink] = "['/caretaker/summary']">Summary</span>
         </div>

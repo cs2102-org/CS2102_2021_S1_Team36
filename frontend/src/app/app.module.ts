@@ -26,6 +26,7 @@ import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
+import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
 import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
@@ -34,6 +35,7 @@ import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/fo
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
 import { SearchfilterPipe } from './searchfilter.pipe';
+import { FilterspeciesPipe } from './filterspecies.pipe';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -57,6 +59,7 @@ FullCalendarModule.registerPlugins([
     CaretakerMakeBidComponent,
     PetOwnerSummaryComponent,
     SubmitRatingComponent,
+    CaretakerProfileComponent,
     BidDialogComponent,
     ManageUsersComponent,
     FormNewCaretakerComponent,
@@ -65,6 +68,7 @@ FullCalendarModule.registerPlugins([
     DeleteLeaveAvailComponent,
     DetailedPetComponent,
     SearchfilterPipe,
+    FilterspeciesPipe,
   ],
   imports: [
     BrowserModule,

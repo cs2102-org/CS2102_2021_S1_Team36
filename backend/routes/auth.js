@@ -1,6 +1,6 @@
 const express = require('express');
 const pool = require('../db');
-const { jwt } = require('../auth/index');
+const { jwt, verifyJwt } = require('../auth/index');
 const bcrypt = require('bcrypt');
 
 const saltRounds = 10;
@@ -71,3 +71,52 @@ authRouter.post("/signup", async (req, res) => {
 module.exports = {
   authRouter
 };
+
+// User profile retrieval. Gets detailed information of specified user [for user profile page]
+authRouter.get('/profile', verifyJwt, async(req, res) => {
+  try {
+      const user = res.locals.user;
+      const email = user.email;
+      const userProfileList = [];
+      const msql_ct = await pool.query(
+          "SELECT email, description, rating, name, password, \
+          CASE WHEN is_fulltime THEN 'Full Time' ELSE 'Part Time' END\
+          FROM Users NATURAL JOIN Caretakers WHERE email = $1\;",
+          [email]
+      );
+      const msql_po = await pool.query(
+          // "select * from users U left join petowners PO on U.email = PO.email\
+          "select * from users U natural join petowners\
+          where U.email = $1;",
+          [email]
+      );
+      userProfileList.push(msql_ct.rows);
+      userProfileList.push(msql_po.rows);
+      console.log(userProfileList);
+      res.json(userProfileList);
+
+  } catch (err) {
+      console.error(err);
+  }
+});
+
+// Update User's Name, Password and Description
+authRouter.put("/update", verifyJwt, async (req, res) => {
+  const user = res.locals.user;
+  const email = user.email;
+  const {name, password, description} = req.body;
+  try {
+    const { rows } = await pool.query(
+      "UPDATE users SET \
+        name = $1,\
+        password = $2, \
+        description = $3 \
+      WHERE email=$4;"
+    , [name, password, description, email]);
+    res.json(true);
+    console.log(req.body);
+    } catch (err) {
+      console.log(err);
+      res.json(false);
+    }
+});
