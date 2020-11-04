@@ -21,6 +21,7 @@ export class CaretakerProfileComponent implements OnInit {
   flatData;
   isCaretaker = false;
   isPetOwner = false;
+  isPcsAdmin = false;
   pets = [];
   petTypes;
   email;
@@ -71,7 +72,8 @@ export class CaretakerProfileComponent implements OnInit {
       this.flatData = user.flat()[0];      
       if (user[0][0] != undefined) {this.userData['caretaker'] = user[0][0]; this.isCaretaker = true;}
       if (user[1][0] != undefined) {this.userData['petowner'] = user[1][0]; this.isPetOwner = true;}
-      console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner);
+      if (user[2][0] != undefined) {this.userData['pcsadmin'] = user[2][0]; this.isPcsAdmin = true;}
+      console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner+', isPcsAdmin');
       console.log(user);
       this.getPrices();
       this.profileForm.patchValue({

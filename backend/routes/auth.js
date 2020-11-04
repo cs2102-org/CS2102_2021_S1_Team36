@@ -85,13 +85,18 @@ authRouter.get('/profile', verifyJwt, async(req, res) => {
           [email]
       );
       const msql_po = await pool.query(
-          // "select * from users U left join petowners PO on U.email = PO.email\
           "select * from users U natural join petowners\
           where U.email = $1;",
           [email]
       );
+      const msql_pcs = await pool.query(
+        "select * from pcsadmins P natural join users U\
+        where P.email = $1;",
+        [email]
+    );
       userProfileList.push(msql_ct.rows);
       userProfileList.push(msql_po.rows);
+      userProfileList.push(msql_pcs.rows);
       console.log(userProfileList);
       res.json(userProfileList);
 
