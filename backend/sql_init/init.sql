@@ -264,6 +264,7 @@ BEGIN
 	where caretaker_email=cemail
 		and (s <= end_date and end_date <= e)
 		and is_paid
+        and is_confirmed
 	group by cemail;
 	
 	return daysWorked;
@@ -285,6 +286,7 @@ BEGIN
 	select sum((end_date - start_date + 1) * amount_bidded) into revenue
 	from bidsfor 
 	where is_paid 
+        and is_confirmed
 		and (s <= end_date and end_date <= e)
 		and caretaker_email=cemail
 	group by cemail;
@@ -345,13 +347,14 @@ $$
 declare 
 	daysWorked INTEGER;
 BEGIN
-	select count(dd) into daysWorked
+	select count(*) into daysWorked
 	from generate_series (s::timestamp, e::timestamp, '1 day'::interval) dd 
 	where exists (select 1 
-                    from bidsFor B
-                where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
-                and is_paid
-                and B.caretaker_email=cemail);
+                  from bidsFor B
+                  where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
+                    and B.is_confirmed
+                    and B.is_paid
+                    and B.caretaker_email=cemail);
 	
 	return daysWorked;
 END;

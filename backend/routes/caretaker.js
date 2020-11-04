@@ -403,6 +403,25 @@ caretakerRouter.get('/txnbefore', verifyJwt, async(req, res) => {
     }
 });
 
+// for specific caretaker to view his projected salary and number of working days for the current month
+// returns (money, days), where
+//  money = salary CT would earn for the month queried if the month were to instantly end
+//      PT and FT will follow their respective salary calculations   
+//  days = num days of the month where he has at least 1 pet to take care of
+caretakerRouter.get('/salaries/:email/:start_date/:end_date', async(req, res) => {
+    try {
+        const { email, start_date, end_date } = req.params;
+        console.log(start_date, end_date);
+        const msql = await pool.query(
+            "select getsalary($1, $2, $3), \
+                    getworkdays($1, $2, $3);",
+            [email, start_date, end_date]);
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 module.exports = {
     caretakerRouter
 }
