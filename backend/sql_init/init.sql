@@ -305,22 +305,31 @@ language plpgsql
 as
 $$
 declare
-    -- if avgPricePerDay is null, they didn't complete any jobs during period
-	avgPricePerDay FLOAT := getTotalRevenue(cemail, s, e) / getPetDays(cemail, s, e);
+    -- these vars are null, caretaker didn't complete any jobs during period
+    totalRev FLOAT := getTotalRevenue(cemail, s, e);
+    daysWorked INT := getPetDays(cemail, s, e);
+	avgPricePerDay FLOAT := totalRev / daysWorked;
 	is_ft BOOLEAN;
 BEGIN	
 	select is_fulltime into is_ft
 	from caretakers
 	where email=cemail;
 	
+    if daysWorked is null then
+        daysWorked := 0;
+    end if;
 	
-	if is_ft and (getPetDays(cemail, s, e) <= 60 or avgPricePerDay is null) then
+    if totalRev is null then
+        totalRev := 0;
+    end if;
+
+	if is_ft and daysWorked <= 60 then
         -- less than 60 pet days worked
 		return 3000;
-	elsif is_ft and getPetDays(cemail, s, e) > 60 then
-		return 3000 + ((getPetDays(cemail, s, e) - 60) * avgPricePerDay);
+	elsif is_ft and daysWorked > 60 then
+		return 3000 + (daysWorked - 60) * avgPricePerDay);
 	else -- is parttime
-		return 0.75 * getTotalRevenue(cemail, s, e);
+		return 0.75 * totalRev;
 	end if;
 END;
 $$;
