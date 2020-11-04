@@ -112,8 +112,9 @@ pcsRouter.post('/ft', async (req, res) => {
 });
 
 // This only counts jobs that were COMPLETED (end_date) during [start, end] inclusive
-// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards
-// his Feb salary
+// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards his Feb salary
+// bc there is min 3k salary for FT, only makes sense when querying entire months
+// e.g. start: 2020-01-01, end: 2020-01-31
 // returns table of (email, name, type, description, salary)
 pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
     try {
