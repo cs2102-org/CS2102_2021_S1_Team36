@@ -248,7 +248,82 @@ BEGIN
 END;
 $$;
 
+-- getPetDays(email, start, end) -> int :: total pet days worked
+-- returns NULL if email hasn't completed any jobs that month (have to check division by NULL)
+drop function if exists getPetDays;
+CREATE OR REPLACE FUNCTION getPetDays(cemail varchar, s date, e date)
+RETURNS int
+language plpgsql
+as
+$$
+declare 
+	daysWorked INTEGER;
+BEGIN
+	select sum(end_date - start_date + 1) into daysWorked
+	from bidsfor
+	where caretaker_email=cemail
+		and (s <= end_date and end_date <= e)
+		and is_paid
+	group by cemail;
+	
+	return daysWorked;
+END;
+$$;
 
+-- getTotalRevenue(email, start, end) -> float :: total revenue
+-- returns NULL if email hasn't completed any jobs that month hence earned no revenue 
+-- take note of this when doing arithmetic with this result
+drop function if exists getTotalRevenue;
+CREATE OR REPLACE FUNCTION getTotalRevenue(cemail varchar, s date, e date)
+RETURNS FLOAT
+language plpgsql
+as
+$$
+declare 
+	revenue FLOAT;
+BEGIN
+	select sum((end_date - start_date + 1) * amount_bidded) into revenue
+	from bidsfor 
+	where is_paid 
+		and (s <= end_date and end_date <= e)
+		and caretaker_email=cemail
+	group by cemail;
+	
+	return revenue;
+END;
+$$;
+
+-- getSalary(email, start, end) -> float
+-- gets salary to be paid to a caretaker for jobs COMPLETED during 
+-- [start, end] inclusive
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the job
+-- in Feb
+drop function if exists getSalary;
+CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
+RETURNS float
+language plpgsql
+as
+$$
+declare
+    -- if avgPricePerDay is null, they didn't complete any jobs during period
+	avgPricePerDay FLOAT := getTotalRevenue(cemail, s, e) / getPetDays(cemail, s, e);
+	is_ft BOOLEAN;
+BEGIN	
+	select is_fulltime into is_ft
+	from caretakers
+	where email=cemail;
+	
+	
+	if is_ft and (getPetDays(cemail, s, e) <= 60 or avgPricePerDay is null) then
+        -- less than 60 pet days worked
+		return 3000;
+	elsif is_ft and getPetDays(cemail, s, e) > 60 then
+		return 3000 + ((getPetDays(cemail, s, e) - 60) * avgPricePerDay);
+	else -- is parttime
+		return 0.75 * getTotalRevenue(cemail, s, e);
+	end if;
+END;
+$$;
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
