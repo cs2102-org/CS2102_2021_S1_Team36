@@ -10,7 +10,10 @@ import { CaretakerSummaryPageComponent } from './components/caretaker/caretaker-
 import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
+import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
+import { PostComponent } from './components/general/forum/post/post.component';
+import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,10 +23,17 @@ const routes: Routes = [
   { path: 'petowner/summary', component: PetOwnerSummaryComponent },
   { path: 'caretaker/bids', component: CaretakerBidsComponent },
   { path: 'caretaker/summary', component: CaretakerSummaryPageComponent },
+  { path: 'profile', component: CaretakerProfileComponent },
   { path: 'forum', component: ForumComponent },
   { path: 'caretaker/bid/:caretaker', component: CaretakerMakeBidComponent },
   { path: 'petowner/summary', component: PetOwnerSummaryComponent },
-  { path: 'admin/manage', component: ManageUsersComponent }
+  { path: 'admin/manage', component: ManageUsersComponent },
+  { path: 'pet-owner-bids', component: PetOwnerBidsComponent },
+  { path: 'caretaker-bids', component: CaretakerBidsComponent },
+  { path: 'caretaker-summary', component: CaretakerSummaryPageComponent },
+  { path: 'forum', component: ForumComponent },
+  { path: 'post', component: PostComponent},
+  { path: 'create-post', component: CreatePostComponent}
 ];
 
 @NgModule({

@@ -19,6 +19,14 @@ export class CaretakerService {
     return this.http.post(baseurl + '/api/caretaker/filter/', details, httpOptions);
   }
 
+  public getFilteredRecommendedCaretakers(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/filter/recommended', details, getHttpOptionsWithAuth());
+  }
+
+  public getFilteredTransactedCaretakers(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/filter/transacted', details, getHttpOptionsWithAuth());
+  }
+
   public getRecommendedCaretakers(): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/rec/', getHttpOptionsWithAuth());
   }
@@ -53,5 +61,25 @@ export class CaretakerService {
 
   public getLeaveDates(): Observable<any> {
     return this.http.get(baseurl + '/api/caretaker/ft/leave', getHttpOptionsWithAuth());
+  }
+
+  public getAvailDates(): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/pt/av', getHttpOptionsWithAuth());
+  }
+
+   public postNewAvail(details): Observable<any> {
+    return this.http.post(baseurl + '/api/caretaker/pt/avail/new/range', details, getHttpOptionsWithAuth());
+  }
+
+  public deleteLeave(date): Observable<any> {
+    return this.http.delete(baseurl + '/api/caretaker/ft/leave/' + date, getHttpOptionsWithAuth());
+  }
+
+  public deleteAvail(date): Observable<any> {
+    return this.http.delete(baseurl + '/api/caretaker/pt/avail/' + date, getHttpOptionsWithAuth());
+  }
+
+  public getCaretakerReviews(email): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/reviews/' + email, httpOptions);
   }
 }

@@ -6,6 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import { BidDialogComponent } from '../../general/bid-dialog/bid-dialog.component';
+import { DeleteLeaveAvailComponent } from '../delete-leave-avail/delete-leave-avail.component';
 
 @Component({
   selector: 'app-caretaker-summary-page',
@@ -21,9 +22,12 @@ export class CaretakerSummaryPageComponent implements OnInit {
     events: [],
     selectable: true,
     unselectAuto: false,
+    eventTextColor: 'black',
+    eventBackgroundColor: 'lightblue',
     select: this.selectDate.bind(this),
     datesSet: this.viewRenderer.bind(this),
     eventClick: this.openBidDialog.bind(this),
+    height: 500,
   };
 
   form = new FormGroup({
@@ -33,17 +37,19 @@ export class CaretakerSummaryPageComponent implements OnInit {
 
   bids: any;
   caretakerType: string;
-  currentStart;
-  currentEnd;
   numOfWorkDaysInThatMonth = 0;
   earningsInThatMonth;
+  msg = '';
+  counterMonths = 0;
+  counterYear = 0;
+  movingDate;
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService
     , private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.getDates();
     this.checkFullTime();
+    this.getDates();
   }
 
   ngAfterViewInit(): void {
@@ -51,10 +57,20 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   viewRenderer(dateInfo) {
-    let aDate = new Date(dateInfo.start);
-    aDate.setDate(aDate.getDate() + 1);
-    this.currentStart = aDate.toISOString().slice(0,10);
-    this.currentEnd = dateInfo.end.toISOString().slice(0,10);
+    if (this.movingDate == undefined) {
+    } else if (dateInfo.start < this.movingDate) {
+      this.counterMonths--;
+    } else {
+      this.counterMonths++;
+    }
+    this.movingDate = dateInfo.start;
+    if (this.counterMonths == 12) {
+      this.counterYear++;
+      this.counterMonths = 0;
+    } else if (this.counterMonths == -12) {
+      this.counterYear--;
+       this.counterMonths = 0;
+    }
     this.getEarningsForMonth();
   }
 
@@ -63,50 +79,80 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   openBidDialog(selectionInfo) {
-    this.dialog.open(BidDialogComponent, { data: {
-      dataKey: this.bids[selectionInfo.event.id]
-    }});
+    if (selectionInfo.event.title != "Leave" && selectionInfo.event.title != "Available") {
+      this.dialog.open(BidDialogComponent, { data: {
+        dataKey: this.bids[selectionInfo.event.id],
+        type: "Pet Owner: "
+      }});
+    } else {
+      const ref = this.dialog.open(DeleteLeaveAvailComponent, { data: {
+          dataKey: selectionInfo.event.start,
+          type: selectionInfo.event.title
+        }
+      });
+      ref.afterClosed().subscribe(msg => {
+        if (msg) {
+          this.getDates();
+        }
+      })
+    }
   }
 
   getEarningsForMonth() {
-    const details = {start_date: this.currentStart, end_date: this.currentEnd};
-    this.bidService.getCaretakerEarnings(details).subscribe(detail => {
-      this.numOfWorkDaysInThatMonth = detail.length;
-      this.earningsInThatMonth = detail.reduce(this.reduceEarnings, 0);
+    let date = new Date();
+    let m = date.getMonth() + this.counterMonths;
+    let y = date.getFullYear() + this.counterYear;
+    const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
+    const lastDay = new Date(y, m + 1, 1).toISOString().slice(0,10);
+    this.bidService.getCaretakerEarnings(firstDay, lastDay).subscribe(detail => {
+      console.log(detail);
+      this.numOfWorkDaysInThatMonth = detail[0].getworkdays;
+      this.earningsInThatMonth = detail[0].getsalary;
     });
   }
 
   checkFullTime() {
-    this.caretakerType = localStorage.hasOwnProperty('is_fulltime') ? "Full Time" : "Part Time";
+    this.caretakerType = localStorage.getItem('is_fulltime') == 'true' ? "Full Time" : "Part Time";
   }
 
   getDates() {
-    this.caretakerService.getLeaveDates().subscribe(leaves => {
-      leaves = leaves.map(leave => {leave.title="leave"; return leave;}); 
-
-      this.bidService.getBidsCaretaker().subscribe((bids) => {
-        let id = 1;
-        const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
-        const copyBids =JSON.parse(JSON.stringify(bidsUpdated));
-        this.bids = copyBids.reduce((accumulator, currentValue) => {
-          accumulator[currentValue.id] = currentValue;
-          return accumulator;
-        }, {});
-
-        const bidsMid = bidsUpdated.map(function(bid) {
-          let aDate = new Date(bid.end);
-          aDate.setDate(aDate.getDate() + 1);
-          bid.end = aDate.toISOString().slice(0,10);
-          
-          bid.title = `Take care of ${bid.name}'s ${bid.pet_name}`;
-          return bid;
-        });    
-        this.calendarOptions.events = bidsMid.concat(leaves);
+    if (this.caretakerType === "Full Time") {
+      this.caretakerService.getLeaveDates().subscribe(leaves => {
+        leaves = leaves.map(leave => {leave.title="Leave"; return leave;}); 
+        this.getBids(leaves);
       });
+    } else {
+      this.caretakerService.getAvailDates().subscribe(avails => {
+        avails = avails.map(avail => {avail.title="Available"; return avail;}); 
+        this.getBids(avails);
+      });
+    }
+  }
+
+  getBids(dates) {
+    this.bidService.getConfirmedBidsCaretaker().subscribe((bids) => {
+      let id = 1;
+      const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
+      const copyBids =JSON.parse(JSON.stringify(bidsUpdated));
+      this.bids = copyBids.reduce((accumulator, currentValue) => {
+        accumulator[currentValue.id] = currentValue;
+        return accumulator;
+      }, {});
+
+      const bidsMid = bidsUpdated.map(function(bid) {
+        let aDate = new Date(bid.end);
+        aDate.setDate(aDate.getDate() + 1);
+        bid.end = aDate.toISOString().slice(0,10);
+        
+        bid.title = `Take care of ${bid.name}'s ${bid.pet_name}`;
+        return bid;
+      });    
+      this.calendarOptions.events = bidsMid.concat(dates);
     });
   }
 
   selectDate(selectionInfo) {
+    this.msg = "";
     const startDate = selectionInfo.start;
     const endDate = selectionInfo.end;
     startDate.setDate(startDate.getDate() + 1);
@@ -115,10 +161,29 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   onLeaveSubmit() {
-    this.caretakerService.postNewLeave(this.form.value).subscribe(msg => {
+    this.caretakerService.postNewLeave(this.form.value).subscribe((msg) => {
       if (msg) {
-        console.log("success");
+        this.msg = "Leave was successfully added";
+        this.getDates();
+      }}, (err) => {
+        if (err['error']['error'].indexOf('You have a job') >= 0) {
+          this.msg = "You have a job on this date!";
+        } else {
+          this.msg = "You already have a leave on this date!";
+        }
       }
-    });
+    );
   }
+
+  onAvailSubmit() {
+    this.caretakerService.postNewAvail(this.form.value).subscribe(msg => {
+      if (msg) {
+        this.msg = "Availability was successfully added";
+        this.getDates();
+      }}, (err) => {
+        this.msg = "You already declared availability on this date!";
+      }
+    );
+  }
+
 }

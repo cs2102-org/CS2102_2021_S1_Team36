@@ -26,7 +26,7 @@ bidsRouter.get('/by', verifyJwt, async(req, res) => {
     try {
         const email = res.locals.user.email;
         const msql = await pool.query(
-            "SELECT amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, 	to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            "SELECT amount_bidded, caretaker_email, owner_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, 	to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
                 FROM Bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             WHERE owner_email = $1 \
             ORDER BY \
@@ -46,7 +46,7 @@ bidsRouter.get('/by/pending', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const msql = await pool.query(
-            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
             from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email  \
             where owner_email = $1 \
               and is_confirmed is null \
@@ -67,7 +67,7 @@ bidsRouter.get('/by/rejected', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const msql = await pool.query(
-            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
             from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             where owner_email = $1  \
               and is_confirmed is false \
@@ -85,7 +85,7 @@ bidsRouter.get('/by/done', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const msql = await pool.query(
-            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+            "select amount_bidded, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
             from bidsfor B INNER JOIN Users U on B.caretaker_email=U.email \
             where owner_email = $1  \
               and is_confirmed is true \
@@ -106,26 +106,34 @@ bidsRouter.post('/for', verifyJwt, async(req, res) => {
     try {
         const email = res.locals.user.email;
         var { is_confirmed } = req.body;
-
+        let msql;
         if (is_confirmed == "pending" || is_confirmed == "confirmed" || is_confirmed == "rejected") { // return results that are filtered by is_confirmed
             if (is_confirmed == "pending") {
                 is_confirmed = null;
-            } else if (is_confirmed == "confirmed") {
-                is_confirmed = true;
+                msql = await pool.query(
+                    "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
+                    from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
+                    where caretaker_email = $1 and is_confirmed is null",
+                    [email]
+                );
+            } else {
+                if (is_confirmed == "confirmed") {
+                    is_confirmed = true;
+                }
+                else if (is_confirmed == "rejected") {
+                    is_confirmed = false;
+                }
+                msql = await pool.query(
+                    "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
+                    from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
+                    where caretaker_email = $1 and is_confirmed = $2",
+                    [email, is_confirmed]
+                );
             }
-            else if (is_confirmed == "rejected") {
-                is_confirmed = false;
-            }
-            const msql = await pool.query(
-                "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
-                from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
-                where caretaker_email = $1 and is_confirmed = $2",
-                [email, is_confirmed]
-            );
             res.json(msql.rows);
         } else {
             const msql = await pool.query(
-                "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'HH24:MI:SS') as submission_time, transfer_type \
+                "select amount_bidded, owner_email, caretaker_email, name, to_char(end_date, 'YYYY-mm-dd') as end, is_confirmed, is_paid, payment_type, pet_name, rating, to_char(start_date, 'YYYY-mm-dd') as start, to_char(submission_time, 'YYYY-mm-dd HH24:MI:SS') as submission_time, transfer_type \
                 from bidsfor B INNER JOIN Users U on B.owner_email=U.email \
                 where caretaker_email = $1;",
                 [email]
@@ -211,8 +219,30 @@ bidsRouter.put('/status', verifyJwt, async(req, res) => {
                 owner_email = $1 and \
                 caretaker_email = $2 and \
                 pet_name = $3 and \
-                to_char(submission_time, 'HH24:MI:SS')= $4;",
+                to_char(submission_time, 'YYYY-MM-dd HH24:MI:SS')= $4;",
             [owner_email, caretaker_email, pet_name, submission_time, status]
+            );
+        res.json(true); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// set bid as paid
+bidsRouter.put('/paid', verifyJwt, async(req, res) => {
+    try {
+        const caretaker_email = res.locals.user.email;
+        var { owner_email, pet_name, submission_time } = req.body;
+        
+        const msql = await pool.query(
+            "UPDATE bidsfor SET \
+                is_paid = true \
+            where \
+                owner_email = $1 and \
+                caretaker_email = $2 and \
+                pet_name = $3 and \
+                to_char(submission_time, 'YYYY-MM-dd HH24:MI:SS')= $4;",
+            [owner_email, caretaker_email, pet_name, submission_time]
             );
         res.json(true); 
     } catch (err) {
@@ -294,13 +324,12 @@ bidsRouter.post('/earnings/range', async(req, res) => {
 bidsRouter.put('/rate', verifyJwt, async (req, res) => {
     try {
         const owner_email = res.locals.user.email;
-        const { rating, caretaker_email, pet_name, submission_time } = req.body;
+        const { rating, caretaker_email, pet_name, submission_time, review } = req.body;
         const sql = await pool.query(
-            "UPDATE bidsfor SET rating = $1 \
-            WHERE owner_email=$2 AND caretaker_email=$3 AND pet_name=$4 AND to_char(submission_time, 'HH24:MI:SS')=$5;",
-            [rating, owner_email, caretaker_email, pet_name, submission_time]
+            "UPDATE bidsfor SET rating = $1, review = $6 \
+            WHERE owner_email=$2 AND caretaker_email=$3 AND pet_name=$4 AND to_char(submission_time, 'YYYY-MM-dd HH24:MI:SS')=$5;",
+            [rating, owner_email, caretaker_email, pet_name, submission_time, review]
         );
-        console.log(sql);
         res.status(200).send({message: `Updated bidsfor with: ${owner_email}, ${caretaker_email}, ${pet_name}, ${submission_time} with rating ${rating}`});
     } catch (err) {
         console.error(err);
