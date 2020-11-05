@@ -18,8 +18,7 @@ export class SignupComponent implements OnInit {
     return password && passwordConfirm &&
       password.value === passwordConfirm.value ? null : { notMatched: true };
   };
-  signUpSuccess: Boolean = false;
-  errorMessage: string = "";
+  message: string = "";
 
   signUpForm = new FormGroup(
     {
@@ -30,7 +29,6 @@ export class SignupComponent implements OnInit {
       description: new FormControl(''),
       pet_owner: new FormControl(''),
       caretaker: new FormControl(''),
-      caretaker_type: new FormControl('')
     },
     { validators: this.passwordMatchValidator }
   );
@@ -42,18 +40,20 @@ export class SignupComponent implements OnInit {
   ngOnInit(): void {}
 
   onSubmitSignUp() {
+    this.message = "";
     const signUpDetails = this.signUpForm.value;
     this.authService.signUp(signUpDetails);
-    this.authService.loginNotiService.subscribe(message => {
-      if (message == "Signup success") {
-        this.signUpSuccess=true;
-        this.signUpForm.reset();
-        this.errorMessage = "";
+    this.authService.loginErrorService.subscribe(err => {
+      if (err.indexOf("duplicate key value") >= 0) {
+        this.message = "User already exists!";
+      } else {
+        this.message = err;
       }
     });
-    this.authService.loginErrorService.subscribe(err => {
-      if (err.indexOf("duplicate key value")) {
-        this.errorMessage = "User already exists!";
+    this.authService.loginNotiService.subscribe(message => {
+      if (message == "Signup success") {
+        this.signUpForm.reset();
+        this.message = "Signup Success. Login Now!";
       }
     });
   }

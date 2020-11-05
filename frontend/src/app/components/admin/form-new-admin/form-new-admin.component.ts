@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { PcsadminService } from 'src/app/services/pcsadmin/pcsadmin.service';
 
 @Component({
   selector: 'app-form-new-admin',
@@ -13,12 +14,20 @@ export class FormNewAdminComponent implements OnInit {
     email: new FormControl('', [Validators.required, Validators.email]),
   });
 
-  constructor(private dialogRef: MatDialogRef<FormNewAdminComponent>) { }
+  err = '';
+
+  constructor(private dialogRef: MatDialogRef<FormNewAdminComponent>, private pcsAdminService: PcsadminService) { }
 
   ngOnInit(): void {
   }
 
   onSubmitSignUp() {
-
+    this.pcsAdminService.postNewAdmin(this.signUpForm.value).subscribe(msg => {
+      if (msg === "User successfully created.") {
+        this.dialogRef.close(true);
+      } else if (msg === "This email is already taken. User creation failed. ") {
+        this.err = msg;
+      }
+    });
   }
 }

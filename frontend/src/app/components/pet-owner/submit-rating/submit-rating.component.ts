@@ -16,6 +16,7 @@ export class SubmitRatingComponent implements OnInit {
   ratingForm = new FormGroup({
     caretaker_email: new FormControl(''),
     rating: new FormControl('', Validators.required),
+    review: new FormControl(''),
     pet_name: new FormControl(''),
     submission_time: new FormControl('')
   });

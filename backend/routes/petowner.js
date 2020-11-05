@@ -9,6 +9,18 @@ const petownerRouter = express.Router();
 to test the endpoints here, use http://localhost:5000/api/petowner/ in front of the urls
 */
 
+// get all pet owners
+petownerRouter.get('/petowners', async(req, res) => {
+    try {
+        const pets = await pool.query(
+            "SELECT email, name, description FROM Users natural join Petowners order by name asc;",
+        );
+        res.json(pets.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // get the pets of a specified user
 petownerRouter.get('/pets', verifyJwt, async(req, res) => {
     try {
@@ -61,6 +73,85 @@ petownerRouter.post('/:email/pets', async (req, res) => {
     }
 });
 
+// Find petowners with similar tastes as the specified petowner
+// input: email of petowner A
+// output: table (email) of emails of petowners with similar taste as A
+// two petowners have similar taste if their sets of liked caretakers have at least 3 caretakers in common
+// this endpoint is more for testing than actually becoming a feature
+// test: input perry, should get pearl (and vice versa)
+petownerRouter.post('/similar/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * from petowners \
+            where \
+                isSimilar($1, email) and \
+                email != $1",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// Add new pet to database of user (with verifyJwt)
+petownerRouter.post('/addpet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const {pet_name, special_requirements, description, species} = req.body;
+    try {
+    const { rows } = await pool.query(
+        "INSERT INTO pets (email, pet_name, special_requirements, description, species) \
+        VALUES ($1, $2, $3, $4, $5);",
+    [email, pet_name, special_requirements, description, species]);
+    res.json(true);
+    console.log(req.body);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
+// Update existing pet to database of user (with verifyJwt)
+petownerRouter.put('/updatepet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const {pet_name, special_requirements, description, species} = req.body;
+    console.log(req.body);
+    try {
+    const { rows } = await pool.query(
+        "UPDATE pets SET \
+        special_requirements = $3, \
+        description = $4, \
+        species = $5 \
+        WHERE email = $1 and pet_name = $2",
+    [email, pet_name, special_requirements, description, species]);
+    res.json(true);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
+// Remove existing pet from database of user (with verifyJwt)
+petownerRouter.post('/deletepet', verifyJwt, async (req, res) => {
+    const user = res.locals.user;
+    const email = user.email;
+    const { pet_name } = req.body;
+    try {
+    const { rows } = await pool.query(
+        "DELETE FROM pets \
+        WHERE email = $1 and pet_name = $2",
+    [email, pet_name]);
+    res.json(true);
+    console.log(email+pet_name);
+    } catch (err) {
+        console.log(err);
+        res.json(false);
+    }
+});
+
 // returns a list of all pet types
 petownerRouter.get('/alltypes', async(req, res) => {
     try {
@@ -68,6 +159,42 @@ petownerRouter.get('/alltypes', async(req, res) => {
             "select * from Pettypes;"
             );
         res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// find all caretakers that this petowner likes
+// a petowner likes a caretaker if the petowner's average rating for that caretaker is >= 4
+// input: petowner email
+// output: table(email, rating, is_fulltime)
+// this endpoint is more for testing than actually becoming a feature
+// test with perry, pearl
+petownerRouter.post('/likes/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * from caretakers \
+            where \
+                likes($1, email)",
+            [email]
+        );
+        res.json(msql.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// get specified pet details
+petownerRouter.post('/pet/detailed', async(req, res) => {
+    try {
+        const pet_name = req.body.pet_name;
+        const owner = req.body.owner_email;
+        const msql = await pool.query(
+            "select species, special_requirements, description from pets where pet_name=$1 and email=$2;",
+            [pet_name, owner]
+            );
+        res.json(msql.rows[0]); 
     } catch (err) {
         console.error(err);
     }

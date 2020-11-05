@@ -45,6 +45,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   placeholderDate: String;
   currentMinPrice: number = 0;
   numberOfBidDays: number = 0;
+  totalAmount = 0;
 
   bidForm = new FormGroup({
     start_date: new FormControl('', Validators.required),
@@ -56,6 +57,7 @@ export class CaretakerMakeBidComponent implements OnInit {
     transfer_type: new FormControl('', Validators.required),
     amount_bidded: new FormControl('', [Validators.required, (control: AbstractControl) => Validators.min(this.currentMinPrice)(control)]),
   });
+  reviews: any;
 
   constructor(private caretakerService: CaretakerService, 
     private route: ActivatedRoute,
@@ -101,6 +103,7 @@ export class CaretakerMakeBidComponent implements OnInit {
       this.checkIsLogged();
       this.loadCalendar();
       this.findTakeCares();
+      this.getReviews();
     });
   }
 
@@ -206,6 +209,7 @@ export class CaretakerMakeBidComponent implements OnInit {
   onSubmit(bidForm) {
     bidForm.controls['submission_time'].setValue(new Date());
     bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
+    bidForm.controls['amount_bidded'].setValue(bidForm.get('amount_bidded').value / this.numberOfBidDays);
     this.bidService.postBid(bidForm.value).subscribe(status => {
       if (status) {
         this.bidForm.reset();
@@ -228,5 +232,12 @@ export class CaretakerMakeBidComponent implements OnInit {
         }
       }
   }
+
+  getReviews() {
+    this.caretakerService.getCaretakerReviews(this.caretaker.email).subscribe(reviews => {
+      this.reviews = reviews;
+    });
+  }
+
 
 }

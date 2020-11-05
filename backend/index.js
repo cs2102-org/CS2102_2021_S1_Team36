@@ -8,6 +8,8 @@ const { authRouter } = require('./routes/auth');
 const { caretakerRouter } = require('./routes/caretaker.js');
 const { bidsRouter } = require('./routes/bids.js');
 const { petownerRouter } = require('./routes/petowner.js');
+const { postsRouter } = require('./routes/posts.js');
+const { commentsRouter } = require('./routes/comments.js');
 
 const router = express.Router();
 const app = express();
@@ -18,7 +20,9 @@ router.use("/api/auth", authRouter)
       .use("/api/pcs-admins", pcsRouter)
       .use("/api/caretaker", caretakerRouter)
       .use("/api/bids", bidsRouter)
-      .use("/api/petowner", petownerRouter);
+      .use("/api/petowner", petownerRouter)
+      .use("/api/posts", postsRouter)
+      .use("/api/comments", commentsRouter);
 
 
 // TODO: move all petowner related routes into it's own router file

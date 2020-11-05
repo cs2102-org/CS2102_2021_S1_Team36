@@ -17,15 +17,6 @@ export class PetOwnerBidsComponent implements OnInit {
   bids;
   showType = "";
 
-  filterForm = new FormGroup({
-    substr: new FormControl(''),
-    start_date: new FormControl(''),
-    end_date: new FormControl(''),
-    pet_type: new FormControl(''),
-    min: new FormControl(''),
-    max: new FormControl(''),
-  });
-
   currentDate = new Date();
   petTypes: any;
 
@@ -40,12 +31,14 @@ export class PetOwnerBidsComponent implements OnInit {
   showAllBids() {
     this.showType = "";
     this.bidService.getBids().subscribe((bids) => {
-      this.bids = bids;
+      console.log(bids);
+      this.bids = bids.map(this.changeTransferType).map(this.changePaymentType)
+      .map(this.changeConfirmation).map(this.changePaid);
     });
   }
 
   getListOfPetTypes() {
-    this.petOwnerService.getGetListOfPetTypes().subscribe(petTypes => {
+    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
       this.petTypes = petTypes.map(elem => elem.species);
     });
   }
@@ -74,28 +67,69 @@ export class PetOwnerBidsComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-    console.log('SENT');
+  changeTransferType(bid) {
+    if (bid.transfer_type == 1) {
+      bid.transfer = "Pet Owner deliver";
+    } else if (bid.transfer_type == 2) {
+      bid.transfer = "Caretaker pick up";
+    } else {
+      bid.transfer= "Transfer by PCS Building";
+    }
+    return bid;
+  }
+
+  changePaymentType(bid) {
+    if (bid.payment_type == 1) {
+      bid.payment_type = "Cash";
+    } else {
+      bid.payment_type= "Credit Card";
+    }
+    return bid;
+  }
+
+  changePaid(bid) {
+    if (bid.is_paid) {
+      bid.is_paid = "Paid";
+    } else {
+      bid.is_paid = "Not Paid";
+    }
+    return bid;
+  }
+
+  changeConfirmation(bid) {
+    if (bid.is_confirmed == null) {
+       bid.is_confirmed = "Pending";
+    } else if (bid.is_confirmed) {
+      bid.is_confirmed  = "Confirmed";
+    } else {
+      bid.is_confirmed = "Rejected"
+    }
+    return bid;
   }
 
   showPendingBids() {
     this.showType = "Pending";
     this.bidService.getPendingBids().subscribe((bids) => {
-      this.bids = bids;
+      this.bids = bids.map(this.changeTransferType)
+        .map(this.changePaymentType)
+        .map(this.changeConfirmation)
+        .map(this.changePaid);
     });
   }
 
   showRejectedBids() {
     this.showType = "Rejected";
     this.bidService.getRejectedBids().subscribe((bids) => {
-      this.bids = bids;
+      this.bids =  bids.map(this.changeTransferType).map(this.changePaymentType)
+        .map(this.changeConfirmation).map(this.changePaid);
     });
   }
 
   showDoneBids() {
     this.showType = "Done";
     this.bidService.getDoneBids().subscribe((bids) => {
-      this.bids = bids;
+      this.bids =  bids.map(this.changeTransferType).map(this.changePaymentType)
+        .map(this.changeConfirmation).map(this.changePaid);
     });
   }
 }

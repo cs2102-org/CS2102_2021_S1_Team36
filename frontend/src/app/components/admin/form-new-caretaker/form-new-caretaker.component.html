@@ -1,6 +1,8 @@
 <button class="close" mat-button [mat-dialog-close]="true">X</button>
+
 <form class="form" [formGroup]="signUpForm" (ngSubmit)="onSubmitSignUp()">
     <h3>Create New Full Time Caretaker</h3>
+    <p *ngIf="err != ''">{{err}}</p>
     <p>Please specify the details</p>
     <p>
         <label>Name: </label>
@@ -10,5 +12,5 @@
         <label>Email: </label>
         <input type="email" formControlName="email" value=""  autocomplete="new-email">
     </p>
-    <button>Submit</button>
+    <button [disabled]="!signUpForm.valid">Submit</button>
 </form>

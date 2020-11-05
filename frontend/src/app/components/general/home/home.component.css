@@ -1,10 +1,67 @@
-.background {
+/* .background {
     background: url('./img/pets.png') no-repeat center center fixed;
     height: 90vh;
 }
 
+*/
+
 .title {
     text-align: center;
-    padding-top: 10%;
+    margin-top: 10%;
     font-size: 35px;
+    z-index: 10;
+    position: absolute;
+    border-width: thin;
+    box-shadow: 5px 5px 20px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    left: 28%;
+} 
+
+.content {
+  background-color: #1e77aa;
+  height: 95vh;
+  width: 100%;
+}
+
+#photo-one {
+    border-style: solid;
+    padding: 20px;
+    border-width: thin;
+    box-shadow: 5px 5px 20px;
+    background-color: #f8f8f8;
+    width: 440px;
+    position: absolute;
+    top: 150px;
+    left: 50px;
+    transform: rotate(-30deg);
+    z-index: 5;
+}
+
+#photo-two {
+  border-style: solid;
+  padding: 20px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  width: 440px;
+  position: absolute;
+  top: 200px;
+  right: 60px;
+  transform: rotate(20deg);
+  z-index: 5;
+}
+
+#photo-three {
+  border-style: solid;
+  padding: 20px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  width: 640px;
+  position: absolute;
+  bottom: 10%;
+  right: 30%;
+  transform: rotate(5deg);
+  z-index: 5;
 }

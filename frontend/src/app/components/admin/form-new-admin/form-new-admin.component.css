@@ -2,4 +2,7 @@
   float: right;
   top:-24px;
   right:-24px;
+  background-color: red;
+  color: white;
+  border-color: red;
 }
