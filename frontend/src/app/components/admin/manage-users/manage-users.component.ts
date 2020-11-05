@@ -85,43 +85,52 @@ export class ManageUsersComponent implements OnInit {
 
   getAllCaretakers() {
     this.pcsAdminService.getAllCaretakers(this.getCurrentRange()).subscribe(caretakers => {
+      if (this.showType != "Caretakers") {
+        this.msg = '';
+      }
       this.showType = "Caretakers";
-      this.msg = '';
       this.things = caretakers.map(this.getProfit);
     });
   }
 
   getAllAdmins() {
     this.pcsAdminService.getAdminList().subscribe(admins => {
+      if (this.showType != "Admins") {
+        this.msg = '';
+      }
       this.showType = "Admins";
-      this.msg = '';
       this.things = admins;
     });
   }
 
   getAllPetTypes() {
     this.pcsAdminService.getListOfPetTypes().subscribe(petTypes => {
+      if (this.showType != "Pet Types") {
+        this.msg = '';
+      }
       this.showType = "Pet Types";
-      this.msg = '';
       this.things = petTypes;
     });
   }
 
    getAllPetOwners() {
     this.petOwnerService.getAllPetOwners().subscribe(po => {
+      if (this.showType != "Pet Owners") {
+        this.msg = '';
+      }
       this.showType = "Pet Owners";
-      this.msg = '';
       this.things = po.map(po => {po.show = false; return po;});
     });
   }
 
   refreshAfterChange() {
+    console.log(this.showType);
     if (this.showType == "Admins") {
       this.getAllAdmins();
     } else if (this.showType == "Pet Types") {
       this.getAllPetTypes();
     } else if (this.showType == "Pet Owners") {
-      this.getAllPetOwners;
+      this.getAllPetOwners();
     } else {
       this.getAllCaretakers();
     }
