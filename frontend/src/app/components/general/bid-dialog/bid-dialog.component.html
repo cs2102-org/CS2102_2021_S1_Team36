@@ -2,7 +2,7 @@
 <p>Pet: {{bid.pet_name}}</p>
 <p>Date: {{bid.start}} - {{bid.end}}</p>
 <p>Transfer Type: {{bid.transfer}}</p>
-<p>Amount Paid: ${{bid.amount_bidded}}</p>
+<p>Amount Paid Per Day: ${{bid.amount_bidded}}</p>
 <button (click)="showPetDetails()" *ngIf="hide;">Show Pet Details</button>
 <div *ngIf="!hide;">
     <p>Species: {{petDetails.species}}</p>

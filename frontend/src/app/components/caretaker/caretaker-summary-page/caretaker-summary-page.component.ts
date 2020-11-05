@@ -37,11 +37,12 @@ export class CaretakerSummaryPageComponent implements OnInit {
 
   bids: any;
   caretakerType: string;
-  currentStart;
-  currentEnd;
   numOfWorkDaysInThatMonth = 0;
   earningsInThatMonth;
   msg = '';
+  counterMonths = 0;
+  counterYear = 0;
+  movingDate;
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService
     , private dialog: MatDialog) { }
@@ -56,10 +57,20 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   viewRenderer(dateInfo) {
-    let aDate = new Date(dateInfo.start);
-    aDate.setDate(aDate.getDate() + 1);
-    this.currentStart = aDate.toISOString().slice(0,10);
-    this.currentEnd = dateInfo.end.toISOString().slice(0,10);
+    if (this.movingDate == undefined) {
+    } else if (dateInfo.start < this.movingDate) {
+      this.counterMonths--;
+    } else {
+      this.counterMonths++;
+    }
+    this.movingDate = dateInfo.start;
+    if (this.counterMonths == 12) {
+      this.counterYear++;
+      this.counterMonths = 0;
+    } else if (this.counterMonths == -12) {
+      this.counterYear--;
+       this.counterMonths = 0;
+    }
     this.getEarningsForMonth();
   }
 
@@ -88,10 +99,15 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   getEarningsForMonth() {
-    const details = {start_date: this.currentStart, end_date: this.currentEnd};
-    this.bidService.getCaretakerEarnings(details).subscribe(detail => {
-      this.numOfWorkDaysInThatMonth = detail.length;
-      this.earningsInThatMonth = detail.reduce(this.reduceEarnings, 0);
+    let date = new Date();
+    let m = date.getMonth() + this.counterMonths;
+    let y = date.getFullYear() + this.counterYear;
+    const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
+    const lastDay = new Date(y, m + 1, 1).toISOString().slice(0,10);
+    this.bidService.getCaretakerEarnings(firstDay, lastDay).subscribe(detail => {
+      console.log(detail);
+      this.numOfWorkDaysInThatMonth = detail[0].getworkdays;
+      this.earningsInThatMonth = detail[0].getsalary;
     });
   }
 

@@ -1231,7 +1231,7 @@ BEGIN
 	IF EXISTS (
         select 1 from CareTakers
         where 
-            email = NEW.caretaker_email and is_fulltime = true
+            email = NEW.caretaker_email and is_fulltime = false
     ) 
     AND
     NOT EXISTS (
