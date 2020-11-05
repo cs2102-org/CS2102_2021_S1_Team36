@@ -171,7 +171,7 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave', verifyJwt, async (req, res) => {
+caretakerRouter.post('/ft/leave', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const { start_date, end_date } = req.body;

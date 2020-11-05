@@ -207,7 +207,7 @@ BEGIN
 	ELSE
 		return not exists (
 			SELECT generate_series(s::date, e::date, '1 day'::interval)::date as datez
-			EXCEPT (select work_date as datez from parttimeavail where email = email)
+			EXCEPT (select work_date as datez from parttimeavail where email = cemail)
 		);
 	END IF;
 END;
