@@ -216,7 +216,7 @@ caretakerRouter.get('/pt/avail', verifyJwt, async (req, res) => {
     }
 });
 
-// view a specified fulltime caretakers non-availability
+// view a specified parttime caretakers non-availability
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     const date = new Date(), y = date.getFullYear(), m = date.getMonth();
     const firstDay = new Date(y, m, 2).toISOString().slice(0,10);

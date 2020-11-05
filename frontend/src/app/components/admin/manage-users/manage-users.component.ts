@@ -75,9 +75,7 @@ export class ManageUsersComponent implements OnInit {
   }
 
   getProfit(caretaker) {
-    if (caretaker.type == "Part Time") {
-      caretaker.profit = '-';
-    } else if (caretaker.revenue == null) {
+    if (caretaker.revenue == null) {
       caretaker.profit = -caretaker.getsalary;
     } else {
       caretaker.profit = caretaker.revenue - caretaker.getsalary;
