@@ -140,6 +140,17 @@ BEGIN
 END;
 $$;
 
+-- return true if cemail is fulltimecaretaker, else false
+CREATE OR REPLACE FUNCTION isFullTime(cemail varchar)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return (select is_fulltime from Caretakers CT where CT.email = cemail);
+END;
+$$;
+
 -- return the max number of pets this caretaker can take care of
 CREATE OR REPLACE FUNCTION getPetLimit(cemail varchar)
 RETURNS int
@@ -1464,5 +1475,48 @@ CREATE TRIGGER trigger_block_inserting_bid_part_time
     BEFORE INSERT ON BidsFor
     FOR EACH ROW
     EXECUTE PROCEDURE block_inserting_bid_part_time();
+
+
+-- trigger to ensure that only partTime Caretakers are inserted into the PartTimeAvail table
+CREATE OR REPLACE FUNCTION partTimeEntryIsPartTime()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	if isFullTime(NEW.email) THEN
+		RAISE EXCEPTION 'Cannot insert because % is not a part time caretaker', NEW.email;
+		return null;
+	end if;
+	return new;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_check_part_time_entry on PartTimeAvail;
+CREATE TRIGGER trigger_check_part_time_entry
+    BEFORE INSERT ON PartTimeAvail
+    FOR EACH ROW
+    EXECUTE PROCEDURE partTimeEntryIsPartTime();
+	
+-- trigger to ensure that only fullTime Caretakers are inserted into the FullTimeLeave table
+CREATE OR REPLACE FUNCTION fullTimeEntryIsFullTime()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	if not isFullTime(NEW.email) THEN
+		RAISE EXCEPTION 'Cannot insert because % is not a full time caretaker', NEW.email;
+		return null;
+	end if;
+	return new;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_check_full_time_entry on FullTimeLeave;
+CREATE TRIGGER trigger_check_full_time_entry
+    BEFORE INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE fullTimeEntryIsFullTime();
 
 -- =============================================== END TRIGGERS ====================================================
