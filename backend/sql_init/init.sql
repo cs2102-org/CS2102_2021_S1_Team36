@@ -5,6 +5,8 @@ CREATE DATABASE pcs;
 \c pcs;
 
 
+
+
 DROP TABLE IF EXISTS Users CASCADE;
 DROP TABLE IF EXISTS CareTakers CASCADE;
 DROP TABLE IF EXISTS PetOwners CASCADE;
@@ -87,11 +89,11 @@ CREATE TABLE BidsFor (
     rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), 
     review VARCHAR(255) DEFAULT NULL, --can add text for the review
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
+-- disable checks so easier for testing
+--     CONSTRAINT bidsfor_dates_check CHECK (submission_time < start_date AND start_date <= end_date),
+--     CONSTRAINT bidsfor_price_le_bid_amount CHECK (price <= amount_bidded),
+--     CONSTRAINT bidsfor_confirm_before_paid CHECK (NOT is_paid OR is_confirmed) -- check that is_paid implies confirmed
 );
--- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
--- todo: check that price <= amount_bidded
--- check that start_date >= end_date
--- check is_paid then it must be confirmed
 
 CREATE TABLE TakecarePrice (
     daily_price DECIMAL(10,2),
