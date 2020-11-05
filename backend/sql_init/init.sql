@@ -101,6 +101,8 @@ CREATE TABLE TakecarePrice (
     species varchar(30) REFERENCES PetTypes(species),
     PRIMARY KEY (email, species)  --- daily price > base price
 );
+-- for ft caretaker, the daily price is calculated as base_price for that pet + 5 * caretakers rating
+-- for pt caretaker, the daily price is whatever they want to set it as
 
 CREATE TABLE Posts (
 	post_id SERIAL PRIMARY KEY,
@@ -506,6 +508,26 @@ BEGIN
 	return daysWorked;
 END;
 $$;
+
+-- compute the daily price for this caretaker and this pet type
+CREATE OR REPLACE FUNCTION getDailyPrice(cemail varchar, spec varchar)
+RETURNS DECIMAL(10, 2)
+language plpgsql
+as
+$$
+DECLARE
+	r DECIMAL(10, 2);  -- rating
+	bp DECIMAL(10, 2); -- base price
+BEGIN
+	select rating into r from Caretakers CT where CT.email = cemail;
+	select base_price into bp from PetTypes PT where PT.species = spec;
+	if r is null then
+		return bp;
+	else
+		return bp + 5 * r;
+	end if;
+END;
+$$;
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
@@ -578,15 +600,15 @@ INSERT INTO Users(name, email, description, password) VALUES ('xiaozong', 'xiaoz
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('xiaozong@gmail.com', false, 2);
 
 INSERT INTO PetTypes(species, base_price) VALUES ('Dog', 50);
-INSERT INTO PetTypes(species, base_price) VALUES ('Cat', 51);
-INSERT INTO PetTypes(species, base_price) VALUES ('Hamster', 52);
-INSERT INTO PetTypes(species, base_price) VALUES ('Mouse', 53);
-INSERT INTO PetTypes(species, base_price) VALUES ('Bird', 54);
-INSERT INTO PetTypes(species, base_price) VALUES ('Horse', 55);
-INSERT INTO PetTypes(species, base_price) VALUES ('Turtle', 56);
-INSERT INTO PetTypes(species, base_price) VALUES ('Snake', 57);
-INSERT INTO PetTypes(species, base_price) VALUES ('Monkey', 58);
-INSERT INTO PetTypes(species, base_price) VALUES ('Lion', 59);
+INSERT INTO PetTypes(species, base_price) VALUES ('Cat', 60);
+INSERT INTO PetTypes(species, base_price) VALUES ('Hamster', 70);
+INSERT INTO PetTypes(species, base_price) VALUES ('Mouse', 80);
+INSERT INTO PetTypes(species, base_price) VALUES ('Bird', 90);
+INSERT INTO PetTypes(species, base_price) VALUES ('Horse', 100);
+INSERT INTO PetTypes(species, base_price) VALUES ('Turtle', 110);
+INSERT INTO PetTypes(species, base_price) VALUES ('Snake', 120);
+INSERT INTO PetTypes(species, base_price) VALUES ('Monkey', 130);
+INSERT INTO PetTypes(species, base_price) VALUES ('Lion', 140);
 
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('panter@gmail.com', 'roger', 'needs a lot of care', 'roger is a Dog owned by panter', 'Dog');
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peter@gmail.com', 'boomer', 'needs alone time', 'boomer is a Cat owned by peter', 'Cat');
@@ -626,69 +648,69 @@ INSERT INTO Pets(email, pet_name, special_requirements, description, species) VA
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('pearl@gmail.com', 'maddie', 'needs to drink 100 plus', 'maddie is a Horse owned by pearl', 'Horse');
 
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'cassie@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'cassie@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (52, 'cassie@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'cassie@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'cassie@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'carrie@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'carrie@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (53, 'carrie@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'carrie@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'carrie@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'carl@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (71, 'carl@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (74, 'carl@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'carl@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (110, 'carl@gmail.com', 'Bird');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'carlos@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'carlos@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (55, 'carlos@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'carlos@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'carlos@gmail.com', 'Horse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (75, 'caren@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (76, 'caren@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (81, 'caren@gmail.com', 'Turtle');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (85, 'caren@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (135, 'caren@gmail.com', 'Turtle');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (55, 'canneth@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (56, 'canneth@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (62, 'canneth@gmail.com', 'Snake');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (65, 'canneth@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (125, 'canneth@gmail.com', 'Snake');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'cain@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (71, 'cain@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (78, 'cain@gmail.com', 'Monkey');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'cain@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (150, 'cain@gmail.com', 'Monkey');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'carmen@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'carmen@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (59, 'carmen@gmail.com', 'Lion');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'carmen@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (140, 'carmen@gmail.com', 'Lion');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'cejudo@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'cejudo@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (52, 'cejudo@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'cejudo@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'cejudo@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'celine@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (51, 'celine@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (53, 'celine@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'celine@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'celine@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (75, 'cevan@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (76, 'cevan@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (79, 'cevan@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (85, 'cevan@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (115, 'cevan@gmail.com', 'Bird');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (55, 'catarth@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (56, 'catarth@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'catarth@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (65, 'catarth@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (105, 'catarth@gmail.com', 'Horse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'columbus@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'columbus@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (66, 'columbus@gmail.com', 'Turtle');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'columbus@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (120, 'columbus@gmail.com', 'Turtle');
 
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaoping@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaoping@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (62, 'xiaoping@gmail.com', 'Hamster');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaoping@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'xiaoping@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaoming@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaoming@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (63, 'xiaoming@gmail.com', 'Mouse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaoming@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (90, 'xiaoming@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaodong@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaodong@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (64, 'xiaodong@gmail.com', 'Bird');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaodong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'xiaodong@gmail.com', 'Bird');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaolong@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaolong@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (65, 'xiaolong@gmail.com', 'Horse');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaolong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (110, 'xiaolong@gmail.com', 'Horse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (55, 'xiaobao@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (56, 'xiaobao@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaobao@gmail.com', 'Turtle');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (65, 'xiaobao@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (115, 'xiaobao@gmail.com', 'Turtle');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaorong@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaorong@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (67, 'xiaorong@gmail.com', 'Snake');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaorong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (130, 'xiaorong@gmail.com', 'Snake');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaohong@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaohong@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (68, 'xiaohong@gmail.com', 'Monkey');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaohong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (140, 'xiaohong@gmail.com', 'Monkey');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'xiaozong@gmail.com', 'Dog');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (61, 'xiaozong@gmail.com', 'Cat');
-INSERT INTO TakecarePrice(daily_price, email, species) VALUES (69, 'xiaozong@gmail.com', 'Lion');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (70, 'xiaozong@gmail.com', 'Cat');
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (150, 'xiaozong@gmail.com', 'Lion');
 
 INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-01');
 INSERT INTO FullTimeLeave(email, leave_date) VALUES ('cassie@gmail.com', '2020-01-02');
@@ -1517,5 +1539,51 @@ CREATE TRIGGER trigger_check_full_time_entry
     BEFORE INSERT ON FullTimeLeave
     FOR EACH ROW
     EXECUTE PROCEDURE fullTimeEntryIsFullTime();
+
+-- trigger to update a caretakers daily price when his rating changes
+CREATE OR REPLACE FUNCTION updatePriceOnRatingChange()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	-- update the daily_price of this caretaker for all the pet types
+	UPDATE TakecarePrice TP SET
+		daily_price = getDailyPrice(NEW.email, species)
+	WHERE
+		TP.email = NEW.email;
+		
+	RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS trigger_update_price_on_rating_change on Caretakers;
+CREATE TRIGGER trigger_update_price_on_rating_change
+    AFTER UPDATE OF rating ON Caretakers
+    FOR EACH ROW
+    EXECUTE PROCEDURE updatePriceOnRatingChange();
+
+
+-- trigger to update all full time caretakers daily price for a particular pet
+-- when the base_price of that pet is changed
+CREATE OR REPLACE FUNCTION updatePriceOnBasePriceChange()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	-- update the daily_price of all caretaker that take care of NEW.species
+	UPDATE Takecareprice TP SET
+		daily_price = getDailyPrice(email, NEW.species)
+	WHERE
+		TP.species = NEW.species;
+		
+	RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS trigger_update_price_on_base_price_change on PetTypes;
+CREATE TRIGGER trigger_update_price_on_base_price_change
+    AFTER UPDATE OF base_price ON PetTypes
+    FOR EACH ROW
+    EXECUTE PROCEDURE updatePriceOnBasePriceChange();
 
 -- =============================================== END TRIGGERS ====================================================
