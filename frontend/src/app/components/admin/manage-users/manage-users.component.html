@@ -83,7 +83,9 @@
                 <tr *ngFor="let pt of things">
                     <td class="td-pads">{{pt.species}}</td>
                     <td class="td-pads">{{pt.count}}</td>
-                    <th width="10%"><button class="delete-button">Delete</button></th>
+                    <th width="10%">
+                        <button class="delete-button" (click)=deletePetType(pt.species)>Delete</button>
+                    </th>
                 </tr>
             </table>
             </div>

@@ -186,7 +186,14 @@ export class ManageUsersComponent implements OnInit {
   deleteUser(email) {
     this.pcsAdminService.deleteUser(email).subscribe(msg => {
       this.refreshAfterChange();
-      this.msg = "Account successfully deleted";
+      this.msg = email + "(account) successfully deleted";
+    });
+  }
+
+  deletePetType(species) {
+    this.pcsAdminService.deletePetType(species).subscribe(msg => {
+      this.refreshAfterChange();
+      this.msg = species + "(pet type) successfully deleted";
     });
   }
 

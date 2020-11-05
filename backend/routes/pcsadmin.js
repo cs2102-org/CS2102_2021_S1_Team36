@@ -33,6 +33,22 @@ pcsRouter.delete('/user/:email', async (req, res) => {
     }
 });
 
+pcsRouter.delete('/pet-type/:species', async (req, res) => {
+    try {
+        const { species } = req.params;
+        await pool.query(
+            `
+            DELETE FROM PetTypes 
+            WHERE species = $1 
+            `,
+            [species],
+        );
+        return res.status(204).send('Pet Type successfully deleted');
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 pcsRouter.delete('/forum/:id', async (req, res) => {
     try {
         const id = req.params.id;
