@@ -171,7 +171,7 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave', verifyJwt, async (req, res) => {
+caretakerRouter.post('/ft/leave', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const { start_date, end_date } = req.body;
@@ -621,6 +621,58 @@ caretakerRouter.get('/rec', verifyJwt, async (req, res) => {
             [email]
         );
         res.json(msql.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+// find recommended caretakers version 2
+// input: petowner email
+// output: table(email, name rating, is_fulltime as string)
+// test: input perry, should recommend caren only
+caretakerRouter.post('/rec2/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        console.log(email);
+        const msql = await pool.query(
+            "select email, name, rating, \
+            	CASE \
+            		WHEN is_fulltime THEN 'Full Time' \
+            		ELSE 'Part Time' \
+            	END \
+            from Users NATURAL JOIN ( \
+            	select * from caretakers CT \
+            	where \
+            		exists (select * from petowners PO \
+            				where \
+            					isSimilar($1, PO.email) and \
+            					PO.email != $1 and \
+            					likes(PO.email, CT.email) \
+            		   	) \
+            	EXCEPT \
+            	select * from caretakers CT \
+            	where \
+            		exists (select 1 from bidsfor \
+            				where \
+            					owner_email = $1 and \
+            					caretaker_email = CT.email and \
+            					is_confirmed = True) \
+            	EXCEPT \
+            	select * from caretakers CT \
+            	where \
+            		not exists ( \
+            			select species from pets \
+            			where \
+            				email = $1 \
+            			INTERSECT \
+            			select species from Takecareprice TCP \
+            			where \
+            				TCP.email = CT.email \
+            		) \
+	            ) AS Rec",
+            [email]
+        );
+        res.json(msql.rows); 
     } catch (err) {
         console.error(err);
     }

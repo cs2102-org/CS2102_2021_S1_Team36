@@ -83,11 +83,13 @@ CREATE TABLE BidsFor (
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
-    review VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
+    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), 
+    review VARCHAR(255) DEFAULT NULL, --can add text for the review
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
-); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+);
+-- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+-- todo: check that price <= amount_bidded
+-- check that start_date >= end_date
 -- check is_paid then it must be confirmed
 
 CREATE TABLE TakecarePrice (
@@ -223,6 +225,96 @@ BEGIN
 	return isAvail(cemail, s, e) AND hasSpareCapacity(cemail, s, e);
 END;
 $$;
+
+-- returns whether oemail likes cemail
+-- O likes C if O's average rating of C is >= 4
+CREATE OR REPLACE FUNCTION likes(oemail varchar, cemail varchar)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return (select avg(rating) from bidsfor BF
+		where
+			BF.owner_email = oemail and
+			BF.caretaker_email = cemail and
+			rating is not null
+		) >= 4;
+END;
+$$;
+
+-- returns whether owners likes at least 3 caretakers in common
+CREATE OR REPLACE FUNCTION isSimilar(oemail1 varchar, oemail2 varchar)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return (select COUNT(*) from 
+		(
+        select * from Caretakers where likes(oemail1, email)
+		INTERSECT
+		select * from Caretakers where likes(oemail2, email)
+		) AS Common
+	) >= 3;
+END;
+$$;
+
+-- returns the number of blocks of length at least 150
+CREATE OR REPLACE FUNCTION isLeaveValid(cemail varchar, yr int)
+RETURNS boolean
+language plpgsql
+as
+$$
+DECLARE
+	fd date;
+	ld date;
+	cemail_min date;
+	cemail_max date;
+	cemail_x bigint;
+BEGIN
+	select into fd (yr || '-01-01')::date;
+	select into ld (yr || '-12-31')::date;
+	
+	IF (
+		select COUNT(*) from fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		) <= 1 THEN
+		RETURN True;
+	END IF;
+	
+	select into cemail_min MIN(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+	select into cemail_max MAX(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+		
+	select SUM(len / 150) into cemail_x from (
+		select (lead(leave_date, 1) over (order by leave_date asc) - leave_date) as len
+		from (
+		SELECT 
+			email, 
+			leave_date
+		FROM fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		ORDER BY leave_date asc
+		) L1
+	) L2;
+		
+   	cemail_x := cemail_x + (cemail_min - fd) / 150;
+	cemail_x := cemail_x + (ld - cemail_max) / 150;
+	
+	return cemail_x >= 2;
+END;
+$$;
+
 
 -- void function. Creates a new user and pcsadmin in a single transaction.
 drop function if exists createPcsAdmin;
@@ -843,6 +935,7 @@ false, false, '1', '1', 5
 
 
 
+
 INSERT INTO Posts(post_id, email, title, cont) VALUES (1, 'panter@gmail.com', 'How to teach dog to sit',
 'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?');
 
@@ -1016,6 +1109,82 @@ INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 null, null, '1', '1', null
 );
 
+-- test recommend 2
+-- perry likes xiaohong, xiaoming, xiaobao
+-- pearl likes xiaohong, xiaoming, xiaobao, xiaorong, cain, caren
+-- perry owns dog, hamster, bird
+-- cain cares for cat, monkey
+-- caren cares for dog, cat, turtle
+-- perry knows xiaorong, cain does not care for perry pets, caren care for perry pets (dog)
+-- recommend caren only
+delete from takecareprice where email = 'cain@gmail.com' and species = 'Dog'; -- delete dog from cain's carefor set
+
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'carrie@gmail.com', 'axa',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 1
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'carrie@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 2
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaohong@gmail.com', 'axa',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 3
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaohong@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaoming@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaobao@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaorong@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaohong@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaoming@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaobao@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaorong@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'cain@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'caren@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
 
 --================================================ TRIGGERS ===================================================================
 -- You might want to comment out the triggers so it is easier to put in data to test
@@ -1194,6 +1363,28 @@ CREATE TRIGGER trigger_block_taking_leave
     BEFORE INSERT ON FullTimeLeave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
+
+
+-- trigger to ensure the leave table is valid
+-- if invalid row is entered into leave table, this trigger will delete that row
+CREATE OR REPLACE FUNCTION isLeaveValidTrigger()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF NOT isLeaveValid(NEW.email, EXTRACT(YEAR FROM NEW.leave_date)::int) THEN
+		RAISE 'Invalid leave pattern';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+    
+DROP TRIGGER IF EXISTS is_leave_valid_trigger ON FullTimeLeave;
+CREATE CONSTRAINT TRIGGER is_leave_valid_trigger
+    AFTER INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE isLeaveValidTrigger();
 
 
 -- trigger: prevent deleting avail when you have a confirmed bid that overlaps with the avail date (Part Time)

@@ -252,7 +252,7 @@ bidsRouter.put('/paid', verifyJwt, async(req, res) => {
 
 // get all working days and amount paid for that day, for a specified caretaker
 // return table (caretaker_email, date, amount) which means caretaker worked on that date for that amount of money
-bidsRouter.get('/hist/:email', async(req, res) => {
+bidsRouter.post('/hist/:email', async(req, res) => {
     try {
         const { email } = req.params;
         const msql = await pool.query(
@@ -295,6 +295,7 @@ bidsRouter.post('/hist/range', verifyJwt, async(req, res) => {
 // find the number of days worked and total earnings for each caretaker over a specified range
 // returns table (email, name, type, description, rating, days_worked, total_earnings)
 // only caretakers with nonzero work days appear in the result
+// should it be is_paid instead??
 bidsRouter.post('/earnings/range', async(req, res) => {
     try {
         var { start_date, end_date } = req.body;
