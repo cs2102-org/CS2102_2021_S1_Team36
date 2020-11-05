@@ -88,6 +88,7 @@ CREATE TABLE BidsFor (
     FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
 ); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+-- check is_paid then it must be confirmed
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
@@ -305,6 +306,7 @@ BEGIN
 	where caretaker_email=cemail
 		and (s <= end_date and end_date <= e)
 		and is_paid
+        and is_confirmed
 	group by cemail;
 	
 	return daysWorked;
@@ -326,6 +328,7 @@ BEGIN
 	select sum((end_date - start_date + 1) * amount_bidded) into revenue
 	from bidsfor 
 	where is_paid 
+        and is_confirmed
 		and (s <= end_date and end_date <= e)
 		and caretaker_email=cemail
 	group by cemail;
@@ -337,7 +340,7 @@ $$;
 -- getSalary(email, start, end) -> float
 -- gets salary to be paid to a caretaker for jobs COMPLETED during 
 -- [start, end] inclusive
--- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the job
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the entire job 
 -- in Feb
 drop function if exists getSalary;
 CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
@@ -386,12 +389,14 @@ $$
 declare 
 	daysWorked INTEGER;
 BEGIN
-	select count(dd) into daysWorked
+	select count(*) into daysWorked
 	from generate_series (s::timestamp, e::timestamp, '1 day'::interval) dd 
 	where exists (select 1 
-                    from bidsFor B
-                where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
-                and is_paid);
+                  from bidsFor B
+                  where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
+                    and B.is_confirmed
+                    and B.is_paid
+                    and B.caretaker_email=cemail);
 	
 	return daysWorked;
 END;
