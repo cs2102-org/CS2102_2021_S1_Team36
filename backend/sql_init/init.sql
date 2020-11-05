@@ -257,6 +257,61 @@ BEGIN
 END;
 $$;
 
+-- returns the number of blocks of length at least 150
+CREATE OR REPLACE FUNCTION isLeaveValid(cemail varchar, yr int)
+RETURNS boolean
+language plpgsql
+as
+$$
+DECLARE
+	fd date;
+	ld date;
+	cemail_min date;
+	cemail_max date;
+	cemail_x bigint;
+BEGIN
+	select into fd (yr || '-01-01')::date;
+	select into ld (yr || '-12-31')::date;
+	
+	IF (
+		select COUNT(*) from fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		) <= 1 THEN
+		RETURN True;
+	END IF;
+	
+	select into cemail_min MIN(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+	select into cemail_max MAX(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+		
+	select SUM(len / 150) into cemail_x from (
+		select (lead(leave_date, 1) over (order by leave_date asc) - leave_date) as len
+		from (
+		SELECT 
+			email, 
+			leave_date
+		FROM fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		ORDER BY leave_date asc
+		) L1
+	) L2;
+		
+   	cemail_x := cemail_x + (cemail_min - fd) / 150;
+	cemail_x := cemail_x + (ld - cemail_max) / 150;
+	
+	return cemail_x >= 2;
+END;
+$$;
+
 
 --=================================================== END HELPER ============================================================
 
@@ -1128,5 +1183,27 @@ CREATE TRIGGER trigger_block_taking_leave
     BEFORE INSERT ON FullTimeLeave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
+
+
+-- trigger to ensure the leave table is valid
+-- if invalid row is entered into leave table, this trigger will delete that row
+CREATE OR REPLACE FUNCTION isLeaveValidTrigger()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF NOT isLeaveValid(NEW.email, EXTRACT(YEAR FROM NEW.leave_date)::int) THEN
+		RAISE 'Invalid leave pattern';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS is_leave_valid_trigger ON FullTimeLeave;
+CREATE CONSTRAINT TRIGGER is_leave_valid_trigger
+    AFTER INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE isLeaveValidTrigger();
 
 -- =============================================== END TRIGGERS ====================================================
