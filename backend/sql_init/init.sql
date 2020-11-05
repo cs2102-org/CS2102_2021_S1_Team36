@@ -1364,6 +1364,28 @@ CREATE TRIGGER trigger_block_taking_leave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
 
+-- trigger: full time caretaker accept bid immediately if he can work
+CREATE OR REPLACE FUNCTION ft_accept_bid() RETURNS TRIGGER
+    AS $$
+BEGIN
+    UPDATE BidsFor BF
+    SET is_confirmed = true
+    WHERE 
+        BF.caretaker_email = NEW.caretaker_email AND
+        BF.owner_email = NEW.owner_email AND
+        BF.pet_name = NEW.pet_name AND
+        BF.submission_time = NEW.submission_time AND 
+        canWork(NEW.caretaker_email, NEW.start_date, NEW.end_date) AND
+        EXISTS (select 1 from Caretakers where email = New.caretaker_email and is_fulltime=true);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS ft_accept_bid ON BidsFor;
+CREATE TRIGGER ft_accept_bid
+    AFTER INSERT ON BidsFor
+    EXECUTE PROCEDURE ft_accept_bid();
+
 
 -- trigger to ensure the leave table is valid
 -- if invalid row is entered into leave table, this trigger will delete that row
