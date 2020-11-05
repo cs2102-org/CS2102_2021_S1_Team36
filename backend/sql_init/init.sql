@@ -58,7 +58,7 @@ CREATE TABLE PetTypes ( -- enumerates the types of pets there are, like Dog, Cat
 );
 
 CREATE TABLE Pets (
-    email VARCHAR(30) REFERENCES PetOwners(email),
+    email VARCHAR(30) REFERENCES PetOwners(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     special_requirements VARCHAR(255),
     description VARCHAR(255),
@@ -72,7 +72,7 @@ CREATE TABLE PcsAdmins (
 
 CREATE TABLE BidsFor (
     owner_email VARCHAR(30),
-    caretaker_email VARCHAR(30) REFERENCES CareTakers(email),
+    caretaker_email VARCHAR(30) REFERENCES CareTakers(email) ON DELETE CASCADE,
     pet_name VARCHAR(30),
     submission_time TIMESTAMP,
     start_date DATE,
@@ -83,31 +83,34 @@ CREATE TABLE BidsFor (
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
+    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), 
+    review VARCHAR(255) DEFAULT NULL, --can add text for the review
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
-); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+);
+-- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
 -- todo: check that price <= amount_bidded
 -- check that start_date >= end_date
+-- check is_paid then it must be confirmed
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
     daily_price DECIMAL(10,2),
     email varchar(30) REFERENCES Caretakers(email) ON DELETE cascade, -- references the caretaker
     species varchar(30) REFERENCES PetTypes(species),
-    PRIMARY KEY (email, species)
+    PRIMARY KEY (email, species)  --- daily price > base price
 );
 
 CREATE TABLE Posts (
 	post_id SERIAL PRIMARY KEY,
-    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE SET NULL,
+    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE CASCADE,
     title VARCHAR(255),
     cont TEXT,
     last_modified TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE Comments (
-	post_id INTEGER REFERENCES Posts(post_id),
-    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
+	post_id INTEGER REFERENCES Posts(post_id) ON DELETE CASCADE,
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE CASCADE,
     date_time TIMESTAMP DEFAULT NOW(),
     cont TEXT,
     PRIMARY KEY (post_id, email, date_time)
@@ -313,6 +316,183 @@ END;
 $$;
 
 
+-- void function. Creates a new user and pcsadmin in a single transaction.
+drop function if exists createPcsAdmin;
+CREATE OR REPLACE FUNCTION createPcsAdmin(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into pcsadmins values (email);
+END;
+$$;
+
+-- void function. Creates a new user and fulltime caretaker in a single transaction.
+drop function if exists createFtCaretaker;
+CREATE OR REPLACE FUNCTION createFtCaretaker(email varchar, username varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, 'Your bio is blank. Tell the world about yourself!', 'password1');
+    insert into caretakers (email, is_fulltime) values (email, true);
+END;
+$$;
+
+-- void function. Creates a new user and part time caretaker in a single transaction.
+drop function if exists createPtCaretaker;
+CREATE OR REPLACE FUNCTION createPtCaretaker(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into caretakers (email, is_fulltime) values (email, false);
+END;
+$$;
+
+-- void function. Creates a new user and petowner in a single transaction.
+drop function if exists createPetOwner;
+CREATE OR REPLACE FUNCTION createPetOwner(email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+END;
+$$;
+
+-- void function. Creates a new user, petowner and part time caretaker in a single transaction.
+drop function if exists createPtAndPo;
+CREATE OR REPLACE FUNCTION createPtAndPo (email varchar, username varchar, descript varchar, pass varchar)
+RETURNS void
+language plpgsql
+AS
+$$
+BEGIN
+    insert into users values (username, email, descript, pass);
+    insert into petowners (email) values (email);
+    insert into caretakers (email, is_fulltime) values (email, false);
+END;
+$$;
+
+-- getPetDays(email, start, end) -> int :: total pet days worked
+-- returns NULL if email hasn't completed any jobs that month (have to check division by NULL)
+drop function if exists getPetDays;
+CREATE OR REPLACE FUNCTION getPetDays(cemail varchar, s date, e date)
+RETURNS int
+language plpgsql
+as
+$$
+declare 
+	daysWorked INTEGER;
+BEGIN
+	select sum(end_date - start_date + 1) into daysWorked
+	from bidsfor
+	where caretaker_email=cemail
+		and (s <= end_date and end_date <= e)
+		and is_paid
+        and is_confirmed
+	group by cemail;
+	
+	return daysWorked;
+END;
+$$;
+
+-- getTotalRevenue(email, start, end) -> float :: total revenue
+-- returns NULL if email hasn't completed any jobs that month hence earned no revenue 
+-- take note of this when doing arithmetic with this result
+drop function if exists getTotalRevenue;
+CREATE OR REPLACE FUNCTION getTotalRevenue(cemail varchar, s date, e date)
+RETURNS FLOAT
+language plpgsql
+as
+$$
+declare 
+	revenue FLOAT;
+BEGIN
+	select sum((end_date - start_date + 1) * amount_bidded) into revenue
+	from bidsfor 
+	where is_paid 
+        and is_confirmed
+		and (s <= end_date and end_date <= e)
+		and caretaker_email=cemail
+	group by cemail;
+	
+	return revenue;
+END;
+$$;
+
+-- getSalary(email, start, end) -> float
+-- gets salary to be paid to a caretaker for jobs COMPLETED during 
+-- [start, end] inclusive
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the entire job 
+-- in Feb
+drop function if exists getSalary;
+CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
+RETURNS float
+language plpgsql
+as
+$$
+declare
+    -- these vars are null, caretaker didn't complete any jobs during period
+    totalRev FLOAT := getTotalRevenue(cemail, s, e);
+    daysWorked INT := getPetDays(cemail, s, e);
+	avgPricePerDay FLOAT := totalRev / daysWorked;
+	is_ft BOOLEAN;
+BEGIN	
+	select is_fulltime into is_ft
+	from caretakers
+	where email=cemail;
+	
+    if daysWorked is null then
+        daysWorked := 0;
+    end if;
+	
+    if totalRev is null then
+        totalRev := 0;
+    end if;
+
+	if is_ft and daysWorked <= 60 then
+        -- less than 60 pet days worked
+		return 3000;
+	elsif is_ft and daysWorked > 60 then
+		return 3000 + ((daysWorked - 60) * avgPricePerDay);
+	else -- is parttime
+		return 0.75 * totalRev;
+	end if;
+END;
+$$;
+
+-- getWorkDays(email, start, end) -> int :: total working days worked
+-- returns 0 if email hasn't completed any jobs that month
+drop function if exists getWorkDays;
+CREATE OR REPLACE FUNCTION getWorkDays(cemail varchar, s date, e date)
+RETURNS int
+language plpgsql
+as
+$$
+declare 
+	daysWorked INTEGER;
+BEGIN
+	select count(*) into daysWorked
+	from generate_series (s::timestamp, e::timestamp, '1 day'::interval) dd 
+	where exists (select 1 
+                  from bidsFor B
+                  where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
+                    and B.is_confirmed
+                    and B.is_paid
+                    and B.caretaker_email=cemail);
+	
+	return daysWorked;
+END;
+$$;
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
@@ -740,12 +920,12 @@ INSERT INTO FullTimeLeave(email, leave_date) VALUES ('columbus@gmail.com', '2020
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'roger',
 '2020-10-25', '2020-01-01', '2020-01-01',
 100, 110,
-false, false, '1', '1', 5
+false, true, '1', '1', 5
 );
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'cassie@gmail.com', 'alfie',
 '2020-10-25', '2020-01-01', '2020-01-05',
 80, 130,
-false, false, '1', '1', 5
+false, true, '1', '1', 5
 );
 INSERT INTO BidsFor VALUES ('panter@gmail.com', 'carl@gmail.com', 'fido',
 '2020-10-26', '2020-01-01', '2020-01-05',
@@ -1159,7 +1339,7 @@ CREATE TRIGGER trigger_update_rating
     EXECUTE PROCEDURE update_rating();
 
 
--- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date
+-- trigger: prevent adding leave when you have a confirmed bid that overlaps with the leave date (Full Time)
 CREATE OR REPLACE FUNCTION block_taking_leave()
 RETURNS trigger
 language plpgsql
@@ -1199,11 +1379,68 @@ BEGIN
 	RETURN NEW;
 END;
 $$;
-
+    
 DROP TRIGGER IF EXISTS is_leave_valid_trigger ON FullTimeLeave;
 CREATE CONSTRAINT TRIGGER is_leave_valid_trigger
     AFTER INSERT ON FullTimeLeave
     FOR EACH ROW
     EXECUTE PROCEDURE isLeaveValidTrigger();
+
+
+-- trigger: prevent deleting avail when you have a confirmed bid that overlaps with the avail date (Part Time)
+CREATE OR REPLACE FUNCTION block_deleting_avail()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+		select 1 from bidsFor
+		where
+			caretaker_email = OLD.email and
+			((start_date, end_date + interval '1 day') overlaps (OLD.work_date, OLD.work_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'You have a job on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_deleting_avail on PartTimeAvail;
+CREATE TRIGGER trigger_block_deleting_avail
+    BEFORE DELETE ON PartTimeAvail
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_deleting_avail();
+
+-- trigger: prevent adding bid when you have no avail date (Part Time)
+CREATE OR REPLACE FUNCTION block_inserting_bid_part_time()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+        select 1 from CareTakers
+        where 
+            email = NEW.caretaker_email and is_fulltime = false
+    ) 
+    AND
+    NOT EXISTS (
+		select 1 from PartTimeAvail
+		where
+			email = NEW.caretaker_email and
+			((NEW.start_date, NEW.end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day'))
+	) THEN
+		RAISE EXCEPTION 'Part time worker does not have availability on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_inserting_bid_part_time on BidsFor;
+CREATE TRIGGER trigger_block_inserting_bid_part_time
+    BEFORE INSERT ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_inserting_bid_part_time();
 
 -- =============================================== END TRIGGERS ====================================================

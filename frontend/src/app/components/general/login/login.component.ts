@@ -36,7 +36,6 @@ export class LoginComponent implements OnInit {
     this.authService.loginNotiService.subscribe(message => {
       this.dialogRef.close();
       if (this.router.url === '/signup') {
-        console.log("here");
         this.router.navigateByUrl('caretaker-availabilities');
       }
     });

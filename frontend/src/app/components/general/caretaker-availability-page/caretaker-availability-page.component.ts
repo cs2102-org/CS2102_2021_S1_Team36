@@ -1,6 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-import {MatDatepickerModule} from '@angular/material/datepicker';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormGroup, FormControl, AbstractControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
+import { Subscription } from 'rxjs';
+import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { PetownerService } from 'src/app/services/petowner/petowner.service';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -8,68 +15,179 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
   styleUrls: ['./caretaker-availability-page.component.css']
 })
 export class CaretakerAvailabilityPageComponent implements OnInit {
+  @ViewChild('calendar') calendarComponent: FullCalendarComponent;
+
+  selectedCaretaker;
+  placeholderDate: String;
+  typeOfList = "";
+  petTypes;
+
+  calendarOptions: CalendarOptions = {
+    initialView: 'dayGridMonth',
+    height: 450,
+    validRange: function(nowDate) {
+      const aYearFromNow = new Date(nowDate);
+      aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 2);
+      return {
+        start: nowDate,
+        end:  aYearFromNow
+      };
+    },
+    events: [],
+    eventBackgroundColor: 'grey',
+  };
+
   filterForm = new FormGroup({
-    search: new FormControl(''),
-    dateFrom: new FormControl(''),
-    dateTo: new FormControl(''),
-    petType: new FormControl(''),
-    priceFrom: new FormControl(''),
-    priceTo: new FormControl(''),
-    minRating: new FormControl('')
+    substr: new FormControl(''),
+    start_date: new FormControl(''),
+    end_date: new FormControl(''),
+    pet_type: new FormControl(''),
+    min: new FormControl('', Validators.min(0)),
+    max: new FormControl(''),
+    is_fulltime: new FormControl(''),
+    rating: new FormControl('', [Validators.min(0), Validators.max(5)])
   });
 
-  heroes: any[] = [
-    { id: 1, name: 'Dr Nice', Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd'] },
-    { id: 2, name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 3, name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 4, name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 5, name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 6, name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 7, name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 8, name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 9, name: 'Magma' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 10, name: 'Tornado' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 1, name: 'Dr Nice' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 2, name: 'Narco' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 3, name: 'Bombasto' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 4, name: 'Celeritas' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 5, name: 'Magneta' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 6, name: 'RubberMan' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 7, name: 'Dynama' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']},
-    { id: 8, name: 'Dr IQ' , Rating: 5, from: 1, to: 5, price: 20, pets: ['sad', 'asd']}
-  ];
+  caretakers: any[] = [];
+  isLogged: boolean = false;
 
-  selectedHero;
-
-  constructor() { }
+  constructor(private caretakerService: CaretakerService, private router: Router,
+    private authService: AuthService, private petOwnerService: PetownerService) { }
 
   ngOnInit(): void {
+    let aDate = new Date();
+    aDate.setDate(aDate.getDate() - 1);
+    this.placeholderDate = aDate.toISOString().slice(0,10);
+    this.getActiveCaretakers();
+    this.checkIsLogged();
+    this.getListOfPetTypes();
   }
 
-  onSubmit(searchParam) {
-    console.log('SENT');
-    console.log(searchParam);
+  getActiveCaretakers() {
+    this.caretakerService.getActiveCaretakers().subscribe((caretakers) => {
+      let id = 1;
+      this.typeOfList = "";
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
   }
+
+  getListOfPetTypes() {
+    this.petOwnerService.getListOfPetTypes().subscribe(petTypes => {
+      this.petTypes = petTypes.map(elem => elem.species);
+    });
+  }
+
+  showRecommendedCaretakers() {
+    this.caretakerService.getRecommendedCaretakers().subscribe((caretakers) => {
+      this.typeOfList = "Recommended";
+      let id = 1;
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
+  }
+
+  showTransactedCaretakers() {
+    this.caretakerService.getTransactedCaretakers().subscribe((caretakers) => {
+      console.log(caretakers);
+      this.typeOfList = "Previously Transacted";
+      let id = 1;
+      caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+      this.caretakers = caretakers;
+    });
+  }
+
+  onSubmit() {
+    this.checkFormControl("start_date");
+    this.checkFormControl("end_date");
+    this.checkFormControl("rating");
+    this.checkFormControl("pet_type");
+    this.checkFormControl("min");
+    this.checkFormControl("max");
+    this.checkFormControl("substr");
+    this.checkFormControl("is_fulltime");
+
+    if (this.typeOfList === "") {
+      this.caretakerService.getFilteredActiveCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      });
+    } else if (this.typeOfList === "Previously Transacted") {
+      this.caretakerService.getFilteredTransactedCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      }); 
+    } else {
+      this.caretakerService.getFilteredRecommendedCaretakers(this.filterForm.value).subscribe((caretakers) => {
+        let id = 1;
+        caretakers.map(elem => {elem.id = id++; elem.showTakeCare = false;});
+        this.caretakers = caretakers;
+      }); 
+    }
+  }
+
+  checkFormControl(name) {
+    if (this.filterForm.get(name).value === "") {
+      this.filterForm.controls[name].setValue(null);
+    }
+  }
+
+  select(caretaker){
+    if (caretaker.type == "Part Time") {
+      this.caretakerService.getAvailPartTimeCareTaker(caretaker.email).subscribe((dates) => {
+        dates.push({"date": this.placeholderDate});
+        dates.map(elem => {elem.display = 'inverse-background'; elem.groupId= 'yes';});
+        this.calendarOptions.events = dates;
+        this.selectedCaretaker = caretaker;  
+      });
+    } else {
+      this.caretakerService.getAvailFullTimeCareTaker(caretaker.email).subscribe((dates) => {
+        dates.map(function(elem) { 
+          elem.display = 'background';
+          elem.groupId = 'No'; 
+          return elem;
+        });
+        this.calendarOptions.events = dates;
+        this.selectedCaretaker = caretaker;  
+      });
+    }
+  }
+
+  checkIsLogged() {
+    if (localStorage.getItem('accessToken') != null) {
+      this.isLogged = true;
+    }
+    this.authService.loginNotiService
+      .subscribe(message => {
+        if (message == "Login success") {
+          this.isLogged=true;
+        } else {
+          this.isLogged=false;
+        }
+      });
+  }
+
+  openMakeBid() {
+    const encrypted =  Base64.stringify(Utf8.parse(this.selectedCaretaker.email));
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/caretaker/bid/' + encrypted])
+    );
+    window.open(url);
+  }
+
+  showHide(caretaker){
+    event.stopPropagation();
+    if (!caretaker.showTakeCare) {
+      this.caretakerService.getCareTakerPrice(caretaker.email).subscribe((prices) => {
+        caretaker.takesCare = prices;
+        caretaker.showTakeCare = true;
+      });
+    } else {
+      caretaker.showTakeCare = false;
+      caretaker.takesCare = [];
+    }
+  }
+
 }
-
-
-      //  <span class="badge">{{hero.id}}</span> 
-
-
-//                   <<mat-form-field appearance="fill">
-//   <mat-label>Enter a date range</mat-label>
-//   <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-//     <input matStartDate formControlName="start" placeholder="Start date">
-//     <input matEndDate formControlName="end" placeholder="End date">
-//   </mat-date-range-input>
-//   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-//   <mat-date-range-picker #picker></mat-date-range-picker>
-
-//   <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-//   <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-// </mat-form-field>
-
-// new FormGroup({
-//       start: new FormControl(),
-//       end: new FormControl()
-//     })

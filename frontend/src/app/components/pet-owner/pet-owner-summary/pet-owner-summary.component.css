@@ -1,0 +1,25 @@
+.content {
+  background-color: #1e77aa;
+  height: 95vh;
+  width: 100%;
+}
+
+.content-box {
+  float: left;
+  margin-left: 23%;
+  padding: 0 30px;
+  padding-bottom: 20px;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+}
+
+.center {
+  padding: 2%;
+}
+
+h1 {
+    margin-bottom: 10px;
+}

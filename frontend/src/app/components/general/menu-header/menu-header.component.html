@@ -6,25 +6,25 @@
     <ng-template #elseBlock>
         <button (click)="logout()" id="button-login">Logout</button>
     </ng-template>
-    <app-auto-dropdown id="button-pet-owner">
+    <div *ngIf="isLogged;" id="button-forum" [routerLink] = "['/profile']">Profile</div>
+    <app-auto-dropdown id="button-pet-owner" *ngIf="isPetOwner">
         <div trigger>Pet Owner</div>
         <div content>
-            <span mat-menu-item [routerLink] = "['/pet-owner-bids']">Bids</span>
-            <span mat-menu-item>Summary</span>
+            <span mat-menu-item [routerLink] = "['/petowner/bids']">Bids</span>
+            <span mat-menu-item [routerLink] = "['/petowner/summary']">Summary</span>
         </div>
     </app-auto-dropdown>
-    <app-auto-dropdown id="button-caretaker">
+    <app-auto-dropdown id="button-caretaker" *ngIf="isCaretaker">
         <div trigger>Caretaker</div>
         <div content>
-            <span mat-menu-item [routerLink] = "['/caretaker-bids']">Bids</span>
-            <span mat-menu-item>Declare Leave</span>
-            <span mat-menu-item [routerLink] = "['/caretaker-summary']">Summary</span>
+            <span mat-menu-item [routerLink] = "['/caretaker/bids']">Bids</span>
+            <span mat-menu-item [routerLink] = "['/caretaker/summary']">Summary</span>
         </div>
     </app-auto-dropdown>
-    <app-auto-dropdown id="button-admin">
+    <app-auto-dropdown id="button-admin" *ngIf="isAdmin">
         <div trigger>Admin</div>
         <div content>
-            <span mat-menu-item>Stats</span>
+            <span mat-menu-item [routerLink] = "['/admin/manage']">Manage Users/Pet Types</span>
         </div>
     </app-auto-dropdown>
     <div id="button-forum" [routerLink] = "['/forum']">Forum</div>

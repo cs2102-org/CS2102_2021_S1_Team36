@@ -1,0 +1,12 @@
+<div class="fixed-bg">
+
+<div class="header">Create Post</div>
+<form class="form" [formGroup]="newPostForm" (ngSubmit)="onSubmit()">
+    <label for="newPostTitle">Title</label>
+    <textarea id="newPostTitle" name="newPostTitle" rows="1" cols="50" style="width: 50%; margin-left: 2rem;"></textarea><br>
+    <label for="newPostDesc">Description</label>
+    <textarea id="newPostDesc" name="newPostDesc" rows="4" cols="50" style="width: 50%; margin-top: 2rem; height: 4.5rem; margin-left: 2rem;"></textarea><br>
+    <button class="button" type="submit" style="float: right; margin-right: 4.5rem;">Submit</button>
+</form>
+    
+</div>
