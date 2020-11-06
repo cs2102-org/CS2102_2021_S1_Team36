@@ -24,14 +24,14 @@ export class ForumComponent implements OnInit {
   ) { }
 
   posts;
-  flatData = {};
+  flatData = {email:''};
   isPcsAdmin;
 
 
   ngOnInit(): void {
     this.populatePosts();
     this.checkIsLogged();
-    if (!this.isLogged) {
+    if (this.isLogged) {
       this.getFlatData();
     }
   }
@@ -48,6 +48,7 @@ export class ForumComponent implements OnInit {
     .subscribe(message => {
       if (message == "Login success") {
         this.isLogged=true;
+         this.getFlatData();
       } else {
         this.isLogged=false;
       }
