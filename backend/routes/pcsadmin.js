@@ -131,7 +131,7 @@ pcsRouter.post('/supply', async (req, res) => {
 pcsRouter.get('/pet-types', async (req, res) => {
     try {
         const msql = await pool.query(
-            "select species, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
+            "select species, base_price, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
             from Pettypes P1 order by species asc;"
             );
         res.json(msql.rows); 

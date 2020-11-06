@@ -37,6 +37,7 @@ import { SearchfilterPipe } from './searchfilter.pipe';
 import { FilterspeciesPipe } from './filterspecies.pipe';
 import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 import { PostComponent } from './components/general/forum/post/post.component';
+import { UpdateBasePriceComponent } from './components/admin/update-base-price/update-base-price.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -70,7 +71,8 @@ FullCalendarModule.registerPlugins([
     SearchfilterPipe,
     FilterspeciesPipe,
     PostComponent,
-    CreatePostComponent
+    CreatePostComponent,
+    UpdateBasePriceComponent
   ],
   imports: [
     BrowserModule,

@@ -10,6 +10,7 @@ import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
 import { DetailedPetComponent } from '../detailed-pet/detailed-pet.component';
+import { UpdateBasePriceComponent } from '../update-base-price/update-base-price.component';
 
 @Component({
   selector: 'app-manage-users',
@@ -216,5 +217,13 @@ export class ManageUsersComponent implements OnInit {
         pet_name: pet.pet_name
       }
     });
+  }
+
+  updateBasePrice(pt) {
+    const ref = this.dialog.open(UpdateBasePriceComponent, { data : { 
+        pet_type: pt
+      }
+    });
+    ref.disableClose = true;
   }
 }

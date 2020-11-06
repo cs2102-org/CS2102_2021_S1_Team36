@@ -57,7 +57,7 @@ CREATE TABLE PetOwners (
 
 CREATE TABLE PetTypes ( -- enumerates the types of pets there are, like Dog, Cat, etc
     species VARCHAR(30) PRIMARY KEY NOT NULL,
-    base_price DECIMAL(10,2)
+    base_price DECIMAL(10,2) not null
 );
 
 CREATE TABLE Pets (
@@ -696,6 +696,12 @@ INSERT INTO PetTypes(species, base_price) VALUES ('Turtle', 110);
 INSERT INTO PetTypes(species, base_price) VALUES ('Snake', 120);
 INSERT INTO PetTypes(species, base_price) VALUES ('Monkey', 130);
 INSERT INTO PetTypes(species, base_price) VALUES ('Lion', 140);
+
+INSERT INTO Users(name, email, description, password) VALUES ('jane', 'jane@gmail.com', 'jane is an admin of pcs', 'pwjane');
+INSERT INTO PcsAdmins(email) VALUES ('jane@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('janey', 'janey@gmail.com', 'janey is an admin of pcs', 'pwjaney');
+INSERT INTO PcsAdmins(email) VALUES ('janey@gmail.com');
+
 
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('panter@gmail.com', 'roger', 'needs a lot of care', 'roger is a Dog owned by panter', 'Dog');
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('peter@gmail.com', 'boomer', 'needs alone time', 'boomer is a Cat owned by peter', 'Cat');

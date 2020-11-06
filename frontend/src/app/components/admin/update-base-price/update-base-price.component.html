@@ -1,0 +1,7 @@
+<button class="close" mat-button [mat-dialog-close]="true">X</button>
+<form class="form" [formGroup]="typeForm" (ngSubmit)="onSubmitType(typeForm.value)">
+    <h3>Update ({{species}}) Base Price</h3>
+    <p>Please specify the updated base price</p>
+    <input type="number" formControlName="base_price" style="margin-right:10px;">
+    <button>Submit</button>
+</form>

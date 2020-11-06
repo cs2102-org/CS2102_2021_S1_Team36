@@ -77,13 +77,16 @@
             <table>
                 <tr>
                     <th class="theader">Pet Type</th>
+                    <th class="theader">Base Price</th>
                     <th class="theader">Quantity</th>
                     <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let pt of things">
                     <td class="td-pads">{{pt.species}}</td>
+                    <td class="td-pads">${{pt.base_price}}</td>
                     <td class="td-pads">{{pt.count}}</td>
                     <th width="10%">
+                        <button class="show-button" (click)=updateBasePrice(pt)>Update</button>
                         <button class="delete-button" (click)=deletePetType(pt.species)>Delete</button>
                     </th>
                 </tr>
