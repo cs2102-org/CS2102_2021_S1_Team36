@@ -540,6 +540,81 @@ BEGIN
 	end if;
 END;
 $$;
+
+-- function to see which bids satisfy a set of criteria (i.e. a filter on bids)
+DROP FUNCTION IF EXISTS filterBids;
+CREATE OR REPLACE FUNCTION filterBids(
+	p_po_name varchar, -- bids with this substr in petowner name
+	p_ct_name varchar, -- bids with this substr in caretaker name
+	p_is_fulltime boolean, -- bids with this type of caretaker
+	p_pet_type varchar, -- bids with this pet type
+	p_start_date date, -- bids with start_date after this
+	p_end_date date, -- bids with end_date before this
+	p_min DECIMAL(10, 2), -- bids with amount_bidded more than this
+	p_max DECIMAL(10, 2), -- bids with amount_bidded less than this
+	p_rating DECIMAL(10, 2), -- bids with rating more than this
+	p_bid_status boolean, -- bids with this is_confirmed
+	p_paid_status boolean) -- bids with this is_paid
+RETURNS table (
+	owner_email varchar,
+	owner_name varchar,
+	caretaker_email varchar,
+	caretaker_name varchar,
+	caretaker_rating DECIMAL(10, 2),
+	is_fulltime boolean,
+	species varchar,
+	start_date date,
+	end_date date,
+	amount_bidded DECIMAL(10, 2),
+	rating DECIMAL(10, 2),
+	is_confirmed boolean,
+	is_paid boolean
+)
+language plpgsql
+AS
+$$
+BEGIN
+    return query
+	select
+		EBF.owner_email,
+		EBF.owner_name,
+		EBF.caretaker_email,
+		EBF.caretaker_name,
+		EBF.caretaker_rating,
+		EBF.is_fulltime,
+		EBF.species,
+		EBF.start_date,
+		EBF.end_date,
+		EBF.amount_bidded,
+		EBF.rating,
+		EBF.is_confirmed,
+		EBF.is_paid
+	from (
+		BidsFor BF NATURAL JOIN (
+			select U1.email as owner_email, U1.name as owner_name from users U1
+		) UPO NATURAL JOIN (
+			select U2.email as caretaker_email, U2.name as caretaker_name from users U2
+		) UCT NATURAL JOIN (
+			select C1.email as caretaker_email, C1.is_fulltime, C1.rating as caretaker_rating from Caretakers C1
+		) CT NATURAL JOIN (
+			select P1.email as owner_email, P1.pet_name, P1.species from Pets P1
+		) PETS
+	) as EBF
+	where
+		(EBF.owner_name LIKE ('%' || p_po_name || '%') or p_po_name is null) and
+		(EBF.caretaker_name LIKE ('%' || p_ct_name || '%') or p_ct_name is null) and
+		(EBF.is_fulltime = p_is_fulltime or p_is_fulltime is null) and
+		(EBF.species = p_pet_type or p_pet_type is null) and
+		(EBF.start_date >= p_start_date or p_start_date is null) and
+		(EBF.end_date <= p_end_date or p_end_date is null) and
+        (EBF.amount_bidded >= p_min or p_min is null) and
+		(EBF.amount_bidded <= p_max or p_max is null) and
+		(EBF.rating >= p_rating or p_rating is null) and
+		(EBF.is_confirmed = p_bid_status or p_bid_status is null) and
+		(EBF.is_paid = p_paid_status or p_paid_status is null);
+END;
+$$;
+
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
