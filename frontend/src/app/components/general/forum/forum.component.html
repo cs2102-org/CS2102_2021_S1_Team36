@@ -7,7 +7,7 @@
     <div (click)="openPost(post.post_id)">
       <div class="post-title">{{post.title}}</div>
       <div class="post-desc">{{post.cont}}</div>
-      <div class="post-author">Posted By: {{post.name}} | Comments: 0</div>
+      <div class="post-author">Posted By: {{post.name}} | Comments: {{post.count}}</div>
     </div>
     <button type="button" (click)="delete(post)" style="float: right; margin-right: -3.5rem;" *ngIf="post.email == flatData.email || isPcsAdmin">Delete</button>
   </li>
