@@ -7,6 +7,7 @@ import { FormControl, FormGroup, FormBuilder, FormArray, Validators } from '@ang
 import { Router } from '@angular/router';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-forum',
@@ -14,24 +15,43 @@ import Utf8 from 'crypto-js/enc-utf8'
   styleUrls: ['./forum.component.css']
 })
 export class ForumComponent implements OnInit {
+  isLogged: boolean = false;
 
   constructor(
     private http: HttpClient,
     private router: Router,
+    private authService: AuthService
   ) { }
 
   posts;
-  flatData;
+  flatData = {};
   isPcsAdmin;
 
 
   ngOnInit(): void {
     this.populatePosts();
-    this.getFlatData();
+    this.checkIsLogged();
+    if (!this.isLogged) {
+      this.getFlatData();
+    }
   }
 
   public getUser(): Observable<any> {
     return this.http.get(baseurl + '/api/auth/profile', getHttpOptionsWithAuth());
+  }
+
+  checkIsLogged() {
+  if (localStorage.getItem('accessToken') != null) {
+    this.isLogged = true;
+  }
+  this.authService.loginNotiService
+    .subscribe(message => {
+      if (message == "Login success") {
+        this.isLogged=true;
+      } else {
+        this.isLogged=false;
+      }
+    });
   }
 
   getFlatData() {
