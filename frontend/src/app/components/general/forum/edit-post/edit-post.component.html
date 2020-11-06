@@ -1,12 +1,16 @@
-<div class="fixed-bg">
+<div class="content">
+  <div class="center"> 
+      <div class="content-box">
 
-    <div class="header">Edit Post</div>
+    <h1>Edit Post</h1>
     <form class="form" [formGroup]="editPostForm" (ngSubmit)="onSubmit(editPostForm.value)">
         <label for="editPostTitle">Title</label>
-        <textarea id="editPostTitle" name="editPostTitle" formControlName="title" rows="1" cols="50" style="width: 50%; margin-left: 2rem;" required minlength="4"></textarea><br>
+        <textarea name="editPostTitle" formControlName="title" rows="2" style="width:100%" required minlength="4"></textarea><br>
         <label for="editPostDesc">Description</label>
-        <textarea id="editPostDesc" name="editPostDesc" formControlName="cont" rows="4" cols="50" style="width: 50%; margin-top: 2rem; height: 4.5rem; margin-left: 2rem;" required minlength="30"></textarea><br>
-        <button class="button" type="submit" style="float: right; margin-right: 4.5rem;" [disabled]="!editPostForm.valid">Submit</button>
+        <textarea name="editPostDesc" formControlName="cont" rows="20" style="width:100%" required minlength="30"></textarea><br>
+        <button class="button" type="submit" [disabled]="!editPostForm.valid">Submit</button>
     </form>
         
+        </div>
     </div>
+</div>
