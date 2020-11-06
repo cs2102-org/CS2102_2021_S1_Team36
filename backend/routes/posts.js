@@ -25,7 +25,7 @@ postsRouter.post('/specific', async (req, res) => {
         const {post_id} = req.body;
         const result = await pool.query(
             'SELECT * FROM Posts P \
-            NATURAL JOIN (SELECT name, email FROM users U) as foo \
+            LEFT JOIN (SELECT name, email FROM users U) as foo ON P.email = foo.email\
             WHERE P.post_id = $1;',
             [post_id]
         );
@@ -48,6 +48,7 @@ postsRouter.post('/create', verifyJwt, async (req, res) => {
             `,
             [email, title, cont],
         );
+        console.log(result.rows);
         return res.status(200).json(result.rows);
     } catch (err) {
         console.error(err);

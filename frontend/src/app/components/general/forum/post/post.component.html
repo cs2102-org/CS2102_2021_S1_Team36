@@ -2,7 +2,7 @@
 <div class="striations">
         <div class="post-title">{{Post.title}}</div>
         <div class="post-desc">{{ Post.cont }}</div>
-        <div class="post-author">{{ Post.name }}</div>
+        <div class="post-author">{{ Post.name || "[deleted user]"}}</div>
         <button class="button" type="submit" (click)="edit(Post.post_id)" style="float: right; margin-right: -3.5rem;" *ngIf="Post.email == flatData.email">Edit</button>
 </div>
 
