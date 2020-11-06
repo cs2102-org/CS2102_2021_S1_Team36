@@ -1,17 +1,23 @@
-<div class="fixed-bg">
+<div class="content">
+  <div class="center"> 
+      <div class="content-box">
 
-<div class="header">Forum</div>
+        <h1>Forum</h1>
+        <button type="button" (click)="addPost()">New Post</button>
 
-<ul class="striations">
-  <li *ngFor="let post of posts">
-    <div (click)="openPost(post.post_id)">
-      <div class="post-title">{{post.title}}</div>
-      <div class="post-desc">{{post.cont}}</div>
-      <div class="post-author">Posted By: {{post.name || "[deleted user]"}} | Comments: {{post.c1 || 0}}</div>
-    </div>
-    <button type="button" (click)="delete(post)" style="float: right; margin-right: -3.5rem;" *ngIf="post.email == flatData.email || isPcsAdmin">Delete</button>
-  </li>
-</ul>
-
-<button type="button" (click)="addPost()">New Post</button>
+        <div class="posts">
+            <ul class="striations">
+              <li *ngFor="let post of posts">
+                <div (click)="openPost(post.post_id)">
+                  <div class="post-title">{{post.title  | slice:0:30 }}</div>
+                  <div class="post-desc">{{post.cont  | slice:0:30 }}</div>
+                  <div class="post-author">Posted By: {{post.name || "[deleted user]"}} | Comments: {{post.c1 || 0}} </div>
+                  <div class="post-author">Last Modified: {{post.last_modified}} </div>
+                  <button type="button" (click)="delete(post)" class="delete-button" *ngIf="post.email == flatData.email || isPcsAdmin">Delete</button>
+                </div>
+              </li>
+            </ul>
+       
+      </div>
+  </div>
 </div>

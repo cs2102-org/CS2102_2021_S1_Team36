@@ -1,12 +1,17 @@
-<div class="fixed-bg">
+<div class="content">
+  <div class="center"> 
+      <div class="content-box">
 
-<div class="header">Create Post</div>
-<form class="form" [formGroup]="newPostForm" (ngSubmit)="onSubmit(newPostForm.value)">
-    <label for="newPostTitle">Title</label>
-    <textarea id="newPostTitle" name="newPostTitle" formControlName="title" rows="1" cols="50" style="width: 50%; margin-left: 2rem;" required minlength="4"></textarea><br>
-    <label for="newPostDesc">Description</label>
-    <textarea id="newPostDesc" name="newPostDesc" formControlName="cont" rows="4" cols="50" style="width: 50%; margin-top: 2rem; height: 4.5rem; margin-left: 2rem;"></textarea><br>
-    <button class="button" type="submit" style="float: right; margin-right: 4.5rem;" [disabled]="!newPostForm.valid">Submit</button>
-</form>
-    
+        <h1>Create Post</h1>
+        <form class="form" [formGroup]="newPostForm" (ngSubmit)="onSubmit(newPostForm.value)">
+            <label for="newPostTitle">Title</label>
+             <br>
+            <textarea name="newPostTitle" formControlName="title" style="width:100%;" rows=2 required minlength="4"></textarea><br>
+            <label for="newPostDesc">Description</label>
+            <br>
+            <textarea  name="newPostDesc" formControlName="cont" style="width:100%;" rows=20 ></textarea><br>
+            <button class="button" type="submit" [disabled]="!newPostForm.valid">Submit</button>
+        </form>
+    </div>
+    </div>
 </div>
