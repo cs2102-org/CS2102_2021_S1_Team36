@@ -5,7 +5,7 @@
     <label for="newPostTitle">Title</label>
     <textarea id="newPostTitle" name="newPostTitle" formControlName="title" rows="1" cols="50" style="width: 50%; margin-left: 2rem;" required minlength="4"></textarea><br>
     <label for="newPostDesc">Description</label>
-    <textarea id="newPostDesc" name="newPostDesc" formControlName="cont" rows="4" cols="50" style="width: 50%; margin-top: 2rem; height: 4.5rem; margin-left: 2rem;" required minlength="30"></textarea><br>
+    <textarea id="newPostDesc" name="newPostDesc" formControlName="cont" rows="4" cols="50" style="width: 50%; margin-top: 2rem; height: 4.5rem; margin-left: 2rem;"></textarea><br>
     <button class="button" type="submit" style="float: right; margin-right: 4.5rem;" [disabled]="!newPostForm.valid">Submit</button>
 </form>
     

@@ -9,9 +9,9 @@ const postsRouter = express.Router();
 postsRouter.get('/', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT * FROM Posts P \
-            NATURAL JOIN (SELECT name, email FROM users U) as foo \
-            LEFT JOIN (SELECT post_id, count(*) FROM comments GROUP BY (post_id)) as counts ON P.post_id = counts.post_id;'
+            'SELECT P.post_id, U.name, U.email, P.title, P.cont, P.last_modified, counts.c1 FROM Posts P \
+            LEFT JOIN users U  on P.email = U.email \
+            LEFT JOIN (SELECT post_id, count(*) c1 FROM comments GROUP BY (post_id)) as counts ON P.post_id = counts.post_id;'
         );
         return res.status(200).json(result.rows);
     } catch (err) {
