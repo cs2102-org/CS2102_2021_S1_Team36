@@ -225,5 +225,9 @@ export class ManageUsersComponent implements OnInit {
       }
     });
     ref.disableClose = true;
+    ref.afterClosed().subscribe(result => {
+      this.refreshAfterChange();
+      this.msg = result;
+    });
   }
 }

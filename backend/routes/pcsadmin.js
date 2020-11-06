@@ -6,12 +6,28 @@ const pcsRouter = express.Router(); // use address  http://localhost:5000/api/pc
 
 pcsRouter.post('/pet-types', async (req, res) => {
     try {
-        const species = req.body.species;
+        const { species, base_price } = req.body;
         const result = await pool.query(
-            'INSERT INTO PetTypes(species) VALUES($1) returning *',
-            [species],
+            'INSERT INTO PetTypes VALUES($1, $2) returning *',
+            [species, base_price],
         );
         return res.status(200).json(result.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+pcsRouter.put('/pet-types', async (req, res) => {
+    try {
+        const { species, base_price } = req.body;
+        console.log(species, base_price);
+        const result = await pool.query(
+            'UPDATE PetTypes  \
+            SET base_price = $2 \
+            WHERE species = $1',
+            [species, base_price],
+        );
+        return res.status(200).json(true);
     } catch (err) {
         console.error(err);
     }
