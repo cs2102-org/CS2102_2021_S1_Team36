@@ -15,7 +15,6 @@ import { CaretakerAvailabilityPageComponent } from './components/general/caretak
 import { AutoDropdownComponent } from './auto-dropdown.component';
 import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
 import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
-// import { StatsComponent } from './components/admin/stats/stats.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid'; 
 import interactionPlugin from '@fullcalendar/interaction'; 
@@ -26,19 +25,19 @@ import { ForumComponent } from './components/general/forum/forum.component';
 import { CaretakerMakeBidComponent } from './components/general/caretaker-make-bid/caretaker-make-bid.component';
 import { PetOwnerSummaryComponent } from './components/pet-owner/pet-owner-summary/pet-owner-summary.component';
 import { SubmitRatingComponent } from './components/pet-owner/submit-rating/submit-rating.component';
-import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
 import { BidDialogComponent } from './components/general/bid-dialog/bid-dialog.component';
 import { ManageUsersComponent } from './components/admin/manage-users/manage-users.component';
 import { FormNewCaretakerComponent } from './components/admin/form-new-caretaker/form-new-caretaker.component';
 import { FormNewAdminComponent } from './components/admin/form-new-admin/form-new-admin.component';
-import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
-import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 import { DetailedPetComponent } from './components/admin/detailed-pet/detailed-pet.component';
 import { SearchfilterPipe } from './searchfilter.pipe';
 import { FilterspeciesPipe } from './filterspecies.pipe';
 import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 import { PostComponent } from './components/general/forum/post/post.component';
 import { EditPostComponent } from './components/general/forum/edit-post/edit-post.component';
+import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
+import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
+import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,

@@ -16,7 +16,10 @@ export class EditPostComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
+    private router: Router,
   ) { }
+
+  postId;
 
   editPostForm = new FormGroup({
     title: new FormControl(''),
@@ -28,11 +31,16 @@ export class EditPostComponent implements OnInit {
     this.editPost(details).subscribe(x => {
       console.log(details);
     })
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/post/'+this.postId])
+    );
+    window.open(url, "_self");
   }
 
   ngOnInit(): void {
     this.getPost().subscribe(x => {
       console.log(x);
+      this.postId = x[0].post_id;
       this.editPostForm.patchValue({
         title: x[0].title,
         cont: x[0].cont,

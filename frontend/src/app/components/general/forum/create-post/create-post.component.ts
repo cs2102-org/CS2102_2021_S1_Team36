@@ -17,6 +17,7 @@ export class CreatePostComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private router: Router,
   ) { }
 
   newPostForm = new FormGroup({
@@ -25,11 +26,13 @@ export class CreatePostComponent implements OnInit {
   });
   
   onSubmit(details) {
-    
-    console.log(details);
     this.createPost(details).subscribe(x => {
       console.log(details);
-    })
+    });
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/forum'])
+    );
+    window.open(url, "_self");
   }
 
   ngOnInit(): void {

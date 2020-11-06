@@ -73,6 +73,28 @@ petownerRouter.post('/:email/pets', async (req, res) => {
     }
 });
 
+// Find petowners with similar tastes as the specified petowner
+// input: email of petowner A
+// output: table (email) of emails of petowners with similar taste as A
+// two petowners have similar taste if their sets of liked caretakers have at least 3 caretakers in common
+// this endpoint is more for testing than actually becoming a feature
+// test: input perry, should get pearl (and vice versa)
+petownerRouter.post('/similar/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * from petowners \
+            where \
+                isSimilar($1, email) and \
+                email != $1",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // Add new pet to database of user (with verifyJwt)
 petownerRouter.post('/addpet', verifyJwt, async (req, res) => {
     const user = res.locals.user;
@@ -142,6 +164,27 @@ petownerRouter.get('/alltypes', async(req, res) => {
     }
 });
 
+// find all caretakers that this petowner likes
+// a petowner likes a caretaker if the petowner's average rating for that caretaker is >= 4
+// input: petowner email
+// output: table(email, rating, is_fulltime)
+// this endpoint is more for testing than actually becoming a feature
+// test with perry, pearl
+petownerRouter.post('/likes/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const msql = await pool.query(
+            "select * from caretakers \
+            where \
+                likes($1, email)",
+            [email]
+        );
+        res.json(msql.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // get specified pet details
 petownerRouter.post('/pet/detailed', async(req, res) => {
     try {
@@ -156,7 +199,6 @@ petownerRouter.post('/pet/detailed', async(req, res) => {
         console.error(err);
     }
 });
-
 
 module.exports = {
     petownerRouter

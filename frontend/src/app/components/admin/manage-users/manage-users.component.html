@@ -42,7 +42,7 @@
                                 <div *ngIf="checkBelowZero(caretaker.profit)" style="color:red;">${{caretaker.profit}}</div>
                                 <div *ngIf="!checkBelowZero(caretaker.profit) && !checkAboveZero(caretaker.profit)">${{caretaker.profit}}</div>
                             </td>
-                            <th><button (click)="openMakeBid(caretaker)" class="show-button">Show More</button>
+                            <th width="10%"><button (click)="openMakeBid(caretaker)" class="show-button">Show More</button>
                             <button (click)="deleteUser(caretaker.email)" class="delete-button">Delete</button></th>
                         </tr>
                     </table>
@@ -64,7 +64,7 @@
                     <td class="td-pads">{{admin.name}}</td>
                     <td class="td-pads">{{admin.email}}</td>
                     <td class="td-pads">{{admin.description}}</td>
-                    <th><button (click)="deleteUser(admin.email)" class="delete-button">Delete</button></th>
+                    <th width="10%"><button (click)="deleteUser(admin.email)" class="delete-button">Delete</button></th>
                 </tr>
             </table>
             </div>
@@ -83,7 +83,7 @@
                 <tr *ngFor="let pt of things">
                     <td class="td-pads">{{pt.species}}</td>
                     <td class="td-pads">{{pt.count}}</td>
-                    <th><button class="delete-button">Delete</button></th>
+                    <th width="10%"><button class="delete-button">Delete</button></th>
                 </tr>
             </table>
             </div>
@@ -103,10 +103,10 @@
                     <td class="td-pads">{{po.name}}</td>
                     <td class="td-pads">{{po.email}}</td>
                     <td class="td-pads">{{po.description}}</td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center;" width="15%">
                         <button *ngIf="po.show" (click)="showHide(po)" class="delete-button">Hide</button>
                         <button *ngIf="!po.show" (click)="showHide(po)"  class="show-button">Show Pets</button>
-                        <div *ngIf="po.pets" class="smaller-container">
+                        <div *ngIf="po.show" class="smaller-container">
                             <div *ngFor="let pet of po.pets">
                                 <span>{{pet.pet_name}} ({{pet.species}})
                                 <button (click)="showDetailedPet(pet)">More</button></span>

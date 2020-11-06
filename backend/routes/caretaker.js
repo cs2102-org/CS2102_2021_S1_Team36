@@ -171,7 +171,7 @@ caretakerRouter.get('/ft/na/:email', async(req, res) => {
 // get the fullTimeLeave of a specified full time caretaker
 // assumes specified caretaker is actually full time
 // if start_date end_date not specified, assumes we want the interval [now, now + 2 years]
-caretakerRouter.get('/ft/leave', verifyJwt, async (req, res) => {
+caretakerRouter.post('/ft/leave', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const { start_date, end_date } = req.body;
@@ -216,7 +216,7 @@ caretakerRouter.get('/pt/avail', verifyJwt, async (req, res) => {
     }
 });
 
-// view a specified fulltime caretakers non-availability
+// view a specified parttime caretakers non-availability
 caretakerRouter.get('/pt/avail/:email', async(req, res) => {
     const date = new Date(), y = date.getFullYear(), m = date.getMonth();
     const firstDay = new Date(y, m, 2).toISOString().slice(0,10);
@@ -626,6 +626,58 @@ caretakerRouter.get('/rec', verifyJwt, async (req, res) => {
     }
 });
 
+// find recommended caretakers version 2
+// input: petowner email
+// output: table(email, name rating, is_fulltime as string)
+// test: input perry, should recommend caren only
+caretakerRouter.post('/rec2/:email', async(req, res) => {
+    try {
+        const { email } = req.params;
+        console.log(email);
+        const msql = await pool.query(
+            "select email, name, rating, \
+            	CASE \
+            		WHEN is_fulltime THEN 'Full Time' \
+            		ELSE 'Part Time' \
+            	END \
+            from Users NATURAL JOIN ( \
+            	select * from caretakers CT \
+            	where \
+            		exists (select * from petowners PO \
+            				where \
+            					isSimilar($1, PO.email) and \
+            					PO.email != $1 and \
+            					likes(PO.email, CT.email) \
+            		   	) \
+            	EXCEPT \
+            	select * from caretakers CT \
+            	where \
+            		exists (select 1 from bidsfor \
+            				where \
+            					owner_email = $1 and \
+            					caretaker_email = CT.email and \
+            					is_confirmed = True) \
+            	EXCEPT \
+            	select * from caretakers CT \
+            	where \
+            		not exists ( \
+            			select species from pets \
+            			where \
+            				email = $1 \
+            			INTERSECT \
+            			select species from Takecareprice TCP \
+            			where \
+            				TCP.email = CT.email \
+            		) \
+	            ) AS Rec",
+            [email]
+        );
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 // returns a list of caretakers that :email has previously transacted with
 caretakerRouter.get('/txnbefore', verifyJwt, async (req, res) => {
     try {
@@ -663,6 +715,26 @@ caretakerRouter.get('/reviews/:email', async(req, res) => {
         res.json(msql.rows); 
     } catch (err) {
         console.log(err);
+    }
+});
+
+// for specific caretaker to view his projected salary and number of working days for the current month
+// returns (money, days), where
+//  money = salary CT would earn for the month queried if the month were to instantly end
+//      PT and FT will follow their respective salary calculations   
+//  days = num days of the month where he has at least 1 pet to take care of
+caretakerRouter.get('/salaries/:start_date/:end_date', verifyJwt, async(req, res) => {
+    try {
+        const email = res.locals.user.email;
+        const { start_date, end_date } = req.params;
+        console.log(start_date, end_date);
+        const msql = await pool.query(
+            "select getsalary($1, $2, $3), \
+                    getworkdays($1, $2, $3);",
+            [email, start_date, end_date]);
+        res.json(msql.rows); 
+    } catch (err) {
+        console.error(err);
     }
 });
 

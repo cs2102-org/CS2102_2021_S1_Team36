@@ -30,7 +30,8 @@ export class PostComponent implements OnInit {
     'post_id': '',
     'title': '',
     'cont': '',
-    'name': ''
+    'name': '',
+    'email': '',
   };
 
   commentForm = new FormGroup({

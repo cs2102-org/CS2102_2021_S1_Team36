@@ -58,8 +58,8 @@ export class BidService {
     return this.http.put(baseurl + '/api/bids/status', details, getHttpOptionsWithAuth());
   }
 
-  public getCaretakerEarnings(details): Observable<any> {
-    return this.http.post(baseurl + '/api/bids/hist/range/', details, getHttpOptionsWithAuth());
+  public getCaretakerEarnings(start, end): Observable<any> {
+    return this.http.get(baseurl + '/api/caretaker/salaries/' + start + '/' + end, getHttpOptionsWithAuth());
   }
 
   public postPaidBid(details): Observable<any> {

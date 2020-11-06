@@ -2,7 +2,7 @@ const express = require('express');
 const pool = require('../db');
 const { json, response } = require('express');
 
-const pcsRouter = express.Router();
+const pcsRouter = express.Router(); // use address  http://localhost:5000/api/pcs-admins/...
 
 pcsRouter.post('/pet-types', async (req, res) => {
     try {
@@ -72,6 +72,44 @@ pcsRouter.get('/admins', async (req, res) => {
         'select email, name, description from Users natural join pcsadmins order by name asc;',
     );
     return res.status(200).json(result.rows);
+});
+
+// compute the demand statistics for a specified species
+// input: start_date, end_date, species
+// output: table(num_days, total_demand, avg_demand)
+// output is a single row
+pcsRouter.post('/demand', async (req, res) => {
+    const { start_date, end_date, species } = req.body;
+    const msql = await pool.query(
+        "select COUNT(*) as num_days, SUM(demand) total_demand, (SUM(demand) / COUNT(*))::DECIMAL(10, 2) as avg_demand from ( \
+            select datez, ( \
+                select COUNT(*) from bidsFor natural join (select email as owner_email, pet_name, species from pets) SP \
+                where \
+                    clash(start_date, end_date, datez) and \
+                    species = $3 \
+                ) as demand \
+            from (select generate_series($1::date, $2::date, '1 day'::interval)::date as datez) D \
+        ) Dem", 
+        [start_date, end_date, species],
+    );
+    return res.status(200).json(msql.rows);
+});
+
+// compute the supply statistics for a specified species
+// input: species
+// output: table(supply)
+// output is a single row
+pcsRouter.post('/supply', async (req, res) => {
+    const { species } = req.body;
+    const msql = await pool.query(
+        "select SUM(pet_limit) as supply from ( \
+            select getPetLimit(email) as pet_limit from takecareprice \
+            where \
+                species = $1 \
+        ) as PL", 
+        [species],
+    );
+    return res.status(200).json(msql.rows);
 });
 
 pcsRouter.get('/pet-types', async (req, res) => {
@@ -162,7 +200,7 @@ pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
                 rating, \
                 getSalary(email, $1, $2),    \
                 getWorkDays(email, $1, $2),  \
-                CASE WHEN is_fulltime THEN getTotalRevenue(email, $1, $2) ELSE null END as revenue \
+                getTotalRevenue(email, $1, $2) as revenue \
             from \
                 users natural join caretakers order by type asc, name asc;",
             [start_date, end_date]);
@@ -172,33 +210,7 @@ pcsRouter.get('/salaries/:start_date/:end_date', async(req, res) => {
     }
 });
 
-// This only counts jobs that were COMPLETED (end_date) during [start_date, end_date] inclusive
-// e.g.: if job starts Jan 30, ends Feb 5, this job only counts towards his Feb salary
-// bc there is min 3k salary for FT, only makes sense when querying entire months
-// e.g. start: 2020-01-01, end: 2020-01-31
-// returns (salary, pet_days_counted)
-pcsRouter.get('/salaries/:email/:start_date/:end_date', async(req, res) => {
-    try {
-        const { email, start_date, end_date } = req.params;
-        console.log(start_date, end_date);
-        const msql = await pool.query(
-            "select \
-                getSalary(email, $1, $2),    \
-                CASE WHEN getpetdays(email, $1, $2) IS NULL \
-                    THEN 0  \
-                    ELSE getpetdays(email, $1, $2) END \
-                        as pet_days_counted    \
-            from \
-                users natural join caretakers   \
-            where   \
-                email=$3;",
-            [start_date, end_date, email]);
-        res.json(msql.rows); 
-    } catch (err) {
-        console.error(err);
-    }
-});
-
 module.exports = {
     pcsRouter
 }
+

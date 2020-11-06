@@ -83,11 +83,14 @@ CREATE TABLE BidsFor (
     is_paid BOOLEAN DEFAULT False,
     payment_type payment_type,
     transfer_type transfer_type,
-    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), --can add text for the review
-    review VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (owner_email, pet_name) REFERENCES Pets(email, pet_name) ON DELETE CASCADE,
+    rating DECIMAL(10, 1) DEFAULT NULL CHECK (rating ISNULL or (rating >= 0 AND rating <= 5)), 
+    review VARCHAR(255) DEFAULT NULL, --can add text for the review
     PRIMARY KEY (caretaker_email, owner_email, pet_name, submission_time)
-); -- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+);
+-- todo: there should be check that submission_time < start_date <= end_date, but i think leave out this check for now
+-- todo: check that price <= amount_bidded
+-- check that start_date >= end_date
+-- check is_paid then it must be confirmed
 
 CREATE TABLE TakecarePrice (
     base_price DECIMAL(10,2),
@@ -223,6 +226,96 @@ BEGIN
 END;
 $$;
 
+-- returns whether oemail likes cemail
+-- O likes C if O's average rating of C is >= 4
+CREATE OR REPLACE FUNCTION likes(oemail varchar, cemail varchar)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return (select avg(rating) from bidsfor BF
+		where
+			BF.owner_email = oemail and
+			BF.caretaker_email = cemail and
+			rating is not null
+		) >= 4;
+END;
+$$;
+
+-- returns whether owners likes at least 3 caretakers in common
+CREATE OR REPLACE FUNCTION isSimilar(oemail1 varchar, oemail2 varchar)
+RETURNS boolean
+language plpgsql
+as
+$$
+BEGIN
+	return (select COUNT(*) from 
+		(
+        select * from Caretakers where likes(oemail1, email)
+		INTERSECT
+		select * from Caretakers where likes(oemail2, email)
+		) AS Common
+	) >= 3;
+END;
+$$;
+
+-- returns the number of blocks of length at least 150
+CREATE OR REPLACE FUNCTION isLeaveValid(cemail varchar, yr int)
+RETURNS boolean
+language plpgsql
+as
+$$
+DECLARE
+	fd date;
+	ld date;
+	cemail_min date;
+	cemail_max date;
+	cemail_x bigint;
+BEGIN
+	select into fd (yr || '-01-01')::date;
+	select into ld (yr || '-12-31')::date;
+	
+	IF (
+		select COUNT(*) from fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		) <= 1 THEN
+		RETURN True;
+	END IF;
+	
+	select into cemail_min MIN(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+	select into cemail_max MAX(leave_date) from fulltimeleave where
+		email = cemail and
+		fd <= leave_date and
+		leave_date <= ld;
+		
+	select SUM(len / 150) into cemail_x from (
+		select (lead(leave_date, 1) over (order by leave_date asc) - leave_date) as len
+		from (
+		SELECT 
+			email, 
+			leave_date
+		FROM fulltimeleave where
+			email = cemail and
+			fd <= leave_date and
+			leave_date <= ld
+		ORDER BY leave_date asc
+		) L1
+	) L2;
+		
+   	cemail_x := cemail_x + (cemail_min - fd) / 150;
+	cemail_x := cemail_x + (ld - cemail_max) / 150;
+	
+	return cemail_x >= 2;
+END;
+$$;
+
+
 -- void function. Creates a new user and pcsadmin in a single transaction.
 drop function if exists createPcsAdmin;
 CREATE OR REPLACE FUNCTION createPcsAdmin(email varchar, username varchar)
@@ -305,6 +398,7 @@ BEGIN
 	where caretaker_email=cemail
 		and (s <= end_date and end_date <= e)
 		and is_paid
+        and is_confirmed
 	group by cemail;
 	
 	return daysWorked;
@@ -326,6 +420,7 @@ BEGIN
 	select sum((end_date - start_date + 1) * amount_bidded) into revenue
 	from bidsfor 
 	where is_paid 
+        and is_confirmed
 		and (s <= end_date and end_date <= e)
 		and caretaker_email=cemail
 	group by cemail;
@@ -337,7 +432,7 @@ $$;
 -- getSalary(email, start, end) -> float
 -- gets salary to be paid to a caretaker for jobs COMPLETED during 
 -- [start, end] inclusive
--- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the job
+-- e.g.: if job starts Jan 30, ends Feb 5, he will only be paid for the entire job 
 -- in Feb
 drop function if exists getSalary;
 CREATE OR REPLACE FUNCTION getSalary(cemail varchar, s date, e date)
@@ -386,12 +481,14 @@ $$
 declare 
 	daysWorked INTEGER;
 BEGIN
-	select count(dd) into daysWorked
+	select count(*) into daysWorked
 	from generate_series (s::timestamp, e::timestamp, '1 day'::interval) dd 
 	where exists (select 1 
-                    from bidsFor B
-                where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
-                and is_paid);
+                  from bidsFor B
+                  where clash(B.start_date, B.end_date, date_trunc('day', dd)::date)
+                    and B.is_confirmed
+                    and B.is_paid
+                    and B.caretaker_email=cemail);
 	
 	return daysWorked;
 END;
@@ -838,6 +935,7 @@ false, false, '1', '1', 5
 
 
 
+
 INSERT INTO Posts(post_id, email, title, cont) VALUES (1, 'panter@gmail.com', 'How to teach dog to sit',
 'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?');
 
@@ -1011,6 +1109,82 @@ INSERT INTO BidsFor VALUES ('parthus@gmail.com', 'carl@gmail.com', 'hugo',
 null, null, '1', '1', null
 );
 
+-- test recommend 2
+-- perry likes xiaohong, xiaoming, xiaobao
+-- pearl likes xiaohong, xiaoming, xiaobao, xiaorong, cain, caren
+-- perry owns dog, hamster, bird
+-- cain cares for cat, monkey
+-- caren cares for dog, cat, turtle
+-- perry knows xiaorong, cain does not care for perry pets, caren care for perry pets (dog)
+-- recommend caren only
+delete from takecareprice where email = 'cain@gmail.com' and species = 'Dog'; -- delete dog from cain's carefor set
+
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'carrie@gmail.com', 'axa',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 1
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'carrie@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 2
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaohong@gmail.com', 'axa',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 3
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaohong@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaoming@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaobao@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('perry@gmail.com', 'xiaorong@gmail.com', 'axa',
+'2020-01-02', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaohong@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaoming@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaobao@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'xiaorong@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'cain@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
+INSERT INTO BidsFor VALUES ('pearl@gmail.com', 'caren@gmail.com', 'abby',
+'2020-01-01', '2020-01-01', '2020-01-05',
+80, 110,
+true, false, '1', '1', 4
+);
 
 --================================================ TRIGGERS ===================================================================
 -- You might want to comment out the triggers so it is easier to put in data to test
@@ -1190,6 +1364,50 @@ CREATE TRIGGER trigger_block_taking_leave
     FOR EACH ROW
     EXECUTE PROCEDURE block_taking_leave();
 
+-- trigger: full time caretaker accept bid immediately if he can work
+CREATE OR REPLACE FUNCTION ft_accept_bid() RETURNS TRIGGER
+    AS $$
+BEGIN
+    UPDATE BidsFor BF
+    SET is_confirmed = true
+    WHERE 
+        BF.caretaker_email = NEW.caretaker_email AND
+        BF.owner_email = NEW.owner_email AND
+        BF.pet_name = NEW.pet_name AND
+        BF.submission_time = NEW.submission_time AND 
+        canWork(NEW.caretaker_email, NEW.start_date, NEW.end_date) AND
+        EXISTS (select 1 from Caretakers where email = New.caretaker_email and is_fulltime=true);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS ft_accept_bid ON BidsFor;
+CREATE TRIGGER ft_accept_bid
+    AFTER INSERT ON BidsFor
+    EXECUTE PROCEDURE ft_accept_bid();
+
+
+-- trigger to ensure the leave table is valid
+-- if invalid row is entered into leave table, this trigger will delete that row
+CREATE OR REPLACE FUNCTION isLeaveValidTrigger()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF NOT isLeaveValid(NEW.email, EXTRACT(YEAR FROM NEW.leave_date)::int) THEN
+		RAISE 'Invalid leave pattern';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+    
+DROP TRIGGER IF EXISTS is_leave_valid_trigger ON FullTimeLeave;
+CREATE CONSTRAINT TRIGGER is_leave_valid_trigger
+    AFTER INSERT ON FullTimeLeave
+    FOR EACH ROW
+    EXECUTE PROCEDURE isLeaveValidTrigger();
+
 
 -- trigger: prevent deleting avail when you have a confirmed bid that overlaps with the avail date (Part Time)
 CREATE OR REPLACE FUNCTION block_deleting_avail()
@@ -1226,7 +1444,7 @@ BEGIN
 	IF EXISTS (
         select 1 from CareTakers
         where 
-            email = NEW.caretaker_email and is_fulltime = true
+            email = NEW.caretaker_email and is_fulltime = false
     ) 
     AND
     NOT EXISTS (
