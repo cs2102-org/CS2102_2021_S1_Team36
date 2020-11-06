@@ -11,7 +11,7 @@ postsRouter.get('/', async (req, res) => {
         const result = await pool.query(
             'SELECT * FROM Posts P \
             NATURAL JOIN (SELECT name, email FROM users U) as foo \
-            NATURAL JOIN (SELECT post_id, count(*) FROM comments GROUP BY (post_id)) as counts;'
+            LEFT JOIN (SELECT post_id, count(*) FROM comments GROUP BY (post_id)) as counts ON P.post_id = counts.post_id;'
         );
         return res.status(200).json(result.rows);
     } catch (err) {
