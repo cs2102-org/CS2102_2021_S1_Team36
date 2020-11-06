@@ -103,6 +103,7 @@ CREATE TABLE TakecarePrice (
 );
 -- for ft caretaker, the daily price is calculated as base_price for that pet + 5 * caretakers rating
 -- for pt caretaker, the daily price is whatever they want to set it as
+-- triggers (see below) : trigger to update the daily_price when 1) base_price change 2) caretaker rating change
 
 CREATE TABLE Posts (
 	post_id SERIAL PRIMARY KEY,
@@ -510,6 +511,8 @@ END;
 $$;
 
 -- compute the daily price for this caretaker and this pet type
+-- if caretaker is full time, then returns base_price * 5 * rating (base_price depends on pet type)
+-- if caretaker is part time, returns the price specified in Takecareprice if exists, else return null
 CREATE OR REPLACE FUNCTION getDailyPrice(cemail varchar, spec varchar)
 RETURNS DECIMAL(10, 2)
 language plpgsql
@@ -521,10 +524,19 @@ DECLARE
 BEGIN
 	select rating into r from Caretakers CT where CT.email = cemail;
 	select base_price into bp from PetTypes PT where PT.species = spec;
-	if r is null then
-		return bp;
+	if isFullTime(cemail) then
+		if r is null then
+			return bp;
+		else
+			return bp + 5 * r;
+		end if;
 	else
-		return bp + 5 * r;
+		return (
+			select daily_price from Takecareprice TCP
+			where
+				TCP.email = cemail and
+				TCP.species = spec
+			);
 	end if;
 END;
 $$;
@@ -1548,11 +1560,14 @@ as
 $$
 BEGIN
 	-- update the daily_price of this caretaker for all the pet types
-	UPDATE TakecarePrice TP SET
-		daily_price = getDailyPrice(NEW.email, species)
-	WHERE
-		TP.email = NEW.email;
-		
+    -- but only if this caretaker is a fulltime caretaker
+    IF isFullTime(NEW.email) THEN
+	    UPDATE TakecarePrice TP SET
+		    daily_price = getDailyPrice(NEW.email, species)
+	    WHERE
+		    TP.email = NEW.email;
+    END IF;
+
 	RETURN NEW;
 END;
 $$;
@@ -1575,7 +1590,8 @@ BEGIN
 	UPDATE Takecareprice TP SET
 		daily_price = getDailyPrice(email, NEW.species)
 	WHERE
-		TP.species = NEW.species;
+		TP.species = NEW.species and
+        isFullTime(TP.email);
 		
 	RETURN NEW;
 END;
