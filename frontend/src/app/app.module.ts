@@ -15,7 +15,7 @@ import { CaretakerAvailabilityPageComponent } from './components/general/caretak
 import { AutoDropdownComponent } from './auto-dropdown.component';
 import { PetOwnerBidsComponent } from './components/pet-owner/pet-owner-bids/pet-owner-bids.component';
 import { CaretakerBidsComponent } from './components/caretaker/caretaker-bids/caretaker-bids.component';
-import { StatsComponent } from './components/admin/stats/stats.component';
+// import { StatsComponent } from './components/admin/stats/stats.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid'; 
 import interactionPlugin from '@fullcalendar/interaction'; 
@@ -38,6 +38,7 @@ import { SearchfilterPipe } from './searchfilter.pipe';
 import { FilterspeciesPipe } from './filterspecies.pipe';
 import { CreatePostComponent } from './components/general/forum/create-post/create-post.component';
 import { PostComponent } from './components/general/forum/post/post.component';
+import { EditPostComponent } from './components/general/forum/edit-post/edit-post.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -56,7 +57,6 @@ FullCalendarModule.registerPlugins([
     AutoDropdownComponent,
     PetOwnerBidsComponent,
     CaretakerBidsComponent,
-    StatsComponent,
     ForumComponent,
     CaretakerMakeBidComponent,
     PetOwnerSummaryComponent,
@@ -72,7 +72,8 @@ FullCalendarModule.registerPlugins([
     SearchfilterPipe,
     FilterspeciesPipe,
     PostComponent,
-    CreatePostComponent
+    CreatePostComponent,
+    EditPostComponent
   ],
   imports: [
     BrowserModule,

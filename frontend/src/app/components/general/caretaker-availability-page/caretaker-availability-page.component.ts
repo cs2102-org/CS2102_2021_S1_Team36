@@ -5,7 +5,7 @@ import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import { Subscription } from 'rxjs';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import Base64 from 'crypto-js/enc-base64';
-import Utf8 from 'crypto-js/enc-utf8'
+import Utf8 from 'crypto-js/enc-utf8';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
 

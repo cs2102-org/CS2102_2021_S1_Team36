@@ -1,5 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { baseurl, getHttpOptionsWithAuth, httpOptions } from './../../../../services/commons.service';
+import { FormControl, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
 
 @Component({
   selector: 'app-create-post',
@@ -8,16 +15,27 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 export class CreatePostComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private http: HttpClient,
+  ) { }
 
   newPostForm = new FormGroup({
-    newPostTitle: new FormControl(''),
-    newPostDesc: new FormControl('')
+    title: new FormControl(''),
+    cont: new FormControl('')
   });
   
-  onSubmit() {}
+  onSubmit(details) {
+    
+    console.log(details);
+    this.createPost(details).subscribe(x => {
+      console.log(details);
+    })
+  }
 
   ngOnInit(): void {
   }
 
+  createPost(details): Observable<any> {
+    return this.http.post(baseurl + '/api/posts/create', details, getHttpOptionsWithAuth());
+  }
 }

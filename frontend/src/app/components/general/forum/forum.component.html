@@ -3,11 +3,15 @@
 <div class="header">Forum</div>
 
 <ul class="striations">
-  <li *ngFor="let post of fakePosts">
+  <li *ngFor="let post of posts">
+    <div (click)="openPost(post.post_id)">
       <div class="post-title">{{post.title}}</div>
-      <div class="post-desc">{{post.content}}</div>
+      <div class="post-desc">{{post.cont}}</div>
       <div class="post-author">Posted By: {{post.name}} | Comments: 0</div>
+    </div>
+    <button type="button" (click)="delete(post)" style="float: right; margin-right: -3.5rem;" *ngIf="post.email == flatData.email || isPcsAdmin">Delete</button>
   </li>
 </ul>
 
+<button type="button" (click)="addPost()">New Post</button>
 </div>

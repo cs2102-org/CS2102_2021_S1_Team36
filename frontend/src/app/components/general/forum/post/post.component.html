@@ -1,19 +1,22 @@
 <div class="fixed-bg">
 <div class="striations">
-        <div class="post-title">Yolavnreo</div>
-        <div class="post-desc">YolavnreoYolavnreo YolavnreoYolavnreoYolavnreoYolavnreoYolavnreoYolavnreoYolavnreo YolalavnreoYolavnreo vber ver ge fer dsfrefrfw4f wfw fewrf ew fewa fref awfewrafrwef </div>
-        <div class="post-author">Dr Lim</div>
+        <div class="post-title">{{Post.title}}</div>
+        <div class="post-desc">{{ Post.cont }}</div>
+        <div class="post-author">{{ Post.name }}</div>
+        <button class="button" type="submit" (click)="edit(Post.post_id)" style="float: right; margin-right: -3.5rem;" *ngIf="Post.email == flatData.email">Edit</button>
 </div>
 
 <ul class="comments">
-    <li *ngFor="let comment of fakeComments">
-        <div class="comments-desc">{{comment.content}}</div>
+    <li *ngFor="let comment of Comments">
+        <div class="comments-desc">{{comment.cont}}</div>
         <div class="comments-author">{{comment.name}}</div>
+        <div class="comments-date">{{dateStringify(comment.date_time)}}</div>
+        <button class="button" type="submit" (click)="delete(comment)" style="float: right; margin-right: -3.5rem;" *ngIf="comment.email == flatData.email">Delete</button>
     </li>
     <li>
     <div class="comments-desc">Write a comment:</div>
-    <form class="form" [formGroup]="commentForm" (ngSubmit)="onSubmit">
-        <textarea id="newComment" name="newComment" rows="4" cols="50"></textarea><br>
+    <form class="form" [formGroup]="commentForm" (ngSubmit)="onSubmit(commentForm.value)">
+        <textarea id="newComment" formControlName="cont" rows="4" cols="50"></textarea><br>
         <button class="button" type="submit" style="float: right; margin-right: 4.5rem;">Submit</button>
     </form>
     </li>

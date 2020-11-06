@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../../../../services/commons.service';
+import { FormControl, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-post',
@@ -8,40 +16,105 @@ import { FormGroup, FormControl } from '@angular/forms';
 })
 export class PostComponent implements OnInit {
 
-  constructor() { }
-  
+  constructor(
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router,
+  ) { }
+
+  flatData;
   showInput = false;
+  Comments;
+  Post = {
+    'post_id': '',
+    'title': '',
+    'cont': '',
+    'name': ''
+  };
 
   commentForm = new FormGroup({
-    commentForm: new FormControl('')
+    cont: new FormControl('')
   });
 
-  fakeComments: any[] = [
-    {name: 'Dr Nice', title: 'Postt 1', content: 'brey9qffgfg 5w4 g5erq97qgf93'},
-    {name: 'Dr Nicdde', title: 'Postt 1fsd', content: 'brey9qg 54 wg5 4g 54wffgferq97qgf93'},
-    {name: 'Dr Nicsfdsfewe', title: 'Postdst 1', content: 'brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93 brey9qf btns4w g54 wfgferq97qgf93'},
-    {name: 'fewfreaafaDr Nice', title: 'Psdsostt 1', content: 'brey954wg 54w g54wg 4qffgferq97qgf93'},
-    {name: 'Dr Nfrafice', title: 'Posfwett 1', content: 'brey9qffgfe 4wgw4 g 4 wgrq97qgf93'},
-    {name: 'Dr Nfewfrafice', title: 'ddPostt 1', content: 'brey9qff 4g 54 g5gferq97qgf93'},
-    {name: 'Dr Nfrsafice', title: 'Pofwefewfwstt 1', content: 'brey954wg 54w g5qffgferq97qgf93'},
-    {name: 'Dr Ncdsaice', title: 'Posfsafrsett 1', content: 'brey9 g4w g54  gqffgferq97qgf93'},
-    {name: 'Dr Ncsaice', title: 'Postfdt 1', content: 'brey9qffgg  g45w g4ferq97qgf93'},
-    {name: 'Dr Ncesaice', title: 'Posfdsftt 1', content: 'brey9qffgtretgrtgferq97qgf93'},
-    {name: 'Dr Nbhteaice', title: 'Post31t 1', content: 'brey9qffgfvgrfesgaeerq97qgf93'},
-    {name: 'Dr Ncdsaice', title: 'Posfsafrsett 1', content: 'brey9 g4w g54  gqffgferq97qgf93'},
-    {name: 'Dr Ncsaice', title: 'Postfdt 1', content: 'brey9qffgg  g45w g4ferq97qgf93'},
-    {name: 'Dr Ncesaice', title: 'Posfdsftt 1', content: 'brey9qffgtretgrtgferq97qgf93'},
-    {name: 'Dr Nbhteaice', title: 'Post31t 1', content: 'brey9qffgfvgrfesgaeerq97qgf93'}    
-  ];
+
 
   goToBottom() {
-      window.scrollTo(0, document.body.scrollHeight);
-      this.showInput = true; 
+    window.scrollTo(0, document.body.scrollHeight);
+    this.showInput = true;
   }
 
-  onSubmit() {}
+  public getUser(): Observable<any> {
+    return this.http.get(baseurl + '/api/auth/profile', getHttpOptionsWithAuth());
+  }
+
+  onSubmit(value) {
+    value.post_id = this.Post.post_id;
+    console.log(value);
+    this.submitComment(value).subscribe(x => {
+      console.log(x);
+      this.populateComments();
+      if (!x) {
+        alert("Comment failed");
+      } else {
+        console.log("Comment Successful!");
+      }
+    })
+  }
+
+  delete(details) {
+    console.log(details);
+    this.deleteHttp(details).subscribe(x => {
+      this.populateComments();
+    });
+  }
+
+  deleteHttp(details) {
+    return this.http.post(baseurl + '/api/comments/delete', details, getHttpOptionsWithAuth());
+  }
 
   ngOnInit(): void {
+    this.populateComments();
+    this.getUser().subscribe(x => {
+      this.flatData = x.flat()[0]
+      console.log(this.flatData);
+    })
+  }
+
+  dateStringify(epoch) {
+    return new Date(epoch * 1000).toUTCString();
+  }
+
+  submitComment(details) {
+    return this.http.post(baseurl + '/api/comments/create', details, getHttpOptionsWithAuth());
+  }
+
+  getComments(postId): Observable<any> {
+    const details = { 'post_id': postId }
+    return this.http.post(baseurl + '/api/comments/', details, httpOptions);
+  }
+
+  getPost(postId): Observable<any> {
+    const details = { 'post_id': postId }
+    return this.http.post(baseurl + '/api/posts/specific', details, httpOptions);
+  }
+
+  populateComments() {
+    var title = this.route.snapshot.paramMap.get("title");
+    this.getComments(title).subscribe(x => {
+      this.Comments = x;
+    });
+    this.getPost(title).subscribe(x => {
+      this.Post = x[0];
+      console.log(this.Post);
+    })
+  }
+
+  edit(postId) {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/edit-post/'+postId])
+    );
+    window.open(url, "_self");
   }
 
 }
