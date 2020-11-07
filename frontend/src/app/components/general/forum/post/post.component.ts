@@ -59,6 +59,7 @@ export class PostComponent implements OnInit {
         alert("Comment failed");
       } else {
         console.log("Comment Successful!");
+        this.commentForm.reset()
       }
     })
   }
