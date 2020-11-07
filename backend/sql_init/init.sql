@@ -615,6 +615,75 @@ BEGIN
 END;
 $$;
 
+-- function to filter caretakers by a set of criteria
+-- if a pet type is not specified, the price col will be null
+-- if a pet type is specified, the price col will contain the price to take care of that pet
+DROP FUNCTION IF EXISTS filterCaretakers;
+CREATE OR REPLACE FUNCTION filterCaretakers(
+	p_ct_name varchar, -- caretakers with this in their name
+	p_rating DECIMAL(10, 2), -- caretakers with at least this rating
+	p_is_fulltime boolean, -- caretaker of this type
+	p_pet_type varchar, -- caretakers that can take care of this pet type, with p_min <= price <= p_max
+	p_min DECIMAL(10, 2), -- note that if caretaker cannot take care of this pet type, the price does not matter
+	p_max DECIMAL(10, 2),
+	p_start_date date, -- caretakers that can work on this interval
+	p_end_date date
+) RETURNS table (
+	email varchar,
+	name varchar,
+	rating DECIMAL(10, 2),
+	is_fulltime boolean,
+	daily_price DECIMAL(10, 2) -- this is null if no pet type is specified
+)
+language plpgsql
+AS
+$$
+BEGIN
+	if p_pet_type is null then
+    	return query
+		select
+			ECT.email,
+			ECT.name,
+			ECT.rating,
+			ECT.is_fulltime,
+			null::numeric as daily_price
+		from (
+			Caretakers CT NATURAL JOIN (
+				select U1.email, U1.name from users U1
+			) U 
+		) as ECT
+		where
+			(ECT.name LIKE ('%' || p_ct_name || '%') or p_ct_name is null) and
+			(ECT.rating >= p_rating or p_rating is null) and
+			(ECT.is_fulltime = p_is_fulltime or p_is_fulltime is null) and
+			(p_start_date is null or p_end_date is null or canWork(ECT.email, p_start_date, p_end_date));
+	else
+    	return query
+		select
+			ECT.email,
+			ECT.name,
+			ECT.rating,
+			ECT.is_fulltime,
+			ECT.daily_price
+		from (
+			Caretakers CT NATURAL JOIN (
+				select U1.email, U1.name from users U1
+			) U NATURAL JOIN (
+				select * from takecareprice
+			) TCP
+		) as ECT
+		where
+			(ECT.name LIKE ('%' || p_ct_name || '%') or p_ct_name is null) and
+			(ECT.rating >= p_rating or p_rating is null) and
+			(ECT.is_fulltime = p_is_fulltime or p_is_fulltime is null) and
+			(ECT.species = p_pet_type) and
+			(ECT.daily_price >= p_min or p_min is null) and
+			(ECT.daily_price <= p_max or p_max is null) and
+			(p_start_date is null or p_end_date is null or canWork(ECT.email, p_start_date, p_end_date));
+	end if;
+END;
+$$;
+
 --=================================================== END HELPER ============================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a petowner of pcs', 'pwpanter');
