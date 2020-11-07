@@ -3,3 +3,4 @@ node_modules
 
 # todo: remove this later
 db.js
+query.sql
