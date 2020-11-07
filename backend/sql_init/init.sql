@@ -1659,7 +1659,7 @@ BEGIN
     ) 
     AND
     EXISTS (
-		select generate_series(NEW.start_date, NEW.end_date, '1 day'::interval) as datez
+		select generate_series(NEW.start_date, NEW.end_date, '1 day'::interval)::date as work_date
 		EXCEPT
 		select work_date from PartTimeAvail where email = NEW.caretaker_email
 	) THEN
