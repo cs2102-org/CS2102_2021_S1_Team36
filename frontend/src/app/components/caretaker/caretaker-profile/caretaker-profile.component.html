@@ -44,16 +44,16 @@
                     <div formArrayName="takeCareArrays" class="container-one">
                         <tr *ngFor="let takecare of takeCareArrays.controls; let i=index">
                         <div [formGroupName]="i">
-                            <table>
+                            <table style="width:100%;">
                                 <td>Pet Species: {{ takecare.value.species }}
                                     <br>
-                                    <select class="custom-select" formControlName="species">
+                                    <select class="custom-select" formControlName="species" *ngIf="takecare.value.species==''">
                                         <option value="" disabled>Choose your species</option>
                                         <option *ngFor="let species of petTypes | filterspecies: takeCareSpecies" [ngValue]="species">{{species}}</option>
                                     </select>
                                 </td>
-                                <td>Daily Price: $ <input type="text" formControlName="daily_price"></td>
-                                <td><button (click)="updateTakeCare(i)" class="save-button">Save</button></td>
+                                <td>Daily Price: $ <input *ngIf="!is_fulltime" type="text" formControlName="daily_price"><span *ngIf="is_fulltime">{{takecare.value.daily_price}}</span></td>
+                                <td><button *ngIf="!is_fulltime || takecare.value.daily_price == ''" (click)="updateTakeCare(i)" class="save-button">Save</button></td>
                                 <td><button (click)="removeTakeCare(i)" class="remove-button">Remove</button></td>
                             </table>
                         </div>
