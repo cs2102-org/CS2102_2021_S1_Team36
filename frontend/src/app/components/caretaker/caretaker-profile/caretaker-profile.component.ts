@@ -34,6 +34,7 @@ export class CaretakerProfileComponent implements OnInit {
   takeCareForm: FormGroup;
   prices;
   takeCareSpecies;
+  is_fulltime: boolean = false;
 
   constructor(private http: HttpClient,
               private fb: FormBuilder,
@@ -75,6 +76,10 @@ export class CaretakerProfileComponent implements OnInit {
       if (user[2][0] != undefined) {this.userData['pcsadmin'] = user[2][0]; this.isPcsAdmin = true;}
       console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner+', isPcsAdmin');
       console.log(user);
+      console.log("sada" + localStorage.getItem('is_fulltime'));
+      if (localStorage.getItem('is_fulltime') == 'true') {
+        this.is_fulltime=true;
+      }
       this.getPrices();
       this.profileForm.patchValue({
         name: this.flatData.name,
@@ -96,7 +101,6 @@ export class CaretakerProfileComponent implements OnInit {
     this.getUserData();
     this.getOwnerPets();
     this.getListOfPetTypes();
-    console.log(getHttpOptionsWithAuth());
   }
 
   populatePetArray() {
@@ -158,6 +162,8 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(x);
       if (!x) {
         alert("Incorrect Params");
+      } else {
+        this.msg = "Added pet successfully!";
       }
     });
   }
@@ -200,10 +206,16 @@ export class CaretakerProfileComponent implements OnInit {
   ///////////////// CareTaker TakeCare Price///////////////////////
 
   populateTakeCareArray() {
+    this.takeCareForm = this.fb.group({
+      name:'',
+      takeCareArrays: this.fb.array([]),
+    });
+
     for (const takecare of this.prices) {
       const group = this.fb.group({
       species: takecare.species,
       daily_price: takecare.daily_price,
+      base_price: takecare.base_price
       })
 
       this.takeCareArrays.push(group);
@@ -246,7 +258,6 @@ export class CaretakerProfileComponent implements OnInit {
     const updated = this.takeCareArrays.at(i).value;
     const original = this.prices[i];
     console.log(updated);
-    console.log(original);
     if (original == undefined) {
       this.addTakeCareHttp(updated);
       return;
@@ -266,14 +277,27 @@ export class CaretakerProfileComponent implements OnInit {
   }
   
   public addTakeCareHttp(details) {
-    this.http.post(baseurl + '/api/caretaker/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
-      console.log(x);
-      if (!x) {
-        alert("Incorrect Params"); 
-      } else {
-        this.msg = "Updated Successfully!";
-      }
-    });
+    if (this.is_fulltime) {
+      this.http.post(baseurl + '/api/caretaker/ft/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+        console.log("sending"+x);
+        if (!x) {
+          alert("Incorrect Params"); 
+        } else {
+          this.msg = "Updated Successfully!";
+          this.getPrices();
+        }
+      });
+    } else {
+      this.http.post(baseurl + '/api/caretaker/pt/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+        console.log(x);
+        if (!x) {
+          alert("Incorrect Params"); 
+        } else {
+          this.msg = "Updated Successfully!";
+          this.getPrices();
+        }
+      });
+    }
   }
 
   public removeTakeCareHttp(details) {

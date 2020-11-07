@@ -3,7 +3,8 @@
       <div class="content-box">
 
         <h1>Forum</h1>
-        <button type="button" (click)="addPost()">New Post</button>
+        <button type="button" (click)="addPost()" *ngIf="isLogged">New Post</button>
+        <p *ngIf="!isLogged">Login to make new post</p>
 
         <div class="posts">
             <ul class="striations">
