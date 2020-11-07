@@ -1591,13 +1591,28 @@ language plpgsql
 as
 $$
 BEGIN
-	IF NOT isLeaveValid(NEW.email, EXTRACT(YEAR FROM NEW.leave_date)::int) THEN
+	IF NOT (
+		(
+		select sum(len / 150) from (
+			select (lead(leave_date, 1) over (order by leave_date asc)) - leave_date - 1 as len
+			FROM (
+				select * from fulltimeleave
+				where
+					email = NEW.email and
+					EXTRACT(YEAR FROM leave_date) = EXTRACT(YEAR FROM NEW.leave_date)::int
+				UNION
+				select NEW.email as email, ((EXTRACT(YEAR FROM NEW.leave_date)::int - 1) || '-12-31')::date as leave_date
+				UNION
+				select NEW.email as email, ((EXTRACT(YEAR FROM NEW.leave_date)::int + 1) || '-01-01')::date as leave_date
+			) L1
+		) L2
+		) >= 2
+	) THEN
 		RAISE 'Invalid leave pattern';
 	END IF;
 	RETURN NEW;
 END;
 $$;
-    
 DROP TRIGGER IF EXISTS is_leave_valid_trigger ON FullTimeLeave;
 CREATE CONSTRAINT TRIGGER is_leave_valid_trigger
     AFTER INSERT ON FullTimeLeave
