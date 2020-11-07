@@ -107,7 +107,7 @@ CREATE TABLE TakecarePrice (
 
 CREATE TABLE Posts (
 	post_id SERIAL PRIMARY KEY,
-    email VARCHAR(30) NOT NULL REFERENCES Users(email) ON DELETE CASCADE,
+    email VARCHAR(30) REFERENCES Users(email) ON DELETE SET NULL,
     title VARCHAR(255),
     cont TEXT,
     last_modified TIMESTAMP DEFAULT NOW()

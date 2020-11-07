@@ -1,0 +1,16 @@
+<div class="content">
+  <div class="center"> 
+      <div class="content-box">
+
+    <h1>Edit Post</h1>
+    <form class="form" [formGroup]="editPostForm" (ngSubmit)="onSubmit(editPostForm.value)">
+        <label for="editPostTitle">Title</label>
+        <textarea name="editPostTitle" formControlName="title" rows="2" style="width:100%" required minlength="4"></textarea><br>
+        <label for="editPostDesc">Description</label>
+        <textarea name="editPostDesc" formControlName="cont" rows="20" style="width:100%" ></textarea><br>
+        <button class="button" type="submit" [disabled]="!editPostForm.valid">Submit</button>
+    </form>
+        
+        </div>
+    </div>
+</div>

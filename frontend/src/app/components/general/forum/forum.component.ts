@@ -1,4 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { baseurl, getHttpOptionsWithAuth, httpOptions } from '../../../services/commons.service';
+import { FormControl, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import Base64 from 'crypto-js/enc-base64';
+import Utf8 from 'crypto-js/enc-utf8'
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-forum',
@@ -6,26 +15,88 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./forum.component.css']
 })
 export class ForumComponent implements OnInit {
+  isLogged: boolean = false;
 
-  constructor() { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
+  posts;
+  flatData = {email:''};
+  isPcsAdmin;
 
-  fakePosts: any[] = [
-    {name: 'Dr Nice', title: 'Postt 1', content: 'brey9qffgfg 5w4 g5erq97qgf93'},
-    {name: 'Dr Nicdde', title: 'Postt 1fsd', content: 'brey9qg 54 wg5 4g 54wffgferq97qgf93'},
-    {name: 'Dr Nicsfdsfewe', title: 'Postdst 1', content: 'brey9qf 4w g54 wfgferq97qgf93'},
-    {name: 'fewfreaafaDr Nice', title: 'Psdsostt 1', content: 'brey954wg 54w g54wg 4qffgferq97qgf93'},
-    {name: 'Dr Nfrafice', title: 'Posfwett 1', content: 'brey9qffgfe 4wgw4 g 4 wgrq97qgf93'},
-    {name: 'Dr Nfewfrafice', title: 'ddPostt 1', content: 'brey9qff 4g 54 g5gferq97qgf93'},
-    {name: 'Dr Nfrsafice', title: 'Pofwefewfwstt 1', content: 'brey954wg 54w g5qffgferq97qgf93'},
-    {name: 'Dr Ncdsaice', title: 'Posfsafrsett 1', content: 'brey9 g4w g54  gqffgferq97qgf93'},
-    {name: 'Dr Ncsaice', title: 'Postfdt 1', content: 'brey9qffgg  g45w g4ferq97qgf93'},
-    {name: 'Dr Ncesaice', title: 'Posfdsftt 1', content: 'brey9qffgtretgrtgferq97qgf93'},
-    {name: 'Dr Nbhteaice', title: 'Post31t 1', content: 'brey9qffgfvgrfesgaeerq97qgf93'},
-    
-  ];
 
   ngOnInit(): void {
+    this.populatePosts();
+    this.checkIsLogged();
+    if (this.isLogged) {
+      this.getFlatData();
+    }
   }
+
+  public getUser(): Observable<any> {
+    return this.http.get(baseurl + '/api/auth/profile', getHttpOptionsWithAuth());
+  }
+
+  checkIsLogged() {
+  if (localStorage.getItem('accessToken') != null) {
+    this.isLogged = true;
+  }
+  this.authService.loginNotiService
+    .subscribe(message => {
+      if (message == "Login success") {
+        this.isLogged=true;
+         this.getFlatData();
+      } else {
+        this.isLogged=false;
+      }
+    });
+  }
+
+  getFlatData() {
+    this.getUser().subscribe((user) => {
+      this.flatData = user.flat()[0];
+      if (user[2][0] != undefined) {this.isPcsAdmin = true; }
+    });
+  }
+
+  getAllPosts(): Observable<any> {
+    return this.http.get(baseurl + '/api/posts/', httpOptions);
+  }
+
+  populatePosts() {
+    this.getAllPosts().subscribe(x => {
+      this.posts = x;
+      console.log(x);
+    })
+  }
+
+  openPost(selectedPostId) {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/post/' + selectedPostId])
+    );
+    window.open(url, "_self");
+  }
+
+  addPost() {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/create-post/'])
+    );
+    window.open(url, "_self");
+  }
+
+  delete(details) {
+    console.log(details);
+    this.deleteHttp(details).subscribe(x => {
+      this.populatePosts();
+    });
+  }
+
+  deleteHttp(details) {
+    return this.http.post(baseurl + '/api/posts/delete/' + details.post_id, details, getHttpOptionsWithAuth());
+  }
+
 
 }

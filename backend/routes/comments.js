@@ -6,13 +6,15 @@ const { verifyJwt } = require('../auth/index')
 const commentsRouter = express.Router();
 
 // get all comments by qn id
-commentsRouter.get('/', async (req, res) => {
+commentsRouter.post('/', async (req, res) => {
     try {
         const post_id = parseInt(req.body.post_id);
         const result = await pool.query(
             `
-            SELECT * FROM Comments
-            WHERE post_id = $1
+            SELECT post_id, email, date_part('epoch', date_time) as date_time, cont, name FROM Comments \
+            NATURAL JOIN (SELECT name, email FROM users U) as foo \
+            WHERE post_id = $1 \
+            ORDER BY date_time DESC;
             `,
             [post_id]
         );
@@ -23,14 +25,14 @@ commentsRouter.get('/', async (req, res) => {
 });
 
 // create a comment
-commentsRouter.post('/', verifyJwt, async (req, res) => {
+commentsRouter.post('/create', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const { post_id, cont } = req.body;
         const result = await pool.query(
             `
             INSERT INTO Comments(post_id, email, date_time, cont)
-            VALUES($1, $2, DEFAULT, $3) 
+            VALUES($1, $2, DEFAULT, $3)
             returning *
             `,
             [post_id, email, cont],
@@ -64,7 +66,7 @@ commentsRouter.put('/', verifyJwt, async (req, res) => {
 });
 
 // delete a comment 
-commentsRouter.delete('/', verifyJwt, async (req, res) => {
+commentsRouter.post('/delete', verifyJwt, async (req, res) => {
     try {
         const email = res.locals.user.email;
         const { post_id, date_time } = req.body;
@@ -73,7 +75,7 @@ commentsRouter.delete('/', verifyJwt, async (req, res) => {
             DELETE FROM Comments
             WHERE post_id = $1
                 AND email = $2
-                AND DATE(date_time) = DATE($3)
+                AND date_part('epoch', date_time) = $3;
             `,
             [post_id, email, date_time],
         );
