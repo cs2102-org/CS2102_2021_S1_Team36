@@ -273,15 +273,25 @@ export class CaretakerProfileComponent implements OnInit {
   }
   
   public addTakeCareHttp(details) {
-    this.http.post(baseurl + '/api/caretaker/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
-      console.log(x);
-      if (!x) {
-        alert("Incorrect Params"); 
-      } else {
-        this.msg = "Updated Successfully!";
-      }
-    });
     if (this.is_fulltime) {
+      this.http.post(baseurl + '/api/caretaker/ft/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+        console.log(x);
+        if (!x) {
+          alert("Incorrect Params"); 
+        } else {
+          this.msg = "Updated Successfully!";
+        }
+      });
+    } else {
+      this.http.post(baseurl + '/api/caretaker/pt/addprice', details, getHttpOptionsWithAuth()).subscribe(x => {
+        console.log(x);
+        if (!x) {
+          alert("Incorrect Params"); 
+        } else {
+          this.msg = "Updated Successfully!";
+        }
+      });
+    }
   }
 
   public removeTakeCareHttp(details) {
