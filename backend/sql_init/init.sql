@@ -1579,6 +1579,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS ft_accept_bid ON BidsFor;
 CREATE TRIGGER ft_accept_bid
     AFTER INSERT ON BidsFor
+	FOR EACH ROW
     EXECUTE PROCEDURE ft_accept_bid();
 
 
