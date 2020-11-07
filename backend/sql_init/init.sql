@@ -1658,11 +1658,10 @@ BEGIN
             email = NEW.caretaker_email and is_fulltime = false
     ) 
     AND
-    NOT EXISTS (
-		select 1 from PartTimeAvail
-		where
-			email = NEW.caretaker_email and
-			((NEW.start_date, NEW.end_date + interval '1 day') overlaps (work_date, work_date + interval '1 day'))
+    EXISTS (
+		select generate_series(NEW.start_date, NEW.end_date, '1 day'::interval) as datez
+		EXCEPT
+		select work_date from PartTimeAvail where email = NEW.caretaker_email
 	) THEN
 		RAISE EXCEPTION 'Part time worker does not have availability on this date';
 	END IF;
