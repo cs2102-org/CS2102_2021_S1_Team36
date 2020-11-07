@@ -15,6 +15,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
   styleUrls: ['./post.component.css']
 })
 export class PostComponent implements OnInit {
+  isLogged = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -77,10 +78,33 @@ export class PostComponent implements OnInit {
 
   ngOnInit(): void {
     this.populateComments();
-    this.getUser().subscribe(x => {
-      this.flatData = x.flat()[0]
-      console.log(this.flatData);
-    })
+    this.checkIsLogged();
+    if (this.isLogged) {
+      this.getUser().subscribe(x => {
+        this.flatData = x.flat()[0]
+        console.log(this.flatData);
+      })
+    }
+  }
+  
+  checkIsLogged() {
+    this.isLogged = false;
+    if (localStorage.getItem('accessToken') != null) {
+      this.isLogged = true;
+    }
+    this.authService.loginNotiService
+      .subscribe(message => {
+        if (message == "Login success") {
+          this.isLogged=true;
+          this.getUser().subscribe(x => {
+              this.flatData = x.flat()[0]
+              console.log(this.flatData);
+            })
+        } else {
+          this.isLogged=false;
+        }
+    });
+    console.log(this.isLogged);
   }
 
   dateStringify(epoch) {
