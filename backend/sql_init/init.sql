@@ -1549,7 +1549,7 @@ BEGIN
 	) THEN
 		RAISE EXCEPTION 'You have a job on this date';
 	END IF;
-	RETURN NEW;
+	RETURN OLD;
 END;
 $$;
 
