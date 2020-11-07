@@ -1545,6 +1545,7 @@ BEGIN
 		where
 			caretaker_email = NEW.email and
 			((start_date, end_date + interval '1 day') overlaps (NEW.leave_date, NEW.leave_date + interval '1 day'))
+			and is_confirmed = true
 	) THEN
 		RAISE EXCEPTION 'You have a job on this date';
 	END IF;

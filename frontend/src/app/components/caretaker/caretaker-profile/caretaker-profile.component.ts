@@ -129,6 +129,7 @@ export class CaretakerProfileComponent implements OnInit {
   }
 
   addPets() {
+    this.msg = '';
     this.petArrays.push(this.newPet());
   }
 
@@ -175,6 +176,7 @@ export class CaretakerProfileComponent implements OnInit {
   removePetHttp(details) {
     this.http.post(baseurl + '/api/petowner/deletepet', details, getHttpOptionsWithAuth()).subscribe(x => {
       console.log(x);
+      this.msg = "Successfully Deleted!";
     });
   }
 

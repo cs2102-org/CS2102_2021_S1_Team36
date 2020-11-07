@@ -93,6 +93,7 @@ export class CaretakerSummaryPageComponent implements OnInit {
       ref.afterClosed().subscribe(msg => {
         if (msg) {
           this.getDates();
+          this.msg = this.caretakerType == "Full Time" ? "Leave was successfully deleted" : "Availability was successfully deleted";
         }
       })
     }
@@ -161,29 +162,36 @@ export class CaretakerSummaryPageComponent implements OnInit {
   }
 
   onLeaveSubmit() {
-    this.caretakerService.postNewLeave(this.form.value).subscribe((msg) => {
-      if (msg) {
-        this.msg = "Leave was successfully added";
-        this.getDates();
-      }}, (err) => {
-        if (err['error']['error'].indexOf('You have a job') >= 0) {
-          this.msg = "You have a job on this date!";
-        } else {
-          this.msg = "You already have a leave on this date!";
+    if (new Date() >= new Date(this.form.value.start_date)) {
+      this.msg = "Date has past!";
+    } else {
+      this.caretakerService.postNewLeave(this.form.value).subscribe((msg) => {
+        if (msg) {
+          this.msg = "Leave was successfully added";
+          this.getDates();
+        }}, (err) => {
+          if (err['error']['error'].indexOf('You have a job') >= 0) {
+            this.msg = "You have a job on this date!";
+          } else {
+            this.msg = "You already have a leave on this date!";
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   onAvailSubmit() {
-    this.caretakerService.postNewAvail(this.form.value).subscribe(msg => {
-      if (msg) {
-        this.msg = "Availability was successfully added";
-        this.getDates();
-      }}, (err) => {
-        this.msg = "You already declared availability on this date!";
-      }
-    );
+    if (new Date() >= new Date(this.form.value.start_date)) {
+      this.msg = "Date has past!";
+    } else {
+      this.caretakerService.postNewAvail(this.form.value).subscribe(msg => {
+        if (msg) {
+          this.msg = "Availability was successfully added";
+          this.getDates();
+        }}, (err) => {
+          this.msg = "You already declared availability on this date!";
+        }
+      );
+    }
   }
-
 }

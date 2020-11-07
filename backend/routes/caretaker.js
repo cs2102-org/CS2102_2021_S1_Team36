@@ -709,7 +709,7 @@ caretakerRouter.get('/reviews/:email', async(req, res) => {
         const email = req.params.email;
         const msql = await pool.query(
             "SELECT U.name, review, rating FROM bidsFor B inner join Users U on B.owner_email = U.email WHERE \
-            caretaker_email = $1 ",
+            caretaker_email = $1 and B.is_paid = true and B.is_confirmed = true and B.rating is not null ",
             [email]
         );
         res.json(msql.rows); 
