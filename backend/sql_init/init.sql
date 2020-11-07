@@ -65,7 +65,7 @@ CREATE TABLE Pets (
     pet_name VARCHAR(30),
     special_requirements VARCHAR(255),
     description VARCHAR(255),
-    species VARCHAR(30) REFERENCES PetTypes(species) ON DELETE SET NULL,
+    species VARCHAR(30) REFERENCES PetTypes(species) ON DELETE CASCADE,
     PRIMARY KEY (pet_name, email)
 );
 
@@ -98,7 +98,7 @@ CREATE TABLE BidsFor (
 CREATE TABLE TakecarePrice (
     daily_price DECIMAL(10,2),
     email varchar(30) REFERENCES Caretakers(email) ON DELETE cascade, -- references the caretaker
-    species varchar(30) REFERENCES PetTypes(species),
+    species varchar(30) REFERENCES PetTypes(species) ON DELETE cascade,
     PRIMARY KEY (email, species)  --- daily price > base price
 );
 -- for ft caretaker, the daily price is calculated as base_price for that pet + 5 * caretakers rating

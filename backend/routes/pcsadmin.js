@@ -113,7 +113,7 @@ pcsRouter.get('/admins', async (req, res) => {
 pcsRouter.post('/demand', async (req, res) => {
     const { start_date, end_date, species } = req.body;
     const msql = await pool.query(
-        "select COUNT(*) as num_days, SUM(demand) total_demand, (SUM(demand) / COUNT(*))::DECIMAL(10, 2) as avg_demand from ( \
+        "select COUNT(*) as num_days, SUM(demand) as total_demand, (SUM(demand) / COUNT(*))::DECIMAL(10, 2) as avg_demand from ( \
             select datez, ( \
                 select COUNT(*) from bidsFor natural join (select email as owner_email, pet_name, species from pets) SP \
                 where \
