@@ -34,6 +34,7 @@ export class CaretakerProfileComponent implements OnInit {
   takeCareForm: FormGroup;
   prices;
   takeCareSpecies;
+  is_fulltime: boolean = false;
 
   constructor(private http: HttpClient,
               private fb: FormBuilder,
@@ -75,6 +76,10 @@ export class CaretakerProfileComponent implements OnInit {
       if (user[2][0] != undefined) {this.userData['pcsadmin'] = user[2][0]; this.isPcsAdmin = true;}
       console.log('isCaretaker:'+this.isCaretaker+', isPetOwner:'+this.isPetOwner+', isPcsAdmin');
       console.log(user);
+      console.log("sada" + localStorage.getItem('is_fulltime'));
+      if (localStorage.getItem('is_fulltime') == 'true') {
+        this.is_fulltime=true;
+      }
       this.getPrices();
       this.profileForm.patchValue({
         name: this.flatData.name,
@@ -158,6 +163,8 @@ export class CaretakerProfileComponent implements OnInit {
       console.log(x);
       if (!x) {
         alert("Incorrect Params");
+      } else {
+        this.msg = "Added pet successfully!";
       }
     });
   }
@@ -274,6 +281,7 @@ export class CaretakerProfileComponent implements OnInit {
         this.msg = "Updated Successfully!";
       }
     });
+    if (this.is_fulltime) {
   }
 
   public removeTakeCareHttp(details) {

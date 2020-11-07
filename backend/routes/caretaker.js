@@ -344,8 +344,8 @@ caretakerRouter.put('/updateprice', verifyJwt, async (req, res) => {
     }
 });
 
-// adds a Take Care Price of a pet of the currently logged in Care Taker
-caretakerRouter.post('/addprice', verifyJwt, async (req, res) => {
+// adds a Take Care Price of a pet of the currently logged in pt Care Taker
+caretakerRouter.post('/pt/addprice', verifyJwt, async (req, res) => {
     try {
         const user = res.locals.user;
         const email = user.email;
@@ -355,6 +355,29 @@ caretakerRouter.post('/addprice', verifyJwt, async (req, res) => {
             "INSERT INTO takecareprice(daily_price, species, email) \
                 values($2, $3, $1);",
             [email, daily_price, species]
+        );
+
+        res.json(msql.rows);
+    } catch (err) {
+        console.error(err);
+        res.json(false);
+    }
+});
+
+// adds a Take Care Price of a pet of the currently logged in ft Care Taker
+caretakerRouter.post('/ft/addprice', verifyJwt, async (req, res) => {
+    try {
+        const user = res.locals.user;
+        const email = user.email;
+        var { species } = req.body;
+        const base_price = (await pool.query(
+            "SELECT base_price FROM PetTypes where species=$1", [species]
+        )).rows[0].base_price;
+        console.log(base_price);
+        const msql = await pool.query(
+            "INSERT INTO takecareprice(daily_price, species, email) \
+                values($2, $3, $1);",
+            [email, base_price, species]
         );
 
         res.json(msql.rows);
