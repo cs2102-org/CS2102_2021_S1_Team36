@@ -10,6 +10,7 @@ import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
 import { DetailedPetComponent } from '../detailed-pet/detailed-pet.component';
+import { UpdateBasePriceComponent } from '../update-base-price/update-base-price.component';
 
 @Component({
   selector: 'app-manage-users',
@@ -85,43 +86,52 @@ export class ManageUsersComponent implements OnInit {
 
   getAllCaretakers() {
     this.pcsAdminService.getAllCaretakers(this.getCurrentRange()).subscribe(caretakers => {
+      if (this.showType != "Caretakers") {
+        this.msg = '';
+      }
       this.showType = "Caretakers";
-      this.msg = '';
       this.things = caretakers.map(this.getProfit);
     });
   }
 
   getAllAdmins() {
     this.pcsAdminService.getAdminList().subscribe(admins => {
+      if (this.showType != "Admins") {
+        this.msg = '';
+      }
       this.showType = "Admins";
-      this.msg = '';
       this.things = admins;
     });
   }
 
   getAllPetTypes() {
     this.pcsAdminService.getListOfPetTypes().subscribe(petTypes => {
+      if (this.showType != "Pet Types") {
+        this.msg = '';
+      }
       this.showType = "Pet Types";
-      this.msg = '';
       this.things = petTypes;
     });
   }
 
    getAllPetOwners() {
     this.petOwnerService.getAllPetOwners().subscribe(po => {
+      if (this.showType != "Pet Owners") {
+        this.msg = '';
+      }
       this.showType = "Pet Owners";
-      this.msg = '';
       this.things = po.map(po => {po.show = false; return po;});
     });
   }
 
   refreshAfterChange() {
+    console.log(this.showType);
     if (this.showType == "Admins") {
       this.getAllAdmins();
     } else if (this.showType == "Pet Types") {
       this.getAllPetTypes();
     } else if (this.showType == "Pet Owners") {
-      this.getAllPetOwners;
+      this.getAllPetOwners();
     } else {
       this.getAllCaretakers();
     }
@@ -132,7 +142,7 @@ export class ManageUsersComponent implements OnInit {
     const url = this.router.serializeUrl(
       this.router.createUrlTree(['/caretaker/bid/' + encrypted])
     );
-    window.open(url);
+    this.router.navigateByUrl(url);
   }
 
 
@@ -177,7 +187,14 @@ export class ManageUsersComponent implements OnInit {
   deleteUser(email) {
     this.pcsAdminService.deleteUser(email).subscribe(msg => {
       this.refreshAfterChange();
-      this.msg = "Account successfully deleted";
+      this.msg = email + "(account) successfully deleted";
+    });
+  }
+
+  deletePetType(species) {
+    this.pcsAdminService.deletePetType(species).subscribe(msg => {
+      this.refreshAfterChange();
+      this.msg = species + "(pet type) successfully deleted";
     });
   }
 
@@ -199,6 +216,18 @@ export class ManageUsersComponent implements OnInit {
         owner_email: pet.email,
         pet_name: pet.pet_name
       }
+    });
+  }
+
+  updateBasePrice(pt) {
+    const ref = this.dialog.open(UpdateBasePriceComponent, { data : { 
+        pet_type: pt
+      }
+    });
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(result => {
+      this.refreshAfterChange();
+      this.msg = result;
     });
   }
 }

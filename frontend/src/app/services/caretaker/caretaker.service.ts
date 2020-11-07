@@ -60,7 +60,7 @@ export class CaretakerService {
   }
 
   public getLeaveDates(): Observable<any> {
-    return this.http.get(baseurl + '/api/caretaker/ft/leave', getHttpOptionsWithAuth());
+    return this.http.post(baseurl + '/api/caretaker/ft/leave', {}, getHttpOptionsWithAuth());
   }
 
   public getAvailDates(): Observable<any> {

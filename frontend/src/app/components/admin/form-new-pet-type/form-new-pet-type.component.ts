@@ -10,7 +10,8 @@ import { PcsadminService } from 'src/app/services/pcsadmin/pcsadmin.service';
 })
 export class FormNewPetTypeComponent implements OnInit {
  typeForm = new FormGroup({
-    species: new FormControl('', Validators.required)
+    species: new FormControl('', Validators.required),
+    base_price: new FormControl('', Validators.required)
   });
 
   constructor(private dialogRef: MatDialogRef<FormNewPetTypeComponent>, private pcsAdminService: PcsadminService) { }

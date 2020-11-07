@@ -38,6 +38,7 @@ import { EditPostComponent } from './components/general/forum/edit-post/edit-pos
 import { CaretakerProfileComponent } from './components/caretaker/caretaker-profile/caretaker-profile.component';
 import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
+import { UpdateBasePriceComponent } from './components/admin/update-base-price/update-base-price.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -72,7 +73,8 @@ FullCalendarModule.registerPlugins([
     FilterspeciesPipe,
     PostComponent,
     CreatePostComponent,
-    EditPostComponent
+    EditPostComponent,
+    UpdateBasePriceComponent
   ],
   imports: [
     BrowserModule,
