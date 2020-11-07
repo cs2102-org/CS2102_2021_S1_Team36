@@ -123,16 +123,10 @@ export class CaretakerMakeBidComponent implements OnInit {
       });
     } else {
       this.caretakerService.getAvailFullTimeCareTaker(this.caretaker.email).subscribe((dates) => {
-        dates.map(function(date) { 
-          let aDate = new Date(date.end);
-          aDate.setDate(aDate.getDate() + 1);
-          date.display = 'background';
-          date.groupId = 'No'; 
-          date.end = aDate.toISOString().slice(0,10);
-          return date;
-        });
-        this.calendarOptions.events = dates; 
-        this.dates = dates.map(a => [a.start, a.end]);
+        this.dates = dates.map(a => a.date);
+        dates.push({"date": this.placeholderDate});
+        dates.map(elem => {elem.display = 'background'; elem.groupId= 'No';});
+        this.calendarOptions.events = dates;
       });
     }
   }
@@ -174,13 +168,8 @@ export class CaretakerMakeBidComponent implements OnInit {
       }
     } else {
       for (let date of dateArray) {
-        const checkDate = new Date(date)
-        for (let dateRange of this.dates) {
-          const startDate = new Date(dateRange[0]);
-          const endDate = new Date(dateRange[1]);
-          if (startDate <= checkDate && checkDate < endDate) {
-            return false;
-          }
+        if (this.dates.indexOf(date) >= 0) {
+          return false;
         }
       }
     }

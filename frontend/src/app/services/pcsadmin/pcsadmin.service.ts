@@ -22,8 +22,16 @@ export class PcsadminService {
     return this.http.delete(baseurl + '/api/pcs-admins/user/' + details, httpOptions);
   }
 
-  public postNewPetType(type): Observable<any> {
-    return this.http.post(baseurl + '/api/pcs-admins/pet-types', type, httpOptions);
+  public deletePetType(details): Observable<any> {
+    return this.http.delete(baseurl + '/api/pcs-admins/pet-type/' + details, httpOptions);
+  }
+
+  public postNewPetType(details): Observable<any> {
+    return this.http.post(baseurl + '/api/pcs-admins/pet-types', details, httpOptions);
+  }
+
+   public putPetType(details): Observable<any> {
+    return this.http.put(baseurl + '/api/pcs-admins/pet-types', details, httpOptions);
   }
 
   public getPetOwnerPets(email): Observable<any> {

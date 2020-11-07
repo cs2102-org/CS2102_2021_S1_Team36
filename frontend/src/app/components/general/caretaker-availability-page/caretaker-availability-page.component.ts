@@ -174,7 +174,7 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
     const url = this.router.serializeUrl(
       this.router.createUrlTree(['/caretaker/bid/' + encrypted])
     );
-    window.open(url);
+    this.router.navigateByUrl(url);
   }
 
   showHide(caretaker){

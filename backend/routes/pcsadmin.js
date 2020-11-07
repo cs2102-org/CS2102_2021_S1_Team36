@@ -6,12 +6,28 @@ const pcsRouter = express.Router(); // use address  http://localhost:5000/api/pc
 
 pcsRouter.post('/pet-types', async (req, res) => {
     try {
-        const species = req.body.species;
+        const { species, base_price } = req.body;
         const result = await pool.query(
-            'INSERT INTO PetTypes(species) VALUES($1) returning *',
-            [species],
+            'INSERT INTO PetTypes VALUES($1, $2) returning *',
+            [species, base_price],
         );
         return res.status(200).json(result.rows);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+pcsRouter.put('/pet-types', async (req, res) => {
+    try {
+        const { species, base_price } = req.body;
+        console.log(species, base_price);
+        const result = await pool.query(
+            'UPDATE PetTypes  \
+            SET base_price = $2 \
+            WHERE species = $1',
+            [species, base_price],
+        );
+        return res.status(200).json(true);
     } catch (err) {
         console.error(err);
     }
@@ -28,6 +44,22 @@ pcsRouter.delete('/user/:email', async (req, res) => {
             [email],
         );
         return res.status(204).send('Account successfully deleted');
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+pcsRouter.delete('/pet-type/:species', async (req, res) => {
+    try {
+        const { species } = req.params;
+        await pool.query(
+            `
+            DELETE FROM PetTypes 
+            WHERE species = $1 
+            `,
+            [species],
+        );
+        return res.status(204).send('Pet Type successfully deleted');
     } catch (err) {
         console.error(err);
     }
@@ -115,7 +147,7 @@ pcsRouter.post('/supply', async (req, res) => {
 pcsRouter.get('/pet-types', async (req, res) => {
     try {
         const msql = await pool.query(
-            "select species, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
+            "select species, base_price, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count  \
             from Pettypes P1 order by species asc;"
             );
         res.json(msql.rows); 
