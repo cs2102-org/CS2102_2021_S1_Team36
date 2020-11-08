@@ -1,0 +1,88 @@
+ <div class="content">
+    <div class="column-left">
+        <div *ngIf="bidSuccess" class="success">
+            <p>Bid Successful!</p> 
+        </div>
+        <div class="calendar">
+            <h1>Availability</h1>
+            <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        </div>
+    </div>
+
+    <div class="column-center">
+        <div class="details" *ngIf="caretaker != null">
+            <h2>Details</h2>
+            <h3>{{caretaker.name}}</h3>
+            <h3>Rating: {{caretaker.rating}}</h3>
+            <h3>{{caretaker.type}}</h3>
+            <p>{{caretaker.description}}</p>
+            <div class="container">
+                <table class="table">
+                    <tr>
+                        <th class="theader">Type</th>
+                        <th class="theader">Daily price</th>
+                    </tr>
+                    <tr *ngFor="let pet of takesCare">
+                        <td>{{pet.species}}</td>
+                        <td>${{pet.daily_price}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <br>
+        <div *ngIf="isLogged; else elseBlock">
+            <form class="form" [formGroup]="bidForm" (ngSubmit)="onSubmit(bidForm)">
+                <h2>Bid Form</h2>
+                <p>Choose the dates by clicking and dragging on the calendar</p>
+                <p>You have chosen: {{bidForm.get('start_date').value}} - {{bidForm.get('end_date').value}}</p>
+                <p><label>Choose which pet: </label>
+                <select type="text" formControlName="pet_name">
+                    <option></option>
+                    <option value={{pet.key}} *ngFor="let pet of pets | keyvalue">
+                        {{ pet.key }}({{ pet.value }})
+                    </option>
+                </select></p>
+
+                <p><label>Transfer Type: </label>
+                <select type="number" formControlName="transfer_type">
+                    <option></option>
+                    <option value=1>I deliver</option>
+                    <option value=2>Caretaker pick up</option>
+                    <option value=3>Transfer through physical building of PCS</option>
+                </select></p>
+
+                <p><label>Payment Type: </label>
+                <select type="text" formControlName="payment_type">
+                    <option></option>
+                    <option value=1>Cash</option>
+                    <option value=2>Credit Card</option>
+                </select></p>
+
+                <p>Current Min Price: ${{currentMinPrice}}</p>
+
+                <p><label>Bid Price: </label>
+                <input type="number" formControlName="amount_bidded"></p>
+                <p *ngIf="bidForm.get('amount_bidded').touched && bidForm.get('amount_bidded').invalid">
+                    Bid Price cannot be less than {{ currentMinPrice }}. 
+                </p>
+
+                <button class="button" type="submit" [disabled] = "!bidForm.valid">Submit</button>
+            </form>
+        </div>
+        <ng-template #elseBlock>
+            <div class="details">
+                <h3>Please Login to bid</h3>
+            </div>
+        </ng-template>
+    </div>
+
+    <div class="column-right">
+        <div class="container-2">
+            <h2>Reviews</h2>
+            <div *ngFor="let review of reviews" class="review">
+                <p id="review-body">{{review.review}}</p>
+                <p id="review-user">{{review.name}} Rating: {{review.rating}}</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginComponent } from '../login/login.component';
 
@@ -10,10 +11,14 @@ import { LoginComponent } from '../login/login.component';
 })
 export class MenuHeaderComponent implements OnInit {
   isLogged: boolean = false;
+  isPetOwner: boolean = false;
+  isCaretaker: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -24,10 +29,24 @@ export class MenuHeaderComponent implements OnInit {
       .subscribe(message => {
         if (message == "Login success") {
           this.isLogged=true;
+          this.checkAccess();
         } else {
           this.isLogged=false;
         }
       });
+    this.checkAccess();
+  }
+
+  checkAccess() {
+    if (localStorage.hasOwnProperty('caretaker')) {
+      this.isCaretaker = true;
+    }
+    if (localStorage.hasOwnProperty('petowner')) {
+      this.isPetOwner = true;
+    }
+    if (localStorage.hasOwnProperty('admin')) {
+      this.isAdmin = true;
+    }
   }
 
   openLogin() {
@@ -36,5 +55,9 @@ export class MenuHeaderComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.router.navigateByUrl('caretaker-availabilities');
+    this.isCaretaker = false;
+    this.isPetOwner = false;
+    this.isAdmin = false;
   }
 }

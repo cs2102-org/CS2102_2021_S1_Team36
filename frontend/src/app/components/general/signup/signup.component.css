@@ -1,19 +1,20 @@
-.background {
-    background-image: url('./img/cat_dog.jpg');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: right center;
-    height: 94vh;
-}
-
 .content {
-    padding-top: 2%;
-    padding-left: 25%;
+  background-color: #1e77aa;
+  height: 95vh;
+  width: 100%;
 }
 
-.title {
-    padding-bottom: 2%;
-    font-size: 30px;
+.content-box {
+  text-align: center;
+  margin-top: 4%;
+  z-index: 10;
+  position: absolute;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  left: 28%;
+  padding: 30px;
 }
 
 .buttons {
@@ -22,4 +23,18 @@
 
 .button {
     margin-right: 10px;
+}
+
+#photo-one {
+  border-style: solid;
+  padding: 20px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+  width: 540px;
+  position: absolute;
+  top: 20%;
+  left: 60%;
+  transform: rotate(30deg);
+  z-index: 5;
 }

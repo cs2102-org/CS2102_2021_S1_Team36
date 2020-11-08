@@ -1,2 +1,6 @@
 node_modules
 .env
+
+# todo: remove this later
+db.js
+query.sql

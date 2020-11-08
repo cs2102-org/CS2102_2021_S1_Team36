@@ -1,0 +1,17 @@
+<div class="content">
+  <div class="center"> 
+      <div class="content-box">
+
+        <h1>Create Post</h1>
+        <form class="form" [formGroup]="newPostForm" (ngSubmit)="onSubmit(newPostForm.value)">
+            <label for="newPostTitle">Title</label>
+             <br>
+            <textarea name="newPostTitle" formControlName="title" style="width:100%;" rows=2 required minlength="4"></textarea><br>
+            <label for="newPostDesc">Description</label>
+            <br>
+            <textarea  name="newPostDesc" formControlName="cont" style="width:100%;" rows=20 ></textarea><br>
+            <button class="button" type="submit" [disabled]="!newPostForm.valid">Submit</button>
+        </form>
+    </div>
+    </div>
+</div>

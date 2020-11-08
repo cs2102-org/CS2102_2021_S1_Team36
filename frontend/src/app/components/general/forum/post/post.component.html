@@ -1,0 +1,37 @@
+<div class="content">
+  <div class="column-left"> 
+      <div class="content-box">
+        <div class="content-box-2">
+            <h1 style="margin: 10px;">{{Post.title}}</h1>
+            <div class="post-desc">{{ Post.cont }}</div>
+            <div class="post-author">{{ Post.name || "[deleted user]"}}</div>
+            <button class="edit-button" type="submit" (click)="edit(Post.post_id)" *ngIf="isLogged && Post.email == flatData.email">Edit</button>
+        </div>
+            <ul class="comments">
+                <li *ngFor="let comment of Comments">
+                    <div style="padding:10px;">
+                        <div class="comments-desc">{{comment.cont}}</div>
+                        <div style="font-size: 10px">{{dateStringify(comment.date_time)}}</div>
+                    </div>
+                    <div class="comments-author">{{comment.name}}
+                    <br>
+                    <button class="delete-button" type="submit" (click)="delete(comment)" style="float: right;" *ngIf="isLogged && comment.email == flatData.email">Delete</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="column-right">
+        <div class="content-box">
+            <div *ngIf="isLogged">
+                <div class="comments-desc">Write a comment:</div>
+                <form class="form" [formGroup]="commentForm" (ngSubmit)="onSubmit(commentForm.value)">
+                    <textarea formControlName="cont" rows="4" style="width:100%" ></textarea><br>
+                    <button class="button" type="submit" style="float: right;">Submit</button>
+                </form>
+            </div>
+            <p *ngIf="!isLogged">Login to comment</p>
+         </div>
+    </div>
+</div>

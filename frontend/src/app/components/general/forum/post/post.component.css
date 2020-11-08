@@ -1,0 +1,114 @@
+.content {
+  background-color: #1e77aa;
+  height: 95vh;
+  width: 100%;
+}
+
+.content-box {
+  border-style: solid;
+  padding: 40px;
+  border-radius: 10px;
+  border-width: thin;
+  box-shadow: 5px 5px 20px;
+  background-color: #f8f8f8;
+}
+
+.center {
+  padding: 2%;
+}
+
+.content-box-2 {
+  padding: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  background-color: rgb(243, 243, 243);
+  box-shadow: 1px 1px 7px 0px rgba(0, 0, 0, 0.5);
+}
+
+.edit-button {
+  background-color: #5eda62;
+  border: none;
+  color: white;
+  float: right;
+}
+
+.edit-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
+
+
+.column-left {
+  width: 50%;
+  padding-top: 2%;
+  padding-left: 10%;
+  padding-right: 2%;
+  float: left;
+  word-wrap: break-word;
+}
+
+.column-right {
+  padding-top: 2%;
+  float: left;
+  border-radius: 10px;
+  width:30%;
+}
+
+
+.header {
+    font-size: 5rem;
+    margin-left: 5%;
+}
+
+.post-desc{
+    padding-top: 1%;
+}
+
+.post-author {
+    text-align: right;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0%;
+}
+
+.comments{
+    overflow-y: auto;
+    height: 40vh;
+}
+
+.comments li {
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+    min-height: 75px;
+    background-color: rgb(127, 221, 255);
+    opacity: 80%;
+    width: 90%;
+    margin-left:9%;
+    box-shadow: 1px 1px 7px 0px rgba(0, 0, 0, 0.5);
+}
+
+
+.comments-author {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+
+.delete-button {
+  background-color: #eb756c;
+  border: none;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #e6e47e !important;
+  color: black;
+}
