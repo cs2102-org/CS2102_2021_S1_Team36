@@ -1208,6 +1208,13 @@ INSERT INTO PetOwners(email) VALUES ('xiaozong@gmail.com');
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('xiaozong@gmail.com', 'daisy', 'daisy needs love!', 'daisy is a Horse', 'Horse');
 INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('xiaozong@gmail.com', 'jerry', 'jerry needs love!', 'jerry is a Dog', 'Dog');
 
+
+
+
+
+
+
+
 INSERT INTO BidsFor VALUES ('felix@gmail.com', 'cassie@gmail.com', 'charlie', '2020-01-01 00:00:00', '2021-11-04', '2021-11-06', 80, 84, NULL, False, '1', '1', NULL, NULL);
 INSERT INTO BidsFor VALUES ('dawson@gmail.com', 'rupert@gmail.com', 'sammy', '2020-01-01 00:00:01', '2021-02-16', '2021-02-21', 87, 91, NULL, False, '1', '1', NULL, NULL);
 INSERT INTO BidsFor VALUES ('ian@gmail.com', 'alice@gmail.com', 'boomer', '2020-01-01 00:00:02', '2022-11-24', '2022-11-26', 72, 89, NULL, False, '1', '1', NULL, NULL);

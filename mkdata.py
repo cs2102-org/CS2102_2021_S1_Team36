@@ -265,4 +265,4 @@ def run():
     print('done')
     print(f'bids={bidCount}')
 
-run()
+#
