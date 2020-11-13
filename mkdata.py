@@ -5,10 +5,11 @@
 import os
 import datetime
 import random
+import csv
 
 outfile = "query2.sql"
 
-# userNames = 'alice alex arnold bob becky beth connor cassie carrie caleb charlie dick dawson emma felix gordon hassan ian jenny konstance rupert ronald romeo rick xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'.split()
+userNames = 'alice alex arnold bob becky beth connor cassie carrie caleb charlie dick dawson emma felix gordon hassan ian jenny konstance rupert ronald romeo rick xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'.split()
 
 types = 'Dog Cat Hamster Mouse Bird Horse Turtle Snake Monkey Lion'.split()
 
@@ -214,6 +215,24 @@ def sqlInsertUser(u):
     return res
 
 
+def readNames():
+    with open('names.csv', 'r') as file:
+        content = csv.reader(file)
+        human_names = []
+        pet_names = []
+
+        for c in content:
+            human_names.append(c[0].lower())
+            pet_names.append(c[2].lower())
+
+        # remove the header row
+        human_names.pop(0)
+        pet_names.pop(0)
+        return human_names, pet_names
+
+# comment this line to use small dataset of names
+userNames, petNames = readNames()  
+
 # make all the users
 users = []
 for un in userNames:
@@ -251,6 +270,9 @@ def getRandomBid(submissionTime):
 
 # makes everything generated into sql
 def run():
+    print(userNames[-1])
+    print(petNames[-1])
+
     N = len(types)
     f = open(outfile, "w");
 
