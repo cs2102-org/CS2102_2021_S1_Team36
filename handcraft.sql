@@ -1,16 +1,21 @@
--- sql for Petowner with a lot of bids
--- names used: alan, ricky, roger, rocky
+-- contains the manually added sql data
+-- used to put in very specific things
+-- to be fully independent from sql_init, need to initialize petowners and caretakers yourself
+-- can assume that PetTypes table is initialized
+-- also, avoid using names that have been used in sql_init
+-- record the names (of Users) used here, so I can exclude from the sql_init data generation:
+-- apple, pearl, carmen, butch, billy, ricky, roger, rocky, panter, peter, patty, patrick, patricia
 
+
+
+-- sql for Petowner with a lot of bids
 -- Alan the swanky owner of three pets
 -- digger the dog
 -- biscuit the bird
 -- cookie the cat
-
 -- He always ask ricky to take care his dog
 -- roger take care his cat
 -- rocky take care his bird
-
-
 
 INSERT INTO Users(name, email, description, password) VALUES ('alan', 'alan@gmail.com', 'alan is a User of PCS', 'alanpw');
 INSERT INTO Petowners(email) VALUES ('alan@gmail.com');
@@ -103,7 +108,6 @@ INSERT INTO BidsFor VALUES ('alan@gmail.com', 'rocky@gmail.com', 'biscuit',
 90, 90,
 True, False, '1', '1', NULL
 );
-
 
 
 
@@ -246,4 +250,79 @@ INSERT INTO BidsFor VALUES ('billy@gmail.com', 'cain@gmail.com', 'biscuit',
 '2020-11-03 00:00:03', '2020-12-01', '2020-12-07',
 90, 95,
 True, True, '1', '1', NULL
+);
+
+
+
+-- Forum
+-- panter, peter, patty, patrick, patricia are discussing stuff
+INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a User of PCS', 'panterpw');
+INSERT INTO Petowners(email) VALUES ('panter@gmail.com');
+
+INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a User of PCS', 'peterpw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('peter@gmail.com', True, 0);
+
+INSERT INTO Users(name, email, description, password) VALUES ('patty', 'patty@gmail.com', 'patty is a User of PCS', 'pattypw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('patty@gmail.com', False, 0);
+
+INSERT INTO Users(name, email, description, password) VALUES ('patrick', 'patrick@gmail.com', 'patrick is a User of PCS', 'patrickpw');
+INSERT INTO Petowners(email) VALUES ('patrick@gmail.com');
+
+INSERT INTO Users(name, email, description, password) VALUES ('patricia', 'patricia@gmail.com', 'patricia is a User of PCS', 'patriciapw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('patricia@gmail.com', True, 0);
+
+INSERT INTO Posts(post_id, email, title, cont) VALUES (1, 'panter@gmail.com', 'How to teach dog to sit',
+'Im trying to teach my dog roger how to sit but he just doesnt get it, any tips?');
+
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'peter@gmail.com', '2020-09-26',
+    'you need to do progressive training, like in NS'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patty@gmail.com', '2020-09-26',
+    'i think you shouldnt own pets if you dont even know this basic stuff'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patrick@gmail.com', '2020-09-26',
+    'dickson dont be mean to people everyoen has to start somewhere'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patricia@gmail.com', '2020-09-27',
+    'have you tried giving him treats every time your dog does it correctly?'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'peter@gmail.com', '2020-09-27',
+    'have you tried beating him with a slipper???'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'panter@gmail.com', '2020-09-27',
+    'noo...i would never hurt my precious dog'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patty@gmail.com', '2020-09-27',
+    'you need to be dominant so your dog knows you are pack leader'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    1, 'patrick@gmail.com', '2020-09-27',
+    'eh pm me i am expert because i watch youtube'
+);
+
+INSERT INTO Posts(post_id, email, title, cont) VALUES (2, 'patty@gmail.com', 'How to make cat like me',
+'why does my cat hate me so much??');
+
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'peter@gmail.com', '2020-09-26',
+    'either it likes you or it doesnt, you can only accept the outcome'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'patricia@gmail.com', '2020-09-26',
+    'I think you need to give her some space'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'panter@gmail.com', '2020-09-26',
+    'hey i have the same problem too'
+);
+INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
+    2, 'peter@gmail.com', '2020-09-27',
+    'Does this work for dogs also?'
 );
