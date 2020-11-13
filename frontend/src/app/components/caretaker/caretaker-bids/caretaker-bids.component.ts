@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
 import { BidService } from 'src/app/services/bid/bid.service';
+import { ConfirmationDialogComponent } from '../../general/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-caretaker-bids',
@@ -29,7 +31,8 @@ export class CaretakerBidsComponent implements OnInit {
   bids: any;
 
   constructor(private bidService: BidService,
-    private titleService: Title) { 
+    private titleService: Title,
+    private dialog: MatDialog) { 
     this.titleService.setTitle('Caretaker');
   }
 
@@ -103,26 +106,33 @@ export class CaretakerBidsComponent implements OnInit {
   }
 
   acceptBid(bid) {
-    this.setBid(bid, true);
-    this.bidService.postAcceptBid(this.bidForm.value).subscribe(msg => {
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
       if (msg) {
-        this.reloadAfterChangeBid();
+        this.setBid(bid, true);
+        this.bidService.postAcceptBid(this.bidForm.value).subscribe(msg => {
+          if (msg) {
+            this.reloadAfterChangeBid();
+          }
+        });
       }
     });
   }
 
   rejectBid(bid) {
-    this.setBid(bid, false);
-    this.bidService.postAcceptBid(this.bidForm.value).subscribe(msg => {
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
       if (msg) {
-      this.reloadAfterChangeBid();
-    }
+        this.setBid(bid, false);
+        this.bidService.postAcceptBid(this.bidForm.value).subscribe(msg => {
+          if (msg) {
+          this.reloadAfterChangeBid();
+        }
+        });
+      }
     });
-  }
-  
-  onSubmit(searchParam) {
-    console.log('SENT');
-    console.log(searchParam);
   }
 
   changeTransferType(bid) {
@@ -166,9 +176,15 @@ export class CaretakerBidsComponent implements OnInit {
   }
 
   postPaid(bid) {
-    this.setBidPaid(bid);
-    this.bidService.postPaidBid(this.bidForm.value).subscribe(msg => {
-      this.reloadAfterChangeBid();
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
+      if (msg) {
+        this.setBidPaid(bid);
+        this.bidService.postPaidBid(this.bidForm.value).subscribe(msg => {
+          this.reloadAfterChangeBid();
+        });
+      }
     });
   }
 }

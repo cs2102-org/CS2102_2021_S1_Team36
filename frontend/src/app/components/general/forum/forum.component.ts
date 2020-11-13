@@ -9,6 +9,8 @@ import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Title } from '@angular/platform-browser';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-forum',
@@ -22,7 +24,8 @@ export class ForumComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    private titleService: Title) { 
+    private titleService: Title,
+    private dialog: MatDialog) { 
     this.titleService.setTitle('Forum');
   }
 
@@ -91,9 +94,16 @@ export class ForumComponent implements OnInit {
   }
 
   delete(details) {
+    event.stopPropagation();
     console.log(details);
-    this.deleteHttp(details).subscribe(x => {
-      this.populatePosts();
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
+      if (msg) {
+        this.deleteHttp(details).subscribe(x => {
+          this.populatePosts();
+        });
+      }
     });
   }
 
