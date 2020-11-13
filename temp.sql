@@ -1,0 +1,10 @@
+INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a User of PCS', 'panterpw');
+INSERT INTO Petowners(email) VALUES ('panter@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('peter', 'peter@gmail.com', 'peter is a User of PCS', 'peterpw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('peter@gmail.com', True, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('patty', 'patty@gmail.com', 'patty is a User of PCS', 'pattypw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('patty@gmail.com', False, 0);
+INSERT INTO Users(name, email, description, password) VALUES ('patrick', 'patrick@gmail.com', 'patrick is a User of PCS', 'patrickpw');
+INSERT INTO Petowners(email) VALUES ('patrick@gmail.com');
+INSERT INTO Users(name, email, description, password) VALUES ('patricia', 'patricia@gmail.com', 'patricia is a User of PCS', 'patriciapw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('patricia@gmail.com', True, 0);

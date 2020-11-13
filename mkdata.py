@@ -1,5 +1,5 @@
 # usage: run python mkdata.py
-# this will generate a file called query.sql containing initial insert statements
+# this will generate a file called query2.sql containing initial insert statements
 # we should .gitignore the query.sql
 
 import os
@@ -37,6 +37,8 @@ reqs = ['needs a lot of care',
         ]
 
 months = list(range(1, 13)) # list repesenting the 12 months
+
+leaveMonths = [1, 2, 6, 7, 11, 12] # months that you can safely take leave
 
 class Pet:
     def __init__(self, name, species):
@@ -107,11 +109,19 @@ def getRandomAvail(yr, length):
             res.append(sd + datetime.timedelta(i))
     return res
 
+def getRandomLeave(yr):
+    numDays = 7
+    mth = random.choice(leaveMonths)
+    sd = datetime.datetime(yr, mth, 1)
+    res = []
+    for i in range(numDays):
+        res.append(sd + datetime.timedelta(i))
+    return res
+
 # adds a random week in 2021 and a random week in 2022 to this User's leave
 def giveLeave(u):
-    leaveLen = 3
-    u.leave.extend(getRandomPeriod(2021, leaveLen))
-    u.leave.extend(getRandomPeriod(2022, leaveLen))
+    u.leave.extend(getRandomLeave(2021))
+    u.leave.extend(getRandomLeave(2022))
 
 # adds random avail in 2021 and in 2022 to this User's avail
 def giveAvail(u):
@@ -266,3 +276,4 @@ def run():
     print(f'bids={bidCount}')
 
 #
+run()
