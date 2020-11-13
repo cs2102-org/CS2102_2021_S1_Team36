@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { BidService } from 'src/app/services/bid/bid.service';
 
 @Component({
@@ -27,7 +28,10 @@ export class CaretakerBidsComponent implements OnInit {
   });
   bids: any;
 
-  constructor(private bidService: BidService) { }
+  constructor(private bidService: BidService,
+    private titleService: Title) { 
+    this.titleService.setTitle('Caretaker');
+  }
 
   ngOnInit(): void {
     this.showAllBids();

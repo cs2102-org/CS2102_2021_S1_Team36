@@ -9,6 +9,7 @@ import { PetownerService } from 'src/app/services/petowner/petowner.service';
 import { NONE_TYPE } from '@angular/compiler';
 import { registerLocaleData } from '@angular/common';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-caretaker-profile',
@@ -40,7 +41,10 @@ export class CaretakerProfileComponent implements OnInit {
               private fb: FormBuilder,
               private authService: AuthService,
               private caretakerService: CaretakerService,
-              private petOwnerService: PetownerService) {
+              private petOwnerService: PetownerService,
+              private titleService: Title) {
+
+    this.titleService.setTitle('Profile');
     this.petForm = this.fb.group({
       name:'',
       petArrays: this.fb.array([]),

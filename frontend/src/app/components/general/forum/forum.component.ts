@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8'
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-forum',
@@ -20,8 +21,10 @@ export class ForumComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    private titleService: Title) { 
+    this.titleService.setTitle('Forum');
+  }
 
   posts;
   flatData = {email:''};

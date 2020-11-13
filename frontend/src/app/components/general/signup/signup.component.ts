@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ValidatorFn, FormGroup, ValidationErrors, FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { LoginComponent } from '../login/login.component';
 
@@ -34,8 +35,10 @@ export class SignupComponent implements OnInit {
   );
   constructor(
     private dialog: MatDialog,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private titleService: Title) { 
+    this.titleService.setTitle('Signup');
+  }
 
   ngOnInit(): void {}
 
