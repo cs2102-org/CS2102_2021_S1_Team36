@@ -8,7 +8,7 @@ import random
 
 outfile = "query2.sql"
 
-userNames = 'alice alex arnold bob becky beth connor cassie carrie caleb charlie dick dawson emma felix gordon hassan ian jenny konstance rupert ronald romeo rick xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'.split()
+# userNames = 'alice alex arnold bob becky beth connor cassie carrie caleb charlie dick dawson emma felix gordon hassan ian jenny konstance rupert ronald romeo rick xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'.split()
 
 types = 'Dog Cat Hamster Mouse Bird Horse Turtle Snake Monkey Lion'.split()
 
