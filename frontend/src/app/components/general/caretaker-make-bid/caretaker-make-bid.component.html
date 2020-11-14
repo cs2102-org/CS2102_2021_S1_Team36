@@ -79,9 +79,11 @@
     <div class="column-right">
         <div class="container-2">
             <h2>Reviews</h2>
-            <div *ngFor="let review of reviews" class="review">
-                <p id="review-body">{{review.review}}</p>
-                <p id="review-user">{{review.name}} Rating: {{review.rating}}</p>
+            <div class="review-container">
+                <div *ngFor="let review of reviews" class="review">
+                    <p id="review-body">{{review.review}}</p>
+                    <p id="review-user">{{review.name}} Rating: {{review.rating}}</p>
+                </div>
             </div>
         </div>
     </div>

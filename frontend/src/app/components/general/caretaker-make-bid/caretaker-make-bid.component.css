@@ -130,3 +130,8 @@ table {
 td {
   padding-left: 10px;
 }
+
+.review-container {
+  overflow-y: auto;
+  height: 70vh;
+}
