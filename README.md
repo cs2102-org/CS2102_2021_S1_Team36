@@ -14,7 +14,7 @@ Before running:
 - `npm run dev` to run the app
 
 ## Heroku
-- https://https://cs2102-fe.herokuapp.com/
+- https://cs2102-fe.herokuapp.com/
 
 ## Demo
 - https://youtu.be/bWRyizxCpzE
