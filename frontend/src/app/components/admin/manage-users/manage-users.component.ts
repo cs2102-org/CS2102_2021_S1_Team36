@@ -11,6 +11,9 @@ import Utf8 from 'crypto-js/enc-utf8'
 import { Router } from '@angular/router';
 import { DetailedPetComponent } from '../detailed-pet/detailed-pet.component';
 import { UpdateBasePriceComponent } from '../update-base-price/update-base-price.component';
+import { Title } from '@angular/platform-browser';
+import { ConfirmationDialogComponent } from '../../general/confirmation-dialog/confirmation-dialog.component';
+
 
 @Component({
   selector: 'app-manage-users',
@@ -34,7 +37,10 @@ export class ManageUsersComponent implements OnInit {
   constructor(private caretakerService: CaretakerService, private dialog: MatDialog,
     private pcsAdminService: PcsadminService,
     private petOwnerService: PetownerService,
-    private router: Router) { }
+    private router: Router,
+    private titleService: Title) { 
+    this.titleService.setTitle('Admin');
+  }
 
   ngOnInit(): void {
     this.getAllAdmins();
@@ -49,7 +55,11 @@ export class ManageUsersComponent implements OnInit {
   toggleDateLeft() {
     this.date.setMonth(this.date.getMonth() - 1);
     this.setMonthYear();
-    this.getAllCaretakers();
+    if (this.showType == 'Caretakers') {
+      this.getAllCaretakers();
+    } else if (this.showType == 'Pet Types') {
+      this.getAllPetTypes();
+    }
   }
 
   toggleDateRight() {
@@ -59,7 +69,11 @@ export class ManageUsersComponent implements OnInit {
     } else {
       this.date.setMonth(this.date.getMonth() + 1);
       this.setMonthYear();
-      this.getAllCaretakers();
+      if (this.showType == 'Caretakers') {
+        this.getAllCaretakers();
+      } else if (this.showType == 'Pet Types') {
+        this.getAllPetTypes();
+      }
     }
   }
 
@@ -105,7 +119,8 @@ export class ManageUsersComponent implements OnInit {
   }
 
   getAllPetTypes() {
-    this.pcsAdminService.getListOfPetTypes().subscribe(petTypes => {
+    this.pcsAdminService.getListOfPetTypes(this.getCurrentRange()).subscribe(petTypes => {
+      console.log(petTypes);
       if (this.showType != "Pet Types") {
         this.msg = '';
       }
@@ -185,16 +200,28 @@ export class ManageUsersComponent implements OnInit {
   }
 
   deleteUser(email) {
-    this.pcsAdminService.deleteUser(email).subscribe(msg => {
-      this.refreshAfterChange();
-      this.msg = email + "(account) successfully deleted";
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
+      if (msg) {
+        this.pcsAdminService.deleteUser(email).subscribe(msg => {
+          this.refreshAfterChange();
+          this.msg = email + "(account) successfully deleted";
+        });
+      }
     });
   }
 
   deletePetType(species) {
-    this.pcsAdminService.deletePetType(species).subscribe(msg => {
-      this.refreshAfterChange();
-      this.msg = species + "(pet type) successfully deleted";
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
+      if (msg) {
+        this.pcsAdminService.deletePetType(species).subscribe(msg => {
+          this.refreshAfterChange();
+          this.msg = species + "(pet type) successfully deleted";
+        });
+      }
     });
   }
 

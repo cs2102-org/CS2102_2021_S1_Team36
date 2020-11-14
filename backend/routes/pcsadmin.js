@@ -144,14 +144,15 @@ pcsRouter.post('/supply', async (req, res) => {
     return res.status(200).json(msql.rows);
 });
 
-pcsRouter.post('/supplyanddemand', async (req, res) => {
-    const { start_date, end_date } = req.body;
+pcsRouter.get('/supplyanddemand/:start_date/:end_date', async (req, res) => {
+    const { start_date, end_date } = req.params;
+    console.log(start_date, end_date);
     const msql = await pool.query(
         "select * from \
             ( \
             select \
                 species, \
-                base_price, \
+                base_price, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count, \
                 ( \
                     select SUM(pet_limit) as supply from ( \
                         select getPetLimit(email) as pet_limit from takecareprice \

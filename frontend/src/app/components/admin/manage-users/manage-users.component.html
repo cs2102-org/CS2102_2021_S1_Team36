@@ -72,19 +72,29 @@
 
             <div *ngIf="showType ==='Pet Types'">
             <button (click)="openNewTypeForm()">Add New PetType</button>
-            <div class="spacing"></div>
+            <div style="text-align:center">
+                <button (click)="toggleDateLeft()" class="button-date"><</button>
+                <h2 style="display:inline-block">{{month}} {{year}}</h2>
+                <button (click)="toggleDateRight()" class="button-date">></button>
+            </div>
             <div class="container">
             <table>
                 <tr>
                     <th class="theader">Pet Type</th>
                     <th class="theader">Base Price</th>
-                    <th class="theader">Quantity</th>
+                    <th class="theader">Qty</th>
+                    <th class="theader">Total Supply(Pet Days)</th>
+                    <th class="theader">Total Demand(Pet Days)</th>
+                    <th class="theader">Avg Demand/Day</th>
                     <th class="theader"></th>
                 </tr>
                 <tr *ngFor="let pt of things">
                     <td class="td-pads">{{pt.species}}</td>
                     <td class="td-pads">${{pt.base_price}}</td>
                     <td class="td-pads">{{pt.count}}</td>
+                    <td class="td-pads">{{pt.supply}}</td>
+                    <td class="td-pads">{{pt.total_demand}}</td>
+                    <td class="td-pads">{{pt.avg_demand}}</td>
                     <th width="10%">
                         <button class="show-button" (click)=updateBasePrice(pt)>Update</button>
                         <button class="delete-button" (click)=deletePetType(pt.species)>Delete</button>
