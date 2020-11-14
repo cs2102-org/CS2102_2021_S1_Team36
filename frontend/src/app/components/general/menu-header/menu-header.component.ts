@@ -30,7 +30,8 @@ export class MenuHeaderComponent implements OnInit {
         if (message == "Login success") {
           this.isLogged=true;
           this.checkAccess();
-        } else {
+        } else if (message == "Signup success") {
+        }else {
           this.isLogged=false;
         }
       });
