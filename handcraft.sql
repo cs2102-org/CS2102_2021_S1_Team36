@@ -205,7 +205,7 @@ True, True, '1', '1', 5
 -- Carmen Hamster harry, Mouse mickey
 -- Butch Bird biscuit
 -- Billy Bird biscuit
-
+-- give him avail on months 10, 11, 12 of 2020
 INSERT INTO Users(name, email, description, password) VALUES ('cain', 'cain@gmail.com', 'cain is a User of PCS', 'cainpw');
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cain@gmail.com', False, 0);
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'cain@gmail.com', 'Dog');
@@ -213,6 +213,98 @@ INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'cain@gmail.
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'cain@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'cain@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (90, 'cain@gmail.com', 'Bird');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-31');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-31');
 
 INSERT INTO Users(name, email, description, password) VALUES ('apple', 'apple@gmail.com', 'apple is a User of PCS', 'applepw');
 INSERT INTO Petowners(email) VALUES ('apple@gmail.com');
@@ -331,6 +423,8 @@ INSERT INTO BidsFor VALUES ('billy@gmail.com', 'cain@gmail.com', 'biscuit',
 90, 95,
 True, True, '1', '1', NULL
 );
+
+
 
 
 

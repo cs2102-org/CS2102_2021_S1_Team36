@@ -946,7 +946,6 @@ CREATE TRIGGER trigger_update_price_on_base_price_change
     EXECUTE PROCEDURE updatePriceOnBasePriceChange();
 
 
---==================================================== first half of trigger ====================================================
 
 
 
@@ -966,9 +965,20 @@ CREATE TRIGGER trigger_update_price_on_base_price_change
 
 
 
+--==================================================== end first half of trigger ====================================================
 
 
--- ======================================= GENERATED DATA =======================================
+--==================================================== GENERATED DATA HERE ====================================================
+
+
+
+
+
+
+
+
+
+
 INSERT INTO PetTypes(species, base_price) VALUES ('Dog', 50);
 INSERT INTO PetTypes(species, base_price) VALUES ('Cat', 60);
 INSERT INTO PetTypes(species, base_price) VALUES ('Hamster', 70);
@@ -10402,7 +10412,16 @@ INSERT INTO BidsFor VALUES ('gui@gmail.com', 'shem@gmail.com', 'persy', '2020-01
 
 
 
--- ======================================= END GENERATED DATA =======================================
+
+
+
+
+
+
+
+--==================================================== END GENERATED DATA HERE ====================================================
+
+-- ================================================ second half of triggers ================================================
 
 
 
@@ -10420,6 +10439,162 @@ INSERT INTO BidsFor VALUES ('gui@gmail.com', 'shem@gmail.com', 'persy', '2020-01
 
 
 
+
+
+
+
+--users covering constraint
+CREATE OR REPLACE FUNCTION check_user_covering() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    uncovered_user VARCHAR(30);
+BEGIN 
+    SELECT email INTO uncovered_user
+    FROM Users u
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM PetOwners p
+        WHERE p.email = u.email
+    )
+    AND
+    NOT EXISTS (
+        SELECT 1
+        FROM CareTakers c
+        WHERE c.email = u.email
+    )
+    AND 
+    NOT EXISTS (
+        SELECT 1
+        FROM PcsAdmins pcs
+        WHERE pcs.email = u.email
+    );
+    
+    IF uncovered_user IS NOT NULL THEN 
+        RAISE exception 'user % must belong to one user type', uncovered_user;
+    END IF;
+    RETURN NULL;
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS user_cover_trigger ON Users;
+CREATE CONSTRAINT TRIGGER user_cover_trigger
+    AFTER INSERT ON Users
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_user_covering();
+
+-- admin + petowner overlap constraint
+CREATE OR REPLACE FUNCTION check_admin_petowner_overlap() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    overlap_user VARCHAR(30);
+BEGIN
+    SELECT pcs.email into overlap_user
+    FROM PcsAdmins pcs, PetOwners p
+    WHERE pcs.email = p.email;
+
+    IF overlap_user IS NOT NULL THEN
+        RAISE exception '% should not be both PCS Admin and Pet Owner', overlap_user;
+    END IF;
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS petowner_overlap_trigger ON PetOwners;
+CREATE TRIGGER petowner_overlap_trigger
+    AFTER INSERT ON PetOwners
+    EXECUTE PROCEDURE check_admin_petowner_overlap();
+
+DROP TRIGGER IF EXISTS pcs_petowner_overlap_trigger ON PcsAdmins;
+CREATE TRIGGER pcs_petowner_overlap_trigger
+    AFTER INSERT ON PcsAdmins
+    EXECUTE PROCEDURE check_admin_petowner_overlap();
+
+-- admin + caretaker overlap constraint
+CREATE OR REPLACE FUNCTION check_admin_caretaker_overlap() RETURNS TRIGGER
+    AS $$
+DECLARE 
+    overlap_user VARCHAR(30);
+BEGIN
+    SELECT pcs.email into overlap_user
+    FROM PcsAdmins pcs, CareTakers c
+    WHERE pcs.email = c.email;
+
+    IF overlap_user IS NOT NULL THEN
+        RAISE exception '% should not be both PCS Admin and CareTaker', overlap_user;
+    END IF;
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS caretaker_overlap_trigger ON CareTakers;
+CREATE TRIGGER caretaker_overlap_trigger
+    AFTER INSERT ON CareTakers
+    EXECUTE PROCEDURE check_admin_caretaker_overlap();
+
+DROP TRIGGER IF EXISTS pcs_caretaker_overlap_trigger ON PcsAdmins;
+CREATE TRIGGER pcs_caretaker_overlap_trigger
+    AFTER INSERT ON PcsAdmins
+    EXECUTE PROCEDURE check_admin_caretaker_overlap();
+
+-- trigger: prevent adding bid when you have no avail date (Part Time)
+CREATE OR REPLACE FUNCTION block_inserting_bid_part_time()
+RETURNS trigger
+language plpgsql
+as
+$$
+BEGIN
+	IF EXISTS (
+        select 1 from CareTakers
+        where 
+            email = NEW.caretaker_email and is_fulltime = false
+    ) 
+    AND
+    EXISTS (
+		select generate_series(NEW.start_date, NEW.end_date, '1 day'::interval)::date as work_date
+		EXCEPT
+		select work_date from PartTimeAvail where email = NEW.caretaker_email
+	) THEN
+		RAISE EXCEPTION 'Part time worker does not have availability on this date';
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_block_inserting_bid_part_time on BidsFor;
+CREATE TRIGGER trigger_block_inserting_bid_part_time
+    BEFORE INSERT ON BidsFor
+    FOR EACH ROW
+    EXECUTE PROCEDURE block_inserting_bid_part_time();
+
+-- ============================================= end second half of triggers ========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- ============================================ HANDCRAFTED DATA ============================================
 
 
 
@@ -10631,7 +10806,7 @@ True, True, '1', '1', 5
 -- Carmen Hamster harry, Mouse mickey
 -- Butch Bird biscuit
 -- Billy Bird biscuit
-
+-- give him avail on months 10, 11, 12 of 2020
 INSERT INTO Users(name, email, description, password) VALUES ('cain', 'cain@gmail.com', 'cain is a User of PCS', 'cainpw');
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('cain@gmail.com', False, 0);
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'cain@gmail.com', 'Dog');
@@ -10639,6 +10814,98 @@ INSERT INTO TakecarePrice(daily_price, email, species) VALUES (100, 'cain@gmail.
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'cain@gmail.com', 'Hamster');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (80, 'cain@gmail.com', 'Mouse');
 INSERT INTO TakecarePrice(daily_price, email, species) VALUES (90, 'cain@gmail.com', 'Bird');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-10-31');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-11-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-01');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-02');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-03');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-04');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-05');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-06');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-07');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-08');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-09');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-10');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-11');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-12');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-13');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-14');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-15');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-16');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-17');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-18');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-19');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-20');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-21');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-22');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-23');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-24');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-25');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-26');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-27');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-28');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-29');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-30');
+INSERT INTO PartTimeAvail(email, work_date) VALUES ('cain@gmail.com', '2020-12-31');
 
 INSERT INTO Users(name, email, description, password) VALUES ('apple', 'apple@gmail.com', 'apple is a User of PCS', 'applepw');
 INSERT INTO Petowners(email) VALUES ('apple@gmail.com');
@@ -10760,6 +11027,8 @@ True, True, '1', '1', NULL
 
 
 
+
+
 -- Forum
 -- panter, peter, patty, patrick, patricia are discussing stuff
 INSERT INTO Users(name, email, description, password) VALUES ('panter', 'panter@gmail.com', 'panter is a User of PCS', 'panterpw');
@@ -10832,3 +11101,7 @@ INSERT INTO Comments(post_id, email, date_time, cont) VALUES (
     2, 'peter@gmail.com', '2020-09-27',
     'Does this work for dogs also?'
 );
+
+
+
+
