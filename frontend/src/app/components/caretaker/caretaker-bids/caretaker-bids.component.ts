@@ -96,9 +96,9 @@ export class CaretakerBidsComponent implements OnInit {
   reloadAfterChangeBid(){
     if (this.showType === "")  {
       this.showAllBids();
-    } else if (this.showType === "done") {
+    } else if (this.showType === "Done") {
       this.showDoneBids();
-    } else if (this.showType === "pending") {
+    } else if (this.showType === "Pending") {
       this.showPendingBids();
     } else {
       this.showRejectedBids();
