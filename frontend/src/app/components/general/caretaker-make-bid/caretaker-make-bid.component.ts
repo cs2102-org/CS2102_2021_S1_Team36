@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarOptions, FullCalendarComponent, isDateSpansEqual, sliceEventStore } from '@fullcalendar/angular';
 import Base64 from 'crypto-js/enc-base64';
@@ -8,6 +9,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { BidService } from 'src/app/services/bid/bid.service';
 import { CaretakerService } from 'src/app/services/caretaker/caretaker.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-caretaker-make-bid',
@@ -63,7 +65,8 @@ export class CaretakerMakeBidComponent implements OnInit {
     private route: ActivatedRoute,
     private petOwnerService: PetownerService,
     private authService: AuthService,
-    private bidService: BidService) { }
+    private bidService: BidService,
+    private dialog: MatDialog) { }
 
   ngOnInit(): void {
     let aDate = new Date();
@@ -196,15 +199,21 @@ export class CaretakerMakeBidComponent implements OnInit {
   }
 
   onSubmit(bidForm) {
-    bidForm.controls['submission_time'].setValue(new Date());
-    bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
-    bidForm.controls['amount_bidded'].setValue(bidForm.get('amount_bidded').value / this.numberOfBidDays);
-    this.bidService.postBid(bidForm.value).subscribe(status => {
-      if (status) {
-        this.bidForm.reset();
-        this.bidSuccess=true;
+    const ref = this.dialog.open(ConfirmationDialogComponent);
+    ref.disableClose = true;
+    ref.afterClosed().subscribe(msg => {
+      if (msg) {
+        bidForm.controls['submission_time'].setValue(new Date());
+        bidForm.controls['caretaker_email'].setValue(this.caretaker.email);
+        bidForm.controls['amount_bidded'].setValue(bidForm.get('amount_bidded').value / this.numberOfBidDays);
+        this.bidService.postBid(bidForm.value).subscribe(status => {
+          if (status) {
+            this.bidForm.reset();
+            this.bidSuccess=true;
+          }
+        }); 
       }
-    });
+    })
   }
 
   selectBidDate(selectionInfo) {

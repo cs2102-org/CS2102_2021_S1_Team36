@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import { cpuUsage } from 'process';
 import { BidService } from 'src/app/services/bid/bid.service';
@@ -24,7 +25,10 @@ export class PetOwnerSummaryComponent implements OnInit {
 
   bids;
 
-  constructor(private bidService: BidService, private dialog: MatDialog) { }
+  constructor(private bidService: BidService, private dialog: MatDialog,
+    private titleService: Title) { 
+    this.titleService.setTitle('Pet Owner');
+  }
 
   ngOnInit(): void {
     this.getEventsOnCalendar();

@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { SubmitRatingComponent } from '../submit-rating/submit-rating.component';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-pet-owner-bids',
@@ -21,7 +22,10 @@ export class PetOwnerBidsComponent implements OnInit {
   petTypes: any;
 
   constructor(private bidService: BidService, private router: Router, private dialog: MatDialog,
-    private petOwnerService: PetownerService) { }
+    private petOwnerService: PetownerService,
+    private titleService: Title) { 
+    this.titleService.setTitle('Pet Owner');
+  }
 
   ngOnInit(): void {
     this.showAllBids();

@@ -8,6 +8,7 @@ import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { PetownerService } from 'src/app/services/petowner/petowner.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-caretaker-availability-page',
@@ -52,7 +53,10 @@ export class CaretakerAvailabilityPageComponent implements OnInit {
   isLogged: boolean = false;
 
   constructor(private caretakerService: CaretakerService, private router: Router,
-    private authService: AuthService, private petOwnerService: PetownerService) { }
+    private authService: AuthService, private petOwnerService: PetownerService,
+    private titleService: Title) { 
+    this.titleService.setTitle('Find Caretakers');
+  }
 
   ngOnInit(): void {
     let aDate = new Date();

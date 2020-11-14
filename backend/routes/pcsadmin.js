@@ -144,6 +144,54 @@ pcsRouter.post('/supply', async (req, res) => {
     return res.status(200).json(msql.rows);
 });
 
+pcsRouter.get('/supplyanddemand/:start_date/:end_date', async (req, res) => {
+    const { start_date, end_date } = req.params;
+    console.log(start_date, end_date);
+    const msql = await pool.query(
+        "select * from \
+            ( \
+            select \
+                species, \
+                base_price, (select COUNT(*) from Pets P2 where P2.species = P1.species) as count, \
+                ( \
+                    select SUM(pet_limit) as supply from ( \
+                        select getPetLimit(email) as pet_limit from takecareprice \
+                            where \
+                                species = P1.species \
+                    ) as PL \
+                ) as supply \
+            from \
+                Pettypes P1 order by species asc) SupplySubquery \
+            NATURAL JOIN ( \
+            select \
+	            species, \
+            	COUNT(*) as num_days, \
+            	SUM(demand) as total_demand, \
+            	(SUM(demand) / COUNT(*))::DECIMAL(10, 2) as avg_demand \
+            from ( \
+            	select \
+            		species, \
+            		datez, \
+            		( \
+            			select COUNT(*) \
+            			from \
+        	    			bidsFor natural join (select email as owner_email, pet_name, species from pets) SP \
+        			        where \
+        				        clash(start_date, end_date, DDates.datez) and \
+        				        species = DP1.species \
+        		    ) as demand \
+        	    from \
+        		    petTypes DP1, \
+        		    (select generate_series($1::date, $2::date, '1 day'::interval)::date as datez) DDates \
+            ) DQ1 \
+            GROUP BY species \
+            ) as DemandSubquery \
+        ",
+        [start_date, end_date],
+    );
+    return res.status(200).json(msql.rows);
+});
+
 pcsRouter.get('/pet-types', async (req, res) => {
     try {
         const msql = await pool.query(

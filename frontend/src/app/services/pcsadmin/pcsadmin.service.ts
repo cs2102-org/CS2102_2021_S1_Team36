@@ -14,8 +14,10 @@ export class PcsadminService {
     return this.http.get(baseurl + '/api/pcs-admins/admins', httpOptions);
   }
 
-  public getListOfPetTypes(): Observable<any> {
-    return this.http.get(baseurl + '/api/pcs-admins/pet-types', httpOptions);
+  public getListOfPetTypes(details): Observable<any> {
+    const start = details[0];
+    const end = details[1];
+    return this.http.get(baseurl + '/api/pcs-admins/supplyanddemand/' + start + "/" + end, httpOptions);
   }
 
   public deleteUser(details): Observable<any> {

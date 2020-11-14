@@ -39,6 +39,7 @@ import { CaretakerProfileComponent } from './components/caretaker/caretaker-prof
 import { FormNewPetTypeComponent } from './components/admin/form-new-pet-type/form-new-pet-type.component';
 import { DeleteLeaveAvailComponent } from './components/caretaker/delete-leave-avail/delete-leave-avail.component';
 import { UpdateBasePriceComponent } from './components/admin/update-base-price/update-base-price.component';
+import { ConfirmationDialogComponent } from './components/general/confirmation-dialog/confirmation-dialog.component';
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -74,7 +75,8 @@ FullCalendarModule.registerPlugins([
     PostComponent,
     CreatePostComponent,
     EditPostComponent,
-    UpdateBasePriceComponent
+    UpdateBasePriceComponent,
+    ConfirmationDialogComponent
   ],
   imports: [
     BrowserModule,

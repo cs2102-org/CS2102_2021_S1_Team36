@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
 import { CalendarOptions, FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { BidService } from 'src/app/services/bid/bid.service';
@@ -45,7 +46,10 @@ export class CaretakerSummaryPageComponent implements OnInit {
   movingDate;
 
   constructor(private caretakerService: CaretakerService, private bidService: BidService
-    , private dialog: MatDialog) { }
+    , private dialog: MatDialog,
+    private titleService: Title) { 
+    this.titleService.setTitle('Caretaker');
+  }
 
   ngOnInit(): void {
     this.checkFullTime();
