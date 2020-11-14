@@ -46,7 +46,7 @@ export class PetOwnerSummaryComponent implements OnInit {
   }
 
   getEventsOnCalendar() {
-    this.bidService.getBids().subscribe(bids => {
+    this.bidService.getDoneBids().subscribe(bids => {
       let id = 1;
       const bidsUpdated = bids.map(bid => {bid.id = id++; return bid;});
       const copyBids =JSON.parse(JSON.stringify(bidsUpdated));
