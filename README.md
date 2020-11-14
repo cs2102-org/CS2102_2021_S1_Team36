@@ -17,4 +17,4 @@ Before running:
 - https://cs2102-fe.herokuapp.com/
 
 ## Demo
-- https://youtu.be/HUvVSV-RpT0
+- https://youtu.be/y9yy57lyGsk
