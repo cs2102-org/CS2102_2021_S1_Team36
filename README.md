@@ -12,3 +12,9 @@ Before running:
 - `npm install` to install packages
 - `psql -f sql_init/init.sql` to create database
 - `npm run dev` to run the app
+
+## Heroku
+- https://https://cs2102-fe.herokuapp.com/
+
+## Demo
+- https://youtu.be/bWRyizxCpzE
