@@ -24,7 +24,7 @@ export class PostComponent implements OnInit {
     private router: Router,
   ) { }
 
-  flatData;
+  flatData = {"email": ''};
   showInput = false;
   Comments;
   Post = {

@@ -80,12 +80,10 @@ ul {
 
 .striations li {
   background-color: rgb(187, 188, 189);
-  opacity: 80%;
 }
 
 .striations li:nth-child(odd) {
   background-color: rgb(243, 243, 243);
-  opacity: 80%;
 }
 
 .striations li:hover {
