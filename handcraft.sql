@@ -4,7 +4,7 @@
 -- can assume that PetTypes table is initialized
 -- also, avoid using names that have been used in sql_init
 -- record the names (of Users) used here, so I can exclude from the sql_init data generation:
--- apple, pearl, carmen, butch, billy, ricky, roger, rocky, panter, peter, patty, patrick, patricia
+-- apple, pearl, carmen, butch, billy, ricky, roger, rocky, panter, peter, patty, patrick, patricia, nala, bob, buddy, brutus
 
 
 

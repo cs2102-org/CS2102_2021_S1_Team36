@@ -7,21 +7,27 @@ import datetime
 import random
 import csv
 
+# global params
 outfile = "query2.sql"
 
-userNames = 'alice alex arnold bob becky beth connor cassie carrie caleb charlie dick dawson emma felix gordon hassan ian jenny konstance rupert ronald romeo rick xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'.split()
+numUsers = 1000 # change to use less Users. To have no limit, put 1000
+
+# part time caretaker is randomly given some blocks of leave (numAvailBlocks), each of which is of length (availBlockLen)
+numAvailBlocks = 1 # integer between 0 to 12
+availBlockLen = 1 # integer between 0 to 28
+
+# full time caretaker is given one block of leave (of length leaveBlockLen) randomly in the year.
+leaveBlockLen = 3 # integer between 0 to 7. Larger integer may result in invalid leave
+
+maxPetsPerOwner = 5 # petowner will have random amount of pets, up to this integer
+maxCareForPerCaretaker = 5 # caretaker can take care of random amount of pets, up to this integer
+numBids = 100 # how many bids to randomly generate. Bids are all in the future.
 
 types = 'Dog Cat Hamster Mouse Bird Horse Turtle Snake Monkey Lion'.split()
 
 basePrices = dict(zip(types, range(50, 50 + 10*len(types), 10)))
 
-moreNames = 'cassie carrie carl carlos caren canneth cain carmen cejudo celine cevan catarth columbus xiaoping xiaoming xiaodong xiaolong xiaobao xiaorong xiaohong xiaozong'
-
-petNames = ['roger', 'boomer', 'jerry', 'tom', 'felix', 'roscoe', 'sammy',
-            'cloud', 'millie', 'rufus', 'axa', 'abby', 'alfie', 'bandit', 'biscuit', 'buster',
-            'chad', 'charlie', 'chewie', 'chippy', 'choco', 'daisy',
-            'digger', 'fergie', 'fido', 'freddie', 'ginger', 'gizmo', 'gus', 'hugo',
-            'jacky', 'jake', 'jaxson', 'logan', 'lucky', 'maddie']
+reservedUserNames = 'apple, pearl, carmen, butch, billy, ricky, roger, rocky, panter, peter, patty, patrick, patricia, nala, bob, buddy, brutus'.split()
 
 reqs = ['needs a lot of care',
         'needs alone time',
@@ -40,6 +46,25 @@ reqs = ['needs a lot of care',
 months = list(range(1, 13)) # list repesenting the 12 months
 
 leaveMonths = [1, 2, 6, 7, 11, 12] # months that you can safely take leave
+
+def readNames():
+    with open('names.csv', 'r') as file:
+        content = csv.reader(file)
+        human_names = []
+        pet_names = []
+
+        for c in content:
+            human_names.append(c[0].lower())
+            pet_names.append(c[2].lower())
+
+        # remove the header row
+        human_names.pop(0)
+        pet_names.pop(0)
+        return human_names, pet_names
+
+userNames, petNames = readNames()
+userNames = list(set(userNames).difference(reservedUserNames))
+userNames = userNames[ : numUsers]
 
 class Pet:
     def __init__(self, name, species):
@@ -99,23 +124,21 @@ def getRandomPeriod(yr, length):
         xs.append(firstDay + datetime.timedelta(i))
     return xs
 
-# returns adds numBlocks random day blocks of given length in the yr
-def getRandomAvail(yr, length):
-    numBlocks = 2
-    mths = random.sample(months, numBlocks)
+# returns a set of random avail dates
+def getRandomAvail(yr):
+    mths = random.sample(months, numAvailBlocks)
     res = []
     for m in mths:
         sd = datetime.datetime(yr, m, 1)
-        for i in range(length):
+        for i in range(availBlockLen):
             res.append(sd + datetime.timedelta(i))
     return res
 
 def getRandomLeave(yr):
-    numDays = 7
     mth = random.choice(leaveMonths)
     sd = datetime.datetime(yr, mth, 1)
     res = []
-    for i in range(numDays):
+    for i in range(leaveBlockLen):
         res.append(sd + datetime.timedelta(i))
     return res
 
@@ -126,15 +149,14 @@ def giveLeave(u):
 
 # adds random avail in 2021 and in 2022 to this User's avail
 def giveAvail(u):
-    availLen = 5
-    u.avail.extend(getRandomAvail(2021, availLen))
-    u.avail.extend(getRandomAvail(2022, availLen))
+    u.avail.extend(getRandomAvail(2021))
+    u.avail.extend(getRandomAvail(2022))
 
 # give User u a random set of animals he can care for
 # if u is part time, we randomly choose some daily price
 # else, use the global basePrice
 def giveCareFor(u):
-    num = random.randint(2, 5) # from 1 to 5 pets
+    num = random.randint(1, maxCareForPerCaretaker)
     careList = random.sample(types, num)
     if u.isFCT:
         for animal in careList:
@@ -146,7 +168,7 @@ def giveCareFor(u):
 
 # gives User u some random pets
 def givePOData(u):
-    numPets = random.randint(1, 5) # from 1 to 5 pets
+    numPets = random.randint(1, maxPetsPerOwner)
     u.pets = makePets(numPets)
 
 # gives u pets that u can take care of
@@ -214,24 +236,7 @@ def sqlInsertUser(u):
             res += f"INSERT INTO PartTimeAvail(email, work_date) VALUES ('{u.email}', '{s}');\n"
     return res
 
-
-def readNames():
-    with open('names.csv', 'r') as file:
-        content = csv.reader(file)
-        human_names = []
-        pet_names = []
-
-        for c in content:
-            human_names.append(c[0].lower())
-            pet_names.append(c[2].lower())
-
-        # remove the header row
-        human_names.pop(0)
-        pet_names.pop(0)
-        return human_names, pet_names
-
-# comment this line to use small dataset of names
-userNames, petNames = readNames()  
+# =============================== generation ==============================================
 
 # make all the users
 users = []
@@ -268,6 +273,24 @@ def getRandomBid(submissionTime):
     else:
         return False
 
+# random bid, for a fixed petowner
+def getRandomBidFor(submissionTime, petowner):
+    yr = random.choice([2021, 2022])
+    bidPeriod = getRandomPeriod(yr, random.randint(1, 7))
+    sd = bidPeriod[0].strftime("%Y-%m-%d")
+    ed = bidPeriod[-1].strftime("%Y-%m-%d")
+    
+    pet = random.choice(petowner.pets)
+
+    if len(animalCaretakers[pet.species]) > 0:
+        caretaker = random.choice(animalCaretakers[pet.species])
+        dailyPrice = caretaker.caresFor[pet.species]
+        amountBidded = dailyPrice + random.randint(0, 30) # randomly bid higher
+    
+        return f"INSERT INTO BidsFor VALUES ('{petowner.email}', '{caretaker.email}', '{pet.name}', '{submissionTime}', '{sd}', '{ed}', {dailyPrice}, {amountBidded}, NULL, False, '1', '1', NULL, NULL);\n"
+    else:
+        return False
+
 # makes everything generated into sql
 def run():
     print(userNames[-1])
@@ -283,8 +306,9 @@ def run():
         f.write(sqlInsertUser(u))
         f.write("\n")
 
+    # generate random bids
     bidCount = 0
-    for i in range(100):
+    for i in range(numBids):
         start = datetime.datetime(2020, 1, 1)
         t = start + datetime.timedelta(seconds=i)
         b = getRandomBid(t.strftime('%Y-%m-%d %H:%M:%S'))
@@ -295,7 +319,8 @@ def run():
 
     f.close()
     print('done')
-    print(f'bids={bidCount}')
+    print(f"number of users={len(userNames)}")
+    print(f'successful bids={bidCount}')
 
 #
 run()
