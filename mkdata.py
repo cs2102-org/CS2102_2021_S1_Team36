@@ -6,6 +6,8 @@ import os
 import datetime
 import random
 import csv
+from templatewriter import firstHalf
+from templatewriter import secondHalf
 
 # global params
 outfile = "query2.sql"
@@ -293,11 +295,16 @@ def getRandomBidFor(submissionTime, petowner):
 
 # makes everything generated into sql
 def run():
-    print(userNames[-1])
-    print(petNames[-1])
+    #delete file contents
+    f = open(outfile, "w")
+    f.close()
 
+    #write first half of sql init file
+    firstHalf(outfile, 'a+')
+
+    #write bulk generated data
     N = len(types)
-    f = open(outfile, "w");
+    f = open(outfile, "a+")
 
     f.write(sqlInsertPetTypes())
     f.write("\n")
@@ -316,8 +323,11 @@ def run():
             bidCount += 1
             f.write(b)
     f.write("\n")
-
     f.close()
+
+    #write 2nd half of sql init file
+    secondHalf(outfile, 'a+')
+
     print('done')
     print(f"number of users={len(userNames)}")
     print(f'successful bids={bidCount}')

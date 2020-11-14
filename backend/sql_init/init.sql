@@ -967,18 +967,6 @@ CREATE TRIGGER trigger_update_price_on_base_price_change
 
 --==================================================== end first half of trigger ====================================================
 
-
---==================================================== GENERATED DATA HERE ====================================================
-
-
-
-
-
-
-
-
-
-
 INSERT INTO PetTypes(species, base_price) VALUES ('Dog', 50);
 INSERT INTO PetTypes(species, base_price) VALUES ('Cat', 60);
 INSERT INTO PetTypes(species, base_price) VALUES ('Hamster', 70);
@@ -989,6 +977,8 @@ INSERT INTO PetTypes(species, base_price) VALUES ('Turtle', 110);
 INSERT INTO PetTypes(species, base_price) VALUES ('Snake', 120);
 INSERT INTO PetTypes(species, base_price) VALUES ('Monkey', 130);
 INSERT INTO PetTypes(species, base_price) VALUES ('Lion', 140);
+
+--==================================================== GENERATED DATA HERE ====================================================
 
 INSERT INTO Users(name, email, description, password) VALUES ('allyce', 'allyce@gmail.com', 'A user of PCS', 'allycepw');
 INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('allyce@gmail.com', False, 0);
@@ -10412,32 +10402,9 @@ INSERT INTO BidsFor VALUES ('gui@gmail.com', 'shem@gmail.com', 'persy', '2020-01
 
 
 
-
-
-
-
-
-
-
 --==================================================== END GENERATED DATA HERE ====================================================
 
 -- ================================================ second half of triggers ================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -4,3 +4,4 @@ node_modules
 # todo: remove this later
 db.js
 query.sql
+__pycache__/templatewriter.cpython-37.pyc
