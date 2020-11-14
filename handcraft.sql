@@ -13,9 +13,10 @@
 -- digger the dog
 -- biscuit the bird
 -- cookie the cat
--- He always ask ricky to take care his dog
--- roger take care his cat
--- rocky take care his bird
+-- He always ask :
+    -- ricky to take care his dog
+    -- roger take care his cat
+    -- rocky take care his bird
 
 INSERT INTO Users(name, email, description, password) VALUES ('alan', 'alan@gmail.com', 'alan is a User of PCS', 'alanpw');
 INSERT INTO Petowners(email) VALUES ('alan@gmail.com');
@@ -109,6 +110,85 @@ INSERT INTO BidsFor VALUES ('alan@gmail.com', 'rocky@gmail.com', 'biscuit',
 True, False, '1', '1', NULL
 );
 
+
+
+-- recommended caretakers for alan, owner of 3 pets
+-- nala, similar pet owner to alan. owns:
+    -- doobs the dog
+    -- cauchy the cat
+    -- barbie the bird
+-- 3 common caretakers: ricky, roger, rocky
+-- recommended cts: bob, buddy, brutus
+
+-- make nala
+INSERT INTO Users(name, email, description, password) VALUES ('nala', 'nala@gmail.com', 'nala is a User of PCS', 'nalapw');
+INSERT INTO Petowners(email) VALUES ('nala@gmail.com');
+
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('nala@gmail.com', 'doobs', 'doobs needs love!', 'doobs is a Dog', 'Dog');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('nala@gmail.com', 'cauchy', 'cauchy needs love!', 'cauchy is a Cat', 'Cat');
+INSERT INTO Pets(email, pet_name, special_requirements, description, species) VALUES ('nala@gmail.com', 'barbie', 'barbie needs love!', 'barbie is a Bird', 'Bird');
+
+-- boost rating with roger (cat ct) for alan
+INSERT INTO BidsFor VALUES ('alan@gmail.com', 'roger@gmail.com', 'cookie',
+'2020-09-01 00:00:02', '2020-09-02', '2020-09-03',
+60, 60,
+True, True, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('alan@gmail.com', 'roger@gmail.com', 'cookie',
+'2020-09-02 00:00:02', '2020-09-05', '2020-09-06',
+60, 60,
+True, True, '1', '1', 5
+);
+-- boost rating with rocky (bird ct) for alan
+INSERT INTO BidsFor VALUES ('alan@gmail.com', 'rocky@gmail.com', 'biscuit',
+'2020-09-13 00:00:03', '2020-09-14', '2020-09-15',
+90, 90,
+True, True, '1', '1', 5
+);
+--make nala similar to alan
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'ricky@gmail.com', 'doobs',
+'2020-08-01 00:00:01', '2020-08-25', '2020-08-28',
+50, 50,
+True, True, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'roger@gmail.com', 'cauchy',
+'2020-08-15 00:00:02', '2020-08-20', '2020-08-22',
+60, 60,
+True, True, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'rocky@gmail.com', 'barbie',
+'2020-08-13 00:00:03', '2020-08-23', '2020-08-24',
+90, 90,
+True, True, '1', '1', 5
+);
+--make recommended cts: 
+INSERT INTO Users(name, email, description, password) VALUES ('bob', 'bob@gmail.com', 'bob is a User of PCS', 'bobpw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('bob@gmail.com', True, 0);--??rating should be 0 or NULL?
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (50, 'bob@gmail.com', 'Dog');
+
+INSERT INTO Users(name, email, description, password) VALUES ('buddy', 'buddy@gmail.com', 'buddy is a User of PCS', 'buddypw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('buddy@gmail.com', True, 0);
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (60, 'buddy@gmail.com', 'Cat');
+
+INSERT INTO Users(name, email, description, password) VALUES ('brutus', 'brutus@gmail.com', 'brutus is a User of PCS', 'brutuspw');
+INSERT INTO Caretakers(email, is_fulltime, rating) VALUES ('brutus@gmail.com', True, 0);
+INSERT INTO TakecarePrice(daily_price, email, species) VALUES (90, 'brutus@gmail.com', 'Bird');
+-- nala hire the 3 recommended cts before
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'bob@gmail.com', 'doobs',
+'2020-07-01 00:00:01', '2020-07-25', '2020-07-28',
+50, 50,
+True, True, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'buddy@gmail.com', 'cauchy',
+'2020-08-15 00:00:02', '2020-08-20', '2020-08-22',
+60, 60,
+True, True, '1', '1', 5
+);
+INSERT INTO BidsFor VALUES ('nala@gmail.com', 'brutus@gmail.com', 'barbie',
+'2020-08-13 00:00:03', '2020-08-23', '2020-08-24',
+90, 90,
+True, True, '1', '1', 5
+);
 
 
 -- parttime caretaker with a lot of jobs 
