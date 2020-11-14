@@ -27,7 +27,7 @@ types = 'Dog Cat Hamster Mouse Bird Horse Turtle Snake Monkey Lion'.split()
 
 basePrices = dict(zip(types, range(50, 50 + 10*len(types), 10)))
 
-reservedUserNames = 'apple, pearl, carmen, butch, billy, ricky, roger, rocky, panter, peter, patty, patrick, patricia, nala, bob, buddy, brutus'.split()
+reservedUserNames = 'apple pearl carmen butch billy ricky roger rocky panter peter patty patrick patricia nala bob buddy brutus'.split()
 
 reqs = ['needs a lot of care',
         'needs alone time',
