@@ -1,6 +1,12 @@
 # pcs
 CS2102 Pet Care Center 
 
+## Tech Stack
+- Angular
+- Node.js
+- Express
+- PostgreSQL
+
 ## Backend Setup
 
 1) Create `.env` file in `backend` folder
@@ -18,3 +24,13 @@ Before running:
 
 ## Demo
 - https://youtu.be/y9yy57lyGsk
+
+## Screenshots
+Home Page
+![Home Page](./screenshots/Home.png "Home")
+
+Bidding Page
+![Bidding Page](./screenshots/Bidding.png "Title")
+
+Admin Page
+![Admin Page](./screenshots/Admin.png "Title")
